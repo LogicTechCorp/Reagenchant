@@ -20,10 +20,16 @@ package logictechcorp.reagenchant;
 import logictechcorp.libraryex.IModData;
 import logictechcorp.libraryex.proxy.IProxy;
 import net.minecraft.creativetab.CreativeTabs;
+import net.minecraft.init.Blocks;
+import net.minecraft.item.ItemStack;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.SidedProxy;
-import net.minecraftforge.fml.common.event.*;
+import net.minecraftforge.fml.common.event.FMLInitializationEvent;
+import net.minecraftforge.fml.common.event.FMLPostInitializationEvent;
+import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -40,6 +46,16 @@ public class Reagenchant implements IModData
 
     @SidedProxy(clientSide = "logictechcorp.reagenchant.proxy.ClientProxy", serverSide = "logictechcorp.reagenchant.proxy.ServerProxy")
     public static IProxy proxy;
+
+    private static final CreativeTabs CREATIVE_TAB = new CreativeTabs(MOD_ID)
+    {
+        @Override
+        @SideOnly(Side.CLIENT)
+        public ItemStack createIcon()
+        {
+            return new ItemStack(Blocks.ENCHANTING_TABLE);
+        }
+    };
 
     public static final Logger LOGGER = LogManager.getLogger("Reagenchant");
 
@@ -70,7 +86,7 @@ public class Reagenchant implements IModData
     @Override
     public CreativeTabs getCreativeTab()
     {
-        return CreativeTabs.DECORATIONS;
+        return CREATIVE_TAB;
     }
 
     @Override
