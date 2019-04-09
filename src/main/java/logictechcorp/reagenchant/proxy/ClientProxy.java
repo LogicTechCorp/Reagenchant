@@ -18,8 +18,11 @@
 package logictechcorp.reagenchant.proxy;
 
 import logictechcorp.libraryex.proxy.IProxy;
+import logictechcorp.reagenchant.client.renderer.tileentity.TileEntityReagentTableRenderer;
+import logictechcorp.reagenchant.tileentity.TileEntityReagentTable;
 import net.minecraft.client.Minecraft;
 import net.minecraft.world.World;
+import net.minecraftforge.fml.client.registry.ClientRegistry;
 
 public class ClientProxy implements IProxy
 {
@@ -28,6 +31,7 @@ public class ClientProxy implements IProxy
     @Override
     public void preInit()
     {
+        ClientRegistry.bindTileEntitySpecialRenderer(TileEntityReagentTable.class, new TileEntityReagentTableRenderer());
     }
 
     @Override

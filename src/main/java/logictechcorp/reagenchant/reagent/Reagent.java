@@ -17,8 +17,6 @@
 
 package logictechcorp.reagenchant.reagent;
 
-import com.google.common.collect.ImmutableList;
-import com.google.common.collect.ImmutableMap;
 import logictechcorp.reagenchant.api.reagent.IReagent;
 import net.minecraft.enchantment.Enchantment;
 import net.minecraft.enchantment.EnchantmentData;
@@ -28,6 +26,7 @@ import net.minecraft.init.Items;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.ResourceLocation;
+import net.minecraft.util.Tuple;
 import net.minecraft.util.Util;
 import net.minecraft.util.WeightedRandom;
 import net.minecraft.util.math.BlockPos;
@@ -40,7 +39,7 @@ public class Reagent implements IReagent
 {
     private final Item associatedItem;
     private final ResourceLocation name;
-    private final Map<Enchantment, Float> enchantments = new HashMap<>();
+    private final Map<Integer, Tuple<Float, Integer>> enchantments = new HashMap<>();
 
     public Reagent(Item associatedItem, ResourceLocation name)
     {
@@ -49,16 +48,16 @@ public class Reagent implements IReagent
     }
 
     @Override
-    public void addEnchantment(Enchantment enchantment, float probability)
+    public void addEnchantment(Enchantment enchantment, float probability, int reagentCost)
     {
-        this.enchantments.put(enchantment, probability);
+        this.enchantments.put(Enchantment.getEnchantmentID(enchantment), new Tuple<>(probability, reagentCost));
     }
 
     @Override
-    public List<EnchantmentData> buildEnchantmentList(World world, BlockPos pos, EntityPlayer player, ItemStack unenchantedStack, ItemStack reagentStack, int enchantmentTier, int enchantmentLevel, boolean allowTreasure, Random rand)
+    public List<EnchantmentData> createEnchantmentList(World world, BlockPos pos, EntityPlayer player, ItemStack unenchantedStack, ItemStack reagentStack, int enchantmentTier, int enchantmentLevel, boolean allowTreasure, Random random)
     {
         List<EnchantmentData> refinedEnchantmentData = new ArrayList<>();
-        int enchantability = this.getAssociatedItem().getItemEnchantability(unenchantedStack);
+        int enchantability = unenchantedStack.getItem().getItemEnchantability(unenchantedStack);
 
         if(enchantability <= 0)
         {
@@ -66,35 +65,42 @@ public class Reagent implements IReagent
         }
         else
         {
-            enchantmentLevel = enchantmentLevel + 1 + rand.nextInt(enchantability / 4 + 1) + rand.nextInt(enchantability / 4 + 1);
-            float enchantmentMultiplier = (rand.nextFloat() + rand.nextFloat() - 1.0F) * 0.15F;
+            enchantmentLevel = enchantmentLevel + 1 + random.nextInt(enchantability / 4 + 1) + random.nextInt(enchantability / 4 + 1);
+            float enchantmentMultiplier = (random.nextFloat() + random.nextFloat() - 1.0F) * 0.15F;
             enchantmentLevel = MathHelper.clamp(Math.round((float) enchantmentLevel + (float) enchantmentLevel * enchantmentMultiplier), 1, Integer.MAX_VALUE);
 
             List<EnchantmentData> aggregateEnchantmentData = new ArrayList<>();
 
-            for(Enchantment enchantment : this.getApplicableEnchantments(world, pos, player, unenchantedStack, reagentStack, enchantmentTier, enchantmentLevel, rand))
+            for(Enchantment enchantment : this.getApplicableEnchantments(world, pos, player, unenchantedStack, reagentStack, random))
             {
-                if(this.getEnchantmentProbability(world, pos, player, enchantment) > rand.nextFloat())
+                if((!enchantment.isTreasureEnchantment() || allowTreasure) && (enchantment.canApplyAtEnchantingTable(unenchantedStack) || (unenchantedStack.getItem() == Items.BOOK && enchantment.isAllowedOnBooks())))
                 {
-                    if((!enchantment.isTreasureEnchantment() || allowTreasure) && (enchantment.canApplyAtEnchantingTable(unenchantedStack) || (unenchantedStack.getItem() == Items.BOOK && enchantment.isAllowedOnBooks())))
+                    for(int maxEnchantmentLevel = enchantment.getMaxLevel(); maxEnchantmentLevel > enchantment.getMinLevel() - 1; maxEnchantmentLevel--)
                     {
-                        for(int maxEnchantmentLevel = enchantment.getMaxLevel(); maxEnchantmentLevel > enchantment.getMinLevel() - 1; maxEnchantmentLevel--)
+                        if(enchantmentLevel >= enchantment.getMinEnchantability(maxEnchantmentLevel) && enchantmentLevel <= enchantment.getMaxEnchantability(maxEnchantmentLevel))
                         {
-                            if(enchantmentLevel >= enchantment.getMinEnchantability(maxEnchantmentLevel) && enchantmentLevel <= enchantment.getMaxEnchantability(maxEnchantmentLevel))
+                            EnchantmentData enchantmentData = new EnchantmentData(enchantment, maxEnchantmentLevel);
+
+                            float probability = this.getEnchantmentProbability(world, pos, player, unenchantedStack, reagentStack, enchantmentData, random);
+                            float randFloat = random.nextFloat();
+
+                            if(probability < randFloat)
                             {
-                                aggregateEnchantmentData.add(new EnchantmentData(enchantment, maxEnchantmentLevel));
-                                break;
+                                aggregateEnchantmentData.add(enchantmentData);
                             }
+
+                            break;
                         }
                     }
                 }
+
             }
 
             if(!aggregateEnchantmentData.isEmpty())
             {
-                refinedEnchantmentData.add(WeightedRandom.getRandomItem(rand, aggregateEnchantmentData));
+                refinedEnchantmentData.add(WeightedRandom.getRandomItem(random, aggregateEnchantmentData));
 
-                while(rand.nextInt(50) <= enchantmentLevel)
+                while(random.nextInt(50) <= enchantmentLevel)
                 {
                     EnchantmentHelper.removeIncompatible(aggregateEnchantmentData, Util.getLastElement(refinedEnchantmentData));
 
@@ -103,7 +109,7 @@ public class Reagent implements IReagent
                         break;
                     }
 
-                    refinedEnchantmentData.add(WeightedRandom.getRandomItem(rand, aggregateEnchantmentData));
+                    refinedEnchantmentData.add(WeightedRandom.getRandomItem(random, aggregateEnchantmentData));
                     enchantmentLevel /= 2;
                 }
             }
@@ -113,9 +119,9 @@ public class Reagent implements IReagent
     }
 
     @Override
-    public boolean hasApplicableEnchantments(World world, BlockPos pos, EntityPlayer player, ItemStack unenchantedStack, ItemStack reagentStack, int enchantmentTier, int enchantmentLevel, Random rand)
+    public boolean hasApplicableEnchantments(World world, BlockPos pos, EntityPlayer player, ItemStack unenchantedStack, ItemStack reagentStack, Random random)
     {
-        for(Enchantment enchantment : this.getAssociatedEnchantments().keySet())
+        for(Enchantment enchantment : this.getAssociatedEnchantments())
         {
             if(enchantment.canApplyAtEnchantingTable(unenchantedStack))
             {
@@ -127,9 +133,9 @@ public class Reagent implements IReagent
     }
 
     @Override
-    public boolean consumeReagent(World world, BlockPos pos, EntityPlayer player, ItemStack enchantedStack, ItemStack reagentStack, int enchantmentTier, int enchantmentLevel, List<EnchantmentData> enchantmentData, Random rand)
+    public boolean consumeReagent(World world, BlockPos pos, EntityPlayer player, ItemStack enchantedStack, ItemStack reagentStack, List<EnchantmentData> enchantmentData, Random random)
     {
-        return this.hasApplicableEnchantments(world, pos, player, enchantedStack, reagentStack, enchantmentTier, enchantmentLevel, rand);
+        return this.hasApplicableEnchantments(world, pos, player, enchantedStack, reagentStack, random);
     }
 
     @Override
@@ -145,17 +151,24 @@ public class Reagent implements IReagent
     }
 
     @Override
-    public ImmutableMap<Enchantment, Float> getAssociatedEnchantments()
+    public List<Enchantment> getAssociatedEnchantments()
     {
-        return ImmutableMap.copyOf(this.enchantments);
+        List<Enchantment> associatedEnchantments = new ArrayList<>();
+
+        for(Integer id : this.enchantments.keySet())
+        {
+            associatedEnchantments.add(Enchantment.getEnchantmentByID(id));
+        }
+
+        return associatedEnchantments;
     }
 
     @Override
-    public ImmutableList<Enchantment> getApplicableEnchantments(World world, BlockPos pos, EntityPlayer player, ItemStack unenchantedStack, ItemStack reagentStack, int enchantmentTier, int enchantmentLevel, Random rand)
+    public List<Enchantment> getApplicableEnchantments(World world, BlockPos pos, EntityPlayer player, ItemStack unenchantedStack, ItemStack reagentStack, Random random)
     {
         List<Enchantment> enchantments = new ArrayList<>();
 
-        for(Enchantment enchantment : this.getAssociatedEnchantments().keySet())
+        for(Enchantment enchantment : this.getAssociatedEnchantments())
         {
             if(enchantment.canApplyAtEnchantingTable(unenchantedStack))
             {
@@ -163,12 +176,32 @@ public class Reagent implements IReagent
             }
         }
 
-        return ImmutableList.copyOf(enchantments);
+        return enchantments;
     }
 
     @Override
-    public float getEnchantmentProbability(World world, BlockPos pos, EntityPlayer player, Enchantment enchantment)
+    public float getBaseEnchantmentProbability(Enchantment enchantment)
     {
-        return this.enchantments.getOrDefault(enchantment, 0.0F);
+        Tuple<Float, Integer> data = this.enchantments.get(Enchantment.getEnchantmentID(enchantment));
+        return data == null ? 0.0F : data.getFirst();
+    }
+
+    @Override
+    public float getEnchantmentProbability(World world, BlockPos pos, EntityPlayer player, ItemStack unenchantedStack, ItemStack reagentStack, EnchantmentData enchantmentData, Random random)
+    {
+        return this.getBaseEnchantmentProbability(enchantmentData.enchantment);
+    }
+
+    @Override
+    public int getBaseReagentCost(Enchantment enchantment)
+    {
+        Tuple<Float, Integer> data = this.enchantments.get(Enchantment.getEnchantmentID(enchantment));
+        return data == null ? 1 : data.getSecond();
+    }
+
+    @Override
+    public int getReagentCost(World world, BlockPos pos, EntityPlayer player, ItemStack unenchantedStack, ItemStack reagentStack, EnchantmentData enchantmentData, Random random)
+    {
+        return this.getBaseReagentCost(enchantmentData.enchantment);
     }
 }

@@ -19,23 +19,29 @@ package logictechcorp.reagenchant;
 
 import logictechcorp.libraryex.IModData;
 import logictechcorp.libraryex.proxy.IProxy;
+import logictechcorp.reagenchant.handler.GuiHandler;
+import logictechcorp.reagenchant.init.ReagenchantReagents;
 import net.minecraft.creativetab.CreativeTabs;
-import net.minecraft.init.Blocks;
-import net.minecraft.item.ItemStack;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.SidedProxy;
 import net.minecraftforge.fml.common.event.FMLInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPostInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
+import net.minecraftforge.fml.common.network.NetworkRegistry;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 @Mod(modid = Reagenchant.MOD_ID, name = Reagenchant.NAME, version = Reagenchant.VERSION, dependencies = Reagenchant.DEPENDENCIES)
 public class Reagenchant implements IModData
 {
+    //TODO
+    // Change registry
+    // Fix probability
+    // Fix possibility of no enchantments
+    // Fix Enchantment hint
+    // Decide how to handle Treasure Enchantments
+
     public static final String MOD_ID = "reagenchant";
     public static final String NAME = "Reagenchant";
     public static final String VERSION = "1.0.0";
@@ -47,21 +53,13 @@ public class Reagenchant implements IModData
     @SidedProxy(clientSide = "logictechcorp.reagenchant.proxy.ClientProxy", serverSide = "logictechcorp.reagenchant.proxy.ServerProxy")
     public static IProxy proxy;
 
-    private static final CreativeTabs CREATIVE_TAB = new CreativeTabs(MOD_ID)
-    {
-        @Override
-        @SideOnly(Side.CLIENT)
-        public ItemStack createIcon()
-        {
-            return new ItemStack(Blocks.ENCHANTING_TABLE);
-        }
-    };
-
     public static final Logger LOGGER = LogManager.getLogger("Reagenchant");
 
     @Mod.EventHandler
     public void onFMLPreInitialization(FMLPreInitializationEvent event)
     {
+        NetworkRegistry.INSTANCE.registerGuiHandler(this, new GuiHandler());
+        ReagenchantReagents.initReagents();
         proxy.preInit();
     }
 
@@ -86,7 +84,7 @@ public class Reagenchant implements IModData
     @Override
     public CreativeTabs getCreativeTab()
     {
-        return CREATIVE_TAB;
+        return CreativeTabs.DECORATIONS;
     }
 
     @Override

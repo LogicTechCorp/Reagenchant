@@ -47,17 +47,17 @@ public class ReagentRegistry
         {
             IReagent registeredReagent = REAGENTS.get(associatedItem);
 
-            for(Map.Entry<Enchantment, Float> entry : reagent.getAssociatedEnchantments().entrySet())
+            for(Enchantment enchantment : reagent.getAssociatedEnchantments())
             {
-                Enchantment enchantment = entry.getKey();
-                float probability = entry.getValue();
-
-                if(registeredReagent.getAssociatedEnchantments().containsKey(enchantment))
+                if(registeredReagent.getAssociatedEnchantments().contains(enchantment))
                 {
                     continue;
                 }
 
-                registeredReagent.addEnchantment(enchantment, probability);
+                float baseEnchantmentProbability = reagent.getBaseEnchantmentProbability(enchantment);
+                int baseReagentCost = reagent.getBaseReagentCost(enchantment);
+
+                registeredReagent.addEnchantment(enchantment, baseEnchantmentProbability, baseReagentCost);
             }
 
             return;

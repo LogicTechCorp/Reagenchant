@@ -17,8 +17,6 @@
 
 package logictechcorp.reagenchant.api.reagent;
 
-import com.google.common.collect.ImmutableList;
-import com.google.common.collect.ImmutableMap;
 import net.minecraft.enchantment.Enchantment;
 import net.minecraft.enchantment.EnchantmentData;
 import net.minecraft.entity.player.EntityPlayer;
@@ -39,10 +37,11 @@ public interface IReagent
     /**
      * Called to associate an Enchantment with this Reagent.
      *
-     * @param enchantment The Enchantment to be associated with the Reagent
-     * @param probability The probability of the Enchantment being picked
+     * @param enchantment                The Enchantment to be associated with the Reagent.
+     * @param baseEnchantmentProbability The base probability for the Enchantment being applied.
+     * @param baseReagentCost            The base Reagent cost required to apply the Enchantment.
      */
-    void addEnchantment(Enchantment enchantment, float probability);
+    void addEnchantment(Enchantment enchantment, float baseEnchantmentProbability, int baseReagentCost);
 
     /**
      * Returns a list of the Enchantments that are to be applied to the unenchantedStack.
@@ -55,10 +54,10 @@ public interface IReagent
      * @param enchantmentTier  The tier of the enchantment from 1 to 3.
      * @param enchantmentLevel The level of the enchantment from 1 to 30.
      * @param allowTreasure    Whether treasure enchantments can be applied to the unenchantedStack.
-     * @param rand             The random number generator.
+     * @param random           The random number generator.
      * @return A list of the Enchantments that are going to be applied.
      */
-    List<EnchantmentData> buildEnchantmentList(World world, BlockPos pos, EntityPlayer player, ItemStack unenchantedStack, ItemStack reagentStack, int enchantmentTier, int enchantmentLevel, boolean allowTreasure, Random rand);
+    List<EnchantmentData> createEnchantmentList(World world, BlockPos pos, EntityPlayer player, ItemStack unenchantedStack, ItemStack reagentStack, int enchantmentTier, int enchantmentLevel, boolean allowTreasure, Random random);
 
     /**
      * Called to check if this Reagent has Enchantments that are applicable to the unenchantedStack.
@@ -68,28 +67,24 @@ public interface IReagent
      * @param player           The player that is using the Enchantment Table.
      * @param unenchantedStack The Itemstack that is being enchanted.
      * @param reagentStack     The Itemstack that contains the Reagent.
-     * @param enchantmentTier  The tier of the enchantment from 1 to 3.
-     * @param enchantmentLevel The level of the enchantment from 1 to 30.
-     * @param rand             The random number generator.
+     * @param random           The random number generator.
      * @return Whether the Reagent has Enchantments that are applicable to the unenchantedStack.
      */
-    boolean hasApplicableEnchantments(World world, BlockPos pos, EntityPlayer player, ItemStack unenchantedStack, ItemStack reagentStack, int enchantmentTier, int enchantmentLevel, Random rand);
+    boolean hasApplicableEnchantments(World world, BlockPos pos, EntityPlayer player, ItemStack unenchantedStack, ItemStack reagentStack, Random random);
 
     /**
-     * Called after the Enchantments are applied and right before the Reagent is consumed.
+     * Called after the Enchantments are applied to determine if the Reagent is consumed.
      *
-     * @param world            The world the Enchantment Table is in.
-     * @param pos              The position of the Enchantment Table.
-     * @param player           The player that is using the Enchantment Table.
-     * @param enchantedStack   The Itemstack that is being enchanted.
-     * @param reagentStack     The Itemstack that contains the Reagent.
-     * @param enchantmentTier  The tier of the enchantment from 1 to 3.
-     * @param enchantmentLevel The level of the enchantment from 1 to 30.
-     * @param enchantmentData  The Enchantments that were applied.
-     * @param rand             The random number generator.
+     * @param world           The world the Enchantment Table is in.
+     * @param pos             The position of the Enchantment Table.
+     * @param player          The player that is using the Enchantment Table.
+     * @param enchantedStack  The Itemstack that is being enchanted.
+     * @param reagentStack    The Itemstack that contains the Reagent.
+     * @param enchantmentData The Enchantments that were applied.
+     * @param random          The random number generator.
      * @return Whether the Reagent item is consumed.
      */
-    boolean consumeReagent(World world, BlockPos pos, EntityPlayer player, ItemStack enchantedStack, ItemStack reagentStack, int enchantmentTier, int enchantmentLevel, List<EnchantmentData> enchantmentData, Random rand);
+    boolean consumeReagent(World world, BlockPos pos, EntityPlayer player, ItemStack enchantedStack, ItemStack reagentStack, List<EnchantmentData> enchantmentData, Random random);
 
     /**
      * Returns the item that is associated with this Reagent.
@@ -106,35 +101,69 @@ public interface IReagent
     ResourceLocation getName();
 
     /**
-     * Returns a map containing the associated Enchantments and their base probabilities.
+     * Returns a list containing the associated Enchantments.
      *
-     * @return A map containing the associated Enchantments and their base probabilities.
+     * @return A list containing the associated Enchantments.
      */
-    ImmutableMap<Enchantment, Float> getAssociatedEnchantments();
+    List<Enchantment> getAssociatedEnchantments();
 
     /**
-     * Returns a list containing the Enchantments that can be applied to the unenchantedStack.
+     * Called when creating the list of Enchantments that can be applied to the unenchantedStack and allows for modification of said list.
+     * Enchantments are removed from the list if they are not compatible with another Enchantment in the list.
      *
      * @param world            The world the Enchantment Table is in.
      * @param pos              The position of the Enchantment Table.
      * @param player           The player that is using the Enchantment Table.
      * @param unenchantedStack The Itemstack that is being enchanted.
      * @param reagentStack     The Itemstack that contains the Reagent.
-     * @param enchantmentTier  The tier of the enchantment from 1 to 3.
-     * @param enchantmentLevel The level of the enchantment from 1 to 30.
-     * @param rand             The random number generator.
+     * @param random           The random number generator.
      * @return A list containing the Enchantments that can be applied to the unenchantedStack.
      */
-    ImmutableList<Enchantment> getApplicableEnchantments(World world, BlockPos pos, EntityPlayer player, ItemStack unenchantedStack, ItemStack reagentStack, int enchantmentTier, int enchantmentLevel, Random rand);
+    List<Enchantment> getApplicableEnchantments(World world, BlockPos pos, EntityPlayer player, ItemStack unenchantedStack, ItemStack reagentStack, Random random);
 
     /**
-     * Returns the probability of the Enchantment being applied.
+     * Returns the base probability for the Enchantment being applied.
      *
-     * @param world       The world the Enchantment Table is in.
-     * @param pos         The position of the Enchantment Table in the world.
-     * @param player      The player that is using the Enchantment Table.
-     * @param enchantment The Enchantment that the probability is for.
+     * @param enchantment The Enchantment to get the probability for.
+     * @return The base probability for the Enchantment being applied.
+     */
+    float getBaseEnchantmentProbability(Enchantment enchantment);
+
+    /**
+     * Called when creating the list of Enchantments that can be applied to the unenchantedStack and allows for modification of the base probability.
+     * Enchantments are not added to the list if their base probability is not met.
+     *
+     * @param world            The world the Enchantment Table is in.
+     * @param pos              The position of the Enchantment Table in the world.
+     * @param player           The player that is using the Enchantment Table.
+     * @param unenchantedStack The Itemstack that is being enchanted.
+     * @param reagentStack     The Itemstack that contains the Reagent.
+     * @param enchantmentData  The Enchantment that the probability is for.
+     * @param random           The random number generator.
      * @return The probability of the Enchantment being applied.
      */
-    float getEnchantmentProbability(World world, BlockPos pos, EntityPlayer player, Enchantment enchantment);
+    float getEnchantmentProbability(World world, BlockPos pos, EntityPlayer player, ItemStack unenchantedStack, ItemStack reagentStack, EnchantmentData enchantmentData, Random random);
+
+    /**
+     * The base Reagent cost required to apply the Enchantment.
+     *
+     * @param enchantment The Enchantment to get the Reagent cost for.
+     * @return The base Reagent cost required to apply the Enchantment.
+     */
+    int getBaseReagentCost(Enchantment enchantment);
+
+    /**
+     * Called when applying Enchantments to the unenchantedStack and allows for modification of the base Reagent cost.
+     * Enchantments are not applied if their Reagent cost is not met.
+     *
+     * @param world            The world the Enchantment Table is in.
+     * @param pos              The position of the Enchantment Table.
+     * @param player           The player that is using the Enchantment Table.
+     * @param unenchantedStack The Itemstack that is being enchanted.
+     * @param reagentStack     The Itemstack that contains the Reagent.
+     * @param enchantmentData  The Enchantment that is going to be applied.
+     * @param random           The random number generator.
+     * @return The amount of Reagents required to apply the Enchantment.
+     */
+    int getReagentCost(World world, BlockPos pos, EntityPlayer player, ItemStack unenchantedStack, ItemStack reagentStack, EnchantmentData enchantmentData, Random random);
 }

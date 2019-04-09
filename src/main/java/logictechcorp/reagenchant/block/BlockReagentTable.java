@@ -20,16 +20,17 @@ package logictechcorp.reagenchant.block;
 import logictechcorp.libraryex.block.BlockTileEntity;
 import logictechcorp.libraryex.block.builder.BlockBuilder;
 import logictechcorp.reagenchant.Reagenchant;
-import logictechcorp.reagenchant.tileentity.TileEntityReagenchantTable;
+import logictechcorp.reagenchant.handler.GuiHandler;
+import logictechcorp.reagenchant.tileentity.TileEntityReagentTable;
 import net.minecraft.block.material.MapColor;
 import net.minecraft.block.material.Material;
 import net.minecraft.block.state.BlockFaceShape;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.init.Blocks;
 import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
-import net.minecraft.tileentity.TileEntityEnchantmentTable;
 import net.minecraft.util.EnumBlockRenderType;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.EnumHand;
@@ -43,13 +44,13 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 
 import java.util.Random;
 
-public class BlockReagenchantTable extends BlockTileEntity<TileEntityReagenchantTable>
+public class BlockReagentTable extends BlockTileEntity<TileEntityReagentTable>
 {
     protected static final AxisAlignedBB AABB = new AxisAlignedBB(0.0D, 0.0D, 0.0D, 1.0D, 0.75D, 1.0D);
 
-    public BlockReagenchantTable()
+    public BlockReagentTable()
     {
-        super(Reagenchant.getResource("reagenchant_table"), TileEntityReagenchantTable.class, new BlockBuilder(Material.ROCK, MapColor.RED).hardness(5.0F).resistance(2000.0F).creativeTab(Reagenchant.instance.getCreativeTab()));
+        super(Blocks.ENCHANTING_TABLE.getRegistryName(), TileEntityReagentTable.class, new BlockBuilder(Material.ROCK, MapColor.RED).hardness(5.0F).resistance(2000.0F).creativeTab(Reagenchant.instance.getCreativeTab()));
         this.setLightOpacity(0);
     }
 
@@ -130,9 +131,9 @@ public class BlockReagenchantTable extends BlockTileEntity<TileEntityReagenchant
         {
             TileEntity tileEntity = world.getTileEntity(pos);
 
-            if(tileEntity instanceof TileEntityReagenchantTable)
+            if(tileEntity instanceof TileEntityReagentTable)
             {
-                player.displayGui((TileEntityReagenchantTable) tileEntity);
+                player.openGui(Reagenchant.instance, GuiHandler.REAGENT_TABLE_ID, world, pos.getX(), pos.getY(), pos.getZ());
             }
 
             return true;
@@ -140,17 +141,17 @@ public class BlockReagenchantTable extends BlockTileEntity<TileEntityReagenchant
     }
 
     @Override
-    public void onBlockPlacedBy(World worldIn, BlockPos pos, IBlockState state, EntityLivingBase placer, ItemStack stack)
+    public void onBlockPlacedBy(World world, BlockPos pos, IBlockState state, EntityLivingBase placer, ItemStack stack)
     {
-        super.onBlockPlacedBy(worldIn, pos, state, placer, stack);
+        super.onBlockPlacedBy(world, pos, state, placer, stack);
 
         if(stack.hasDisplayName())
         {
-            TileEntity tileentity = worldIn.getTileEntity(pos);
+            TileEntity tileentity = world.getTileEntity(pos);
 
-            if(tileentity instanceof TileEntityEnchantmentTable)
+            if(tileentity instanceof TileEntityReagentTable)
             {
-                ((TileEntityEnchantmentTable) tileentity).setCustomName(stack.getDisplayName());
+                ((TileEntityReagentTable) tileentity).setCustomName(stack.getDisplayName());
             }
         }
     }

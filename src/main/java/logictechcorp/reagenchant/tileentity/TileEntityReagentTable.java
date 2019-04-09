@@ -18,11 +18,7 @@
 package logictechcorp.reagenchant.tileentity;
 
 import logictechcorp.libraryex.tileentity.TileEntityInventory;
-import logictechcorp.reagenchant.Reagenchant;
 import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.entity.player.InventoryPlayer;
-import net.minecraft.inventory.Container;
-import net.minecraft.inventory.ContainerEnchantment;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.ITickable;
@@ -30,26 +26,25 @@ import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.TextComponentString;
 import net.minecraft.util.text.TextComponentTranslation;
-import net.minecraft.world.IInteractionObject;
 
 import java.util.Random;
 
-public class TileEntityReagenchantTable extends TileEntityInventory implements ITickable, IInteractionObject
+public class TileEntityReagentTable extends TileEntityInventory implements ITickable
 {
     private int tickCounter;
     private float pageFlip;
     private float pageFlipPrev;
-    private float flipT;
-    private float flipA;
+    private float flipRandom;
+    private float flipTurn;
     private float bookSpread;
     private float bookSpreadPrev;
     private float bookRotation;
     private float bookRotationPrev;
-    private float tRot;
-    private static final Random rand = new Random();
+    private float offsetRotation;
     private String customName;
+    private static final Random rand = new Random();
 
-    public TileEntityReagenchantTable()
+    public TileEntityReagentTable()
     {
         super(3);
     }
@@ -57,7 +52,7 @@ public class TileEntityReagenchantTable extends TileEntityInventory implements I
     @Override
     public boolean acceptsItemStack(ItemStack stack)
     {
-        return false;
+        return true;
     }
 
     @Override
@@ -71,18 +66,18 @@ public class TileEntityReagenchantTable extends TileEntityInventory implements I
         {
             double posX = player.posX - (double) ((float) this.pos.getX() + 0.5F);
             double posZ = player.posZ - (double) ((float) this.pos.getZ() + 0.5F);
-            this.tRot = (float) MathHelper.atan2(posZ, posX);
+            this.offsetRotation = (float) MathHelper.atan2(posZ, posX);
             this.bookSpread += 0.1F;
 
             if(this.bookSpread < 0.5F || rand.nextInt(40) == 0)
             {
-                float f1 = this.flipT;
+                float randomFlip = this.flipRandom;
 
                 while(true)
                 {
-                    this.flipT += (float) (rand.nextInt(4) - rand.nextInt(4));
+                    this.flipRandom += (float) (rand.nextInt(4) - rand.nextInt(4));
 
-                    if(f1 != this.flipT)
+                    if(randomFlip != this.flipRandom)
                     {
                         break;
                     }
@@ -91,7 +86,7 @@ public class TileEntityReagenchantTable extends TileEntityInventory implements I
         }
         else
         {
-            this.tRot += 0.02F;
+            this.offsetRotation += 0.02F;
             this.bookSpread -= 0.1F;
         }
 
@@ -105,59 +100,45 @@ public class TileEntityReagenchantTable extends TileEntityInventory implements I
             this.bookRotation += ((float) Math.PI * 2F);
         }
 
-        while(this.tRot >= (float) Math.PI)
+        while(this.offsetRotation >= (float) Math.PI)
         {
-            this.tRot -= ((float) Math.PI * 2F);
+            this.offsetRotation -= ((float) Math.PI * 2F);
         }
 
-        while(this.tRot < -(float) Math.PI)
+        while(this.offsetRotation < -(float) Math.PI)
         {
-            this.tRot += ((float) Math.PI * 2F);
+            this.offsetRotation += ((float) Math.PI * 2F);
         }
 
-        float f2;
+        float rotation;
 
-        for(f2 = this.tRot - this.bookRotation; f2 >= (float) Math.PI; f2 -= ((float) Math.PI * 2F))
+        for(rotation = this.offsetRotation - this.bookRotation; rotation >= (float) Math.PI; rotation -= ((float) Math.PI * 2F))
         {
         }
 
-        while(f2 < -(float) Math.PI)
+        while(rotation < -(float) Math.PI)
         {
-            f2 += ((float) Math.PI * 2F);
+            rotation += ((float) Math.PI * 2F);
         }
 
-        this.bookRotation += f2 * 0.4F;
+        this.bookRotation += rotation * 0.4F;
         this.bookSpread = MathHelper.clamp(this.bookSpread, 0.0F, 1.0F);
         this.tickCounter++;
         this.pageFlipPrev = this.pageFlip;
-        float f = (this.flipT - this.pageFlip) * 0.4F;
-        f = MathHelper.clamp(f, -0.2F, 0.2F);
-        this.flipA += (f - this.flipA) * 0.9F;
-        this.pageFlip += this.flipA;
+        float flip = (this.flipRandom - this.pageFlip) * 0.4F;
+        flip = MathHelper.clamp(flip, -0.2F, 0.2F);
+        this.flipTurn += (flip - this.flipTurn) * 0.9F;
+        this.pageFlip += this.flipTurn;
     }
 
-    @Override
-    public Container createContainer(InventoryPlayer playerInventory, EntityPlayer player)
-    {
-        return new ContainerEnchantment(playerInventory, this.world, this.pos);
-    }
-
-    @Override
-    public boolean hasCustomName()
+    private boolean hasCustomName()
     {
         return this.customName != null && !this.customName.isEmpty();
     }
 
-    @Override
-    public String getGuiID()
+    private String getName()
     {
-        return Reagenchant.MOD_ID + ":reagenchant_table";
-    }
-
-    @Override
-    public String getName()
-    {
-        return this.hasCustomName() ? this.customName : "container." + Reagenchant.MOD_ID + ":reagenchant_table";
+        return this.hasCustomName() ? this.customName : "container.enchant";
     }
 
     @Override
@@ -166,9 +147,44 @@ public class TileEntityReagenchantTable extends TileEntityInventory implements I
         return (this.hasCustomName() ? new TextComponentString(this.getName()) : new TextComponentTranslation(this.getName()));
     }
 
-    public void setCustomName(String customNameIn)
+    public int getTickCounter()
     {
-        this.customName = customNameIn;
+        return this.tickCounter;
+    }
+
+    public float getPageFlip()
+    {
+        return this.pageFlip;
+    }
+
+    public float getPageFlipPrev()
+    {
+        return this.pageFlipPrev;
+    }
+
+    public float getBookSpread()
+    {
+        return this.bookSpread;
+    }
+
+    public float getBookSpreadPrev()
+    {
+        return this.bookSpreadPrev;
+    }
+
+    public float getBookRotation()
+    {
+        return this.bookRotation;
+    }
+
+    public float getBookRotationPrev()
+    {
+        return this.bookRotationPrev;
+    }
+
+    public void setCustomName(String customName)
+    {
+        this.customName = customName;
     }
 
     @Override
