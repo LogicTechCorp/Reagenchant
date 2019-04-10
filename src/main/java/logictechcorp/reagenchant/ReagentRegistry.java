@@ -15,9 +15,9 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package logictechcorp.reagenchant.registry;
+package logictechcorp.reagenchant;
 
-import logictechcorp.reagenchant.Reagenchant;
+import com.google.common.collect.ImmutableList;
 import logictechcorp.reagenchant.api.reagent.IReagent;
 import net.minecraft.enchantment.Enchantment;
 import net.minecraft.item.Item;
@@ -28,12 +28,12 @@ import org.apache.logging.log4j.MarkerManager;
 import java.util.HashMap;
 import java.util.Map;
 
-public class ReagentRegistry
+class ReagentRegistry
 {
     private static final Map<ResourceLocation, IReagent> REAGENTS = new HashMap<>();
     private static final Marker MARKER = MarkerManager.getMarker("ReagentRegistry");
 
-    public static void registerReagent(IReagent reagent)
+    static void registerReagent(IReagent reagent)
     {
         ResourceLocation associatedItem = reagent.getAssociatedItem().getRegistryName();
 
@@ -66,13 +66,18 @@ public class ReagentRegistry
         REAGENTS.put(associatedItem, reagent);
     }
 
-    public static boolean isReagentItem(Item item)
+    static boolean isReagentItem(Item item)
     {
         return REAGENTS.containsKey(item.getRegistryName());
     }
 
-    public static IReagent getReagent(Item item)
+    static IReagent getReagent(Item associatedItem)
     {
-        return REAGENTS.get(item.getRegistryName());
+        return REAGENTS.get(associatedItem.getRegistryName());
+    }
+
+    static ImmutableList<IReagent> getReagents()
+    {
+        return ImmutableList.copyOf(REAGENTS.values());
     }
 }

@@ -17,18 +17,17 @@
 
 package logictechcorp.reagenchant.inventory;
 
+import logictechcorp.reagenchant.api.ReagenchantAPI;
 import logictechcorp.reagenchant.reagent.ReagentTableManager;
-import logictechcorp.reagenchant.registry.ReagentRegistry;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.init.Blocks;
 import net.minecraft.init.Items;
 import net.minecraft.inventory.Container;
 import net.minecraft.inventory.IContainerListener;
-import net.minecraft.inventory.IInventory;
 import net.minecraft.inventory.Slot;
 import net.minecraft.item.EnumDyeColor;
 import net.minecraft.item.ItemStack;
-import net.minecraft.world.World;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 import net.minecraftforge.items.SlotItemHandler;
@@ -49,14 +48,13 @@ public class ContainerReagentTable extends Container
             @Override
             public void onSlotChanged()
             {
-                reagentTableManager.onContentsChanged();
-                ContainerReagentTable.this.detectAndSendChanges();
+                reagentTableManager.onContentsChanged(ContainerReagentTable.this);
             }
 
             @Override
             public boolean isItemValid(ItemStack stack)
             {
-                return true;
+                return stack.isItemEnchantable();
             }
 
             @Override
@@ -72,8 +70,7 @@ public class ContainerReagentTable extends Container
             @Override
             public void onSlotChanged()
             {
-                reagentTableManager.onContentsChanged();
-                ContainerReagentTable.this.detectAndSendChanges();
+                reagentTableManager.onContentsChanged(ContainerReagentTable.this);
             }
 
             @Override
@@ -100,14 +97,13 @@ public class ContainerReagentTable extends Container
             @Override
             public void onSlotChanged()
             {
-                reagentTableManager.onContentsChanged();
-                ContainerReagentTable.this.detectAndSendChanges();
+                reagentTableManager.onContentsChanged(ContainerReagentTable.this);
             }
 
             @Override
             public boolean isItemValid(ItemStack stack)
             {
-                return ReagentRegistry.isReagentItem(stack.getItem());
+                return ReagenchantAPI.getInstance().isReagentItem(stack.getItem());
             }
 
             @Override
@@ -129,19 +125,8 @@ public class ContainerReagentTable extends Container
         {
             this.addSlotToContainer(new Slot(reagentTableManager.getPlayer().inventory, k, 8 + k * 18, 142));
         }
-    }
 
-    @Override
-    public void addListener(IContainerListener listener)
-    {
-        super.addListener(listener);
-        this.broadcastData(listener);
-    }
-
-    @Override
-    public boolean enchantItem(EntityPlayer player, int id)
-    {
-        return this.reagentTableManager.enchantItem(player, id);
+        this.reagentTableManager.onContentsChanged(this);
     }
 
     @Override
@@ -150,7 +135,7 @@ public class ContainerReagentTable extends Container
     {
         if(id >= 0 && id <= 2)
         {
-            this.reagentTableManager.getEnchantmentLevels()[id] = data;
+            this.reagentTableManager.getExperienceLevels()[id] = data;
         }
         else if(id == 3)
         {
@@ -162,12 +147,19 @@ public class ContainerReagentTable extends Container
         }
         else if(id >= 7 && id <= 9)
         {
-            this.reagentTableManager.getExperienceLevels()[id - 7] = data;
+            this.reagentTableManager.getEnchantmentLevels()[id - 7] = data;
         }
         else
         {
             super.updateProgressBar(id, data);
         }
+    }
+
+    @Override
+    public void addListener(IContainerListener listener)
+    {
+        super.addListener(listener);
+        this.broadcastData(listener);
     }
 
     @Override
@@ -184,25 +176,31 @@ public class ContainerReagentTable extends Container
     @Override
     public void onContainerClosed(EntityPlayer player)
     {
-    }
-
-    @Override
-    protected void clearContainer(EntityPlayer player, World world, IInventory inventory)
-    {
+        if(this.reagentTableManager.getInventory().getStackInSlot(0).isItemEnchanted())
+        {
+            if(!player.isEntityAlive() || player instanceof EntityPlayerMP && ((EntityPlayerMP) player).hasDisconnected())
+            {
+                player.dropItem(this.reagentTableManager.getInventory().extractItem(0, 64, false), false);
+            }
+            else
+            {
+                player.inventory.placeItemBackInInventory(this.reagentTableManager.getWorld(), this.reagentTableManager.getInventory().extractItem(0, 64, false));
+            }
+        }
     }
 
     private void broadcastData(IContainerListener listener)
     {
-        listener.sendWindowProperty(this, 0, this.reagentTableManager.getEnchantmentLevels()[0]);
-        listener.sendWindowProperty(this, 1, this.reagentTableManager.getEnchantmentLevels()[1]);
-        listener.sendWindowProperty(this, 2, this.reagentTableManager.getEnchantmentLevels()[2]);
+        listener.sendWindowProperty(this, 0, this.reagentTableManager.getExperienceLevels()[0]);
+        listener.sendWindowProperty(this, 1, this.reagentTableManager.getExperienceLevels()[1]);
+        listener.sendWindowProperty(this, 2, this.reagentTableManager.getExperienceLevels()[2]);
         listener.sendWindowProperty(this, 3, this.reagentTableManager.getXpSeed() & -16);
         listener.sendWindowProperty(this, 4, this.reagentTableManager.getEnchantments()[0]);
         listener.sendWindowProperty(this, 5, this.reagentTableManager.getEnchantments()[1]);
         listener.sendWindowProperty(this, 6, this.reagentTableManager.getEnchantments()[2]);
-        listener.sendWindowProperty(this, 7, this.reagentTableManager.getExperienceLevels()[0]);
-        listener.sendWindowProperty(this, 8, this.reagentTableManager.getExperienceLevels()[1]);
-        listener.sendWindowProperty(this, 9, this.reagentTableManager.getExperienceLevels()[2]);
+        listener.sendWindowProperty(this, 7, this.reagentTableManager.getEnchantmentLevels()[0]);
+        listener.sendWindowProperty(this, 8, this.reagentTableManager.getEnchantmentLevels()[1]);
+        listener.sendWindowProperty(this, 9, this.reagentTableManager.getEnchantmentLevels()[2]);
     }
 
     @Override
@@ -288,11 +286,10 @@ public class ContainerReagentTable extends Container
         }
     }
 
-    @SideOnly(Side.CLIENT)
-    public int getLapisAmount()
+    @Override
+    public boolean enchantItem(EntityPlayer player, int enchantmentTier)
     {
-        ItemStack stack = this.reagentTableManager.getInventory().getStackInSlot(1);
-        return stack.isEmpty() ? 0 : stack.getCount();
+        return this.reagentTableManager.enchantItem(player, enchantmentTier, this);
     }
 
     public ReagentTableManager getReagentTableManager()

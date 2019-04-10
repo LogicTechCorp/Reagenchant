@@ -52,12 +52,11 @@ public interface IReagent
      * @param unenchantedStack The Itemstack that is being enchanted.
      * @param reagentStack     The Itemstack that contains the Reagent.
      * @param enchantmentTier  The tier of the enchantment from 1 to 3.
-     * @param enchantmentLevel The level of the enchantment from 1 to 30.
-     * @param allowTreasure    Whether treasure enchantments can be applied to the unenchantedStack.
+     * @param experienceLevel  The level of experience required to unlock the enchantment.
      * @param random           The random number generator.
      * @return A list of the Enchantments that are going to be applied.
      */
-    List<EnchantmentData> createEnchantmentList(World world, BlockPos pos, EntityPlayer player, ItemStack unenchantedStack, ItemStack reagentStack, int enchantmentTier, int enchantmentLevel, boolean allowTreasure, Random random);
+    List<EnchantmentData> createEnchantmentList(World world, BlockPos pos, EntityPlayer player, ItemStack unenchantedStack, ItemStack reagentStack, int enchantmentTier, int experienceLevel, Random random);
 
     /**
      * Called to check if this Reagent has Enchantments that are applicable to the unenchantedStack.
@@ -80,11 +79,11 @@ public interface IReagent
      * @param player          The player that is using the Enchantment Table.
      * @param enchantedStack  The Itemstack that is being enchanted.
      * @param reagentStack    The Itemstack that contains the Reagent.
-     * @param enchantmentData The Enchantments that were applied.
+     * @param enchantmentList The Enchantments that were applied.
      * @param random          The random number generator.
      * @return Whether the Reagent item is consumed.
      */
-    boolean consumeReagent(World world, BlockPos pos, EntityPlayer player, ItemStack enchantedStack, ItemStack reagentStack, List<EnchantmentData> enchantmentData, Random random);
+    boolean consumeReagent(World world, BlockPos pos, EntityPlayer player, ItemStack enchantedStack, ItemStack reagentStack, List<EnchantmentData> enchantmentList, Random random);
 
     /**
      * Returns the item that is associated with this Reagent.

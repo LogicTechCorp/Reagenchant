@@ -54,7 +54,7 @@ public class Reagent implements IReagent
     }
 
     @Override
-    public List<EnchantmentData> createEnchantmentList(World world, BlockPos pos, EntityPlayer player, ItemStack unenchantedStack, ItemStack reagentStack, int enchantmentTier, int enchantmentLevel, boolean allowTreasure, Random random)
+    public List<EnchantmentData> createEnchantmentList(World world, BlockPos pos, EntityPlayer player, ItemStack unenchantedStack, ItemStack reagentStack, int enchantmentTier, int experienceLevel, Random random)
     {
         List<EnchantmentData> refinedEnchantmentData = new ArrayList<>();
         int enchantability = unenchantedStack.getItem().getItemEnchantability(unenchantedStack);
@@ -65,26 +65,25 @@ public class Reagent implements IReagent
         }
         else
         {
-            enchantmentLevel = enchantmentLevel + 1 + random.nextInt(enchantability / 4 + 1) + random.nextInt(enchantability / 4 + 1);
+            experienceLevel = experienceLevel + 1 + random.nextInt(enchantability / 4 + 1) + random.nextInt(enchantability / 4 + 1);
             float enchantmentMultiplier = (random.nextFloat() + random.nextFloat() - 1.0F) * 0.15F;
-            enchantmentLevel = MathHelper.clamp(Math.round((float) enchantmentLevel + (float) enchantmentLevel * enchantmentMultiplier), 1, Integer.MAX_VALUE);
+            experienceLevel = MathHelper.clamp(Math.round((float) experienceLevel + (float) experienceLevel * enchantmentMultiplier), 1, Integer.MAX_VALUE);
 
-            List<EnchantmentData> aggregateEnchantmentData = new ArrayList<>();
+            List<EnchantmentData> aggregateEnchantmentData = new ArrayList<>(EnchantmentHelper.getEnchantmentDatas(experienceLevel, unenchantedStack, false));
+            List<Enchantment> applicableEnchantments = this.getApplicableEnchantments(world, pos, player, unenchantedStack, reagentStack, random);
+            Collections.shuffle(applicableEnchantments, random);
 
-            for(Enchantment enchantment : this.getApplicableEnchantments(world, pos, player, unenchantedStack, reagentStack, random))
+            for(Enchantment enchantment : applicableEnchantments)
             {
-                if((!enchantment.isTreasureEnchantment() || allowTreasure) && (enchantment.canApplyAtEnchantingTable(unenchantedStack) || (unenchantedStack.getItem() == Items.BOOK && enchantment.isAllowedOnBooks())))
+                if(enchantment.canApplyAtEnchantingTable(unenchantedStack) || (unenchantedStack.getItem() == Items.BOOK && enchantment.isAllowedOnBooks()))
                 {
-                    for(int maxEnchantmentLevel = enchantment.getMaxLevel(); maxEnchantmentLevel > enchantment.getMinLevel() - 1; maxEnchantmentLevel--)
+                    for(int enchantmentLevel = enchantment.getMaxLevel(); enchantmentLevel > enchantment.getMinLevel() - 1; enchantmentLevel--)
                     {
-                        if(enchantmentLevel >= enchantment.getMinEnchantability(maxEnchantmentLevel) && enchantmentLevel <= enchantment.getMaxEnchantability(maxEnchantmentLevel))
+                        if(experienceLevel >= enchantment.getMinEnchantability(enchantmentLevel) && experienceLevel <= enchantment.getMaxEnchantability(enchantmentLevel))
                         {
-                            EnchantmentData enchantmentData = new EnchantmentData(enchantment, maxEnchantmentLevel);
+                            EnchantmentData enchantmentData = new EnchantmentData(enchantment, enchantmentLevel);
 
-                            float probability = this.getEnchantmentProbability(world, pos, player, unenchantedStack, reagentStack, enchantmentData, random);
-                            float randFloat = random.nextFloat();
-
-                            if(probability < randFloat)
+                            if(this.getEnchantmentProbability(world, pos, player, unenchantedStack, reagentStack, enchantmentData, random) <= random.nextFloat())
                             {
                                 aggregateEnchantmentData.add(enchantmentData);
                             }
@@ -93,14 +92,13 @@ public class Reagent implements IReagent
                         }
                     }
                 }
-
             }
 
             if(!aggregateEnchantmentData.isEmpty())
             {
                 refinedEnchantmentData.add(WeightedRandom.getRandomItem(random, aggregateEnchantmentData));
 
-                while(random.nextInt(50) <= enchantmentLevel)
+                while(random.nextInt(50) <= experienceLevel)
                 {
                     EnchantmentHelper.removeIncompatible(aggregateEnchantmentData, Util.getLastElement(refinedEnchantmentData));
 
@@ -110,7 +108,7 @@ public class Reagent implements IReagent
                     }
 
                     refinedEnchantmentData.add(WeightedRandom.getRandomItem(random, aggregateEnchantmentData));
-                    enchantmentLevel /= 2;
+                    experienceLevel /= 2;
                 }
             }
 
@@ -133,9 +131,19 @@ public class Reagent implements IReagent
     }
 
     @Override
-    public boolean consumeReagent(World world, BlockPos pos, EntityPlayer player, ItemStack enchantedStack, ItemStack reagentStack, List<EnchantmentData> enchantmentData, Random random)
+    public boolean consumeReagent(World world, BlockPos pos, EntityPlayer player, ItemStack enchantedStack, ItemStack reagentStack, List<EnchantmentData> enchantmentList, Random random)
     {
-        return this.hasApplicableEnchantments(world, pos, player, enchantedStack, reagentStack, random);
+        List<Enchantment> applicableEnchantments = this.getApplicableEnchantments(world, pos, player, enchantedStack, reagentStack, random);
+
+        for(EnchantmentData enchantmentData : enchantmentList)
+        {
+            if(applicableEnchantments.contains(enchantmentData.enchantment))
+            {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     @Override

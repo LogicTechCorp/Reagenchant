@@ -17,11 +17,16 @@
 
 package logictechcorp.reagenchant;
 
+import com.google.common.collect.ImmutableList;
 import logictechcorp.libraryex.IModData;
 import logictechcorp.libraryex.proxy.IProxy;
+import logictechcorp.reagenchant.api.IReagenchantAPI;
+import logictechcorp.reagenchant.api.ReagenchantAPI;
+import logictechcorp.reagenchant.api.reagent.IReagent;
 import logictechcorp.reagenchant.handler.GuiHandler;
 import logictechcorp.reagenchant.init.ReagenchantReagents;
 import net.minecraft.creativetab.CreativeTabs;
+import net.minecraft.item.Item;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.SidedProxy;
@@ -33,15 +38,8 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 @Mod(modid = Reagenchant.MOD_ID, name = Reagenchant.NAME, version = Reagenchant.VERSION, dependencies = Reagenchant.DEPENDENCIES)
-public class Reagenchant implements IModData
+public class Reagenchant implements IModData, IReagenchantAPI
 {
-    //TODO
-    // Change registry
-    // Fix probability
-    // Fix possibility of no enchantments
-    // Fix Enchantment hint
-    // Decide how to handle Treasure Enchantments
-
     public static final String MOD_ID = "reagenchant";
     public static final String NAME = "Reagenchant";
     public static final String VERSION = "1.0.0";
@@ -58,6 +56,7 @@ public class Reagenchant implements IModData
     @Mod.EventHandler
     public void onFMLPreInitialization(FMLPreInitializationEvent event)
     {
+        ReagenchantAPI.setInstance(this);
         NetworkRegistry.INSTANCE.registerGuiHandler(this, new GuiHandler());
         ReagenchantReagents.initReagents();
         proxy.preInit();
@@ -96,5 +95,35 @@ public class Reagenchant implements IModData
     public static ResourceLocation getResource(String name)
     {
         return new ResourceLocation(Reagenchant.MOD_ID + ":" + name);
+    }
+
+    @Override
+    public boolean isStub()
+    {
+        return false;
+    }
+
+    @Override
+    public void registerReagent(IReagent reagent)
+    {
+        ReagentRegistry.registerReagent(reagent);
+    }
+
+    @Override
+    public boolean isReagentItem(Item item)
+    {
+        return ReagentRegistry.isReagentItem(item);
+    }
+
+    @Override
+    public IReagent getReagent(Item associatedItem)
+    {
+        return ReagentRegistry.getReagent(associatedItem);
+    }
+
+    @Override
+    public ImmutableList<IReagent> getReagents()
+    {
+        return ReagentRegistry.getReagents();
     }
 }
