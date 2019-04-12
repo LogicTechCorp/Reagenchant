@@ -81,20 +81,19 @@ final class ReagentManager implements IReagentManager
                         if(reagentRegistry.isReagentItem(associatedItem))
                         {
                             reagent = reagentRegistry.getReagent(associatedItem);
+
+                            if(!(reagent instanceof IReagentConfigurable))
+                            {
+                                continue;
+                            }
+
+                            ((IReagentConfigurable) reagent).readFromConfig(config);
                         }
                         else
                         {
                             reagent = new ReagentConfigurable(new ResourceLocation(config.getOrElse("name", "missing:no")), associatedItem);
                             reagentRegistry.registerReagent(reagent);
                         }
-
-                        if(!(reagent instanceof IReagentConfigurable))
-                        {
-                            continue;
-                        }
-
-                        IReagentConfigurable reagentConfigurable = (IReagentConfigurable) reagent;
-                        reagentConfigurable.readFromConfig(config);
                     }
 
                     config.close();

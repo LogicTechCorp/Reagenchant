@@ -216,14 +216,21 @@ public class ContainerReagentTable extends Container
 
             if(index == 0)
             {
-                if(!this.mergeItemStack(slotStack, 2, 38, true))
+                if(!this.mergeItemStack(slotStack, 3, 38, true))
                 {
                     return ItemStack.EMPTY;
                 }
             }
             else if(index == 1)
             {
-                if(!this.mergeItemStack(slotStack, 2, 38, true))
+                if(!this.mergeItemStack(slotStack, 3, 38, true))
+                {
+                    return ItemStack.EMPTY;
+                }
+            }
+            else if(index == 2)
+            {
+                if(!this.mergeItemStack(slotStack, 3, 38, true))
                 {
                     return ItemStack.EMPTY;
                 }
@@ -231,6 +238,13 @@ public class ContainerReagentTable extends Container
             else if(slotStack.getItem() == Items.DYE && EnumDyeColor.byDyeDamage(slotStack.getMetadata()) == EnumDyeColor.BLUE)
             {
                 if(!this.mergeItemStack(slotStack, 1, 2, true))
+                {
+                    return ItemStack.EMPTY;
+                }
+            }
+            else if(ReagenchantAPI.getInstance().getReagentRegistry().isReagentItem(slotStack.getItem()))
+            {
+                if(!this.mergeItemStack(slotStack, 2, 3, true))
                 {
                     return ItemStack.EMPTY;
                 }

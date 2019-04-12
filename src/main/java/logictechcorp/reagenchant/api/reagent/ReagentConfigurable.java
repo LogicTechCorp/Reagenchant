@@ -43,6 +43,7 @@ public class ReagentConfigurable extends Reagent implements IReagentConfigurable
     @Override
     public void readFromConfig(Config config)
     {
+        this.enchantments.clear();
         List<Config> enchantmentConfigs = config.getOrElse("enchantments", new ArrayList<>());
 
         for(Config enchantmentConfig : enchantmentConfigs)
