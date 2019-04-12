@@ -100,26 +100,18 @@ public class Reagent implements IReagent
                 }
             }
 
-            List<EnchantmentData> refinedEnchantmentData = new ArrayList<>();
-            boolean usedDefault = false;
-
             if(aggregateEnchantmentData.isEmpty())
             {
-                aggregateEnchantmentData.addAll(EnchantmentHelper.getEnchantmentDatas(enchantabilityLevel, unenchantedStack, false));
-                usedDefault = true;
+                return EnchantmentHelper.buildEnchantmentList(random, unenchantedStack, enchantabilityLevel, false);
             }
 
+            List<EnchantmentData> refinedEnchantmentData = new ArrayList<>();
             refinedEnchantmentData.add(WeightedRandom.getRandomItem(random, aggregateEnchantmentData));
-            EnchantmentData guaranteedEnchantment = refinedEnchantmentData.get(0);
-
-            if(!usedDefault)
-            {
-                aggregateEnchantmentData.addAll(EnchantmentHelper.getEnchantmentDatas(enchantabilityLevel, unenchantedStack, false));
-            }
+            aggregateEnchantmentData.addAll(EnchantmentHelper.getEnchantmentDatas(enchantabilityLevel, unenchantedStack, false));
 
             while(random.nextInt(50) <= enchantabilityLevel)
             {
-                EnchantmentHelper.removeIncompatible(aggregateEnchantmentData, guaranteedEnchantment);
+                EnchantmentHelper.removeIncompatible(aggregateEnchantmentData, refinedEnchantmentData.get(0));
 
                 if(aggregateEnchantmentData.isEmpty())
                 {
@@ -222,7 +214,7 @@ public class Reagent implements IReagent
     public int getBaseReagentCost(Enchantment enchantment)
     {
         Tuple<Double, Integer> data = this.enchantments.get(enchantment.getRegistryName());
-        return data == null ? 1 : data.getSecond();
+        return data == null ? 0 : data.getSecond();
     }
 
     @Override
