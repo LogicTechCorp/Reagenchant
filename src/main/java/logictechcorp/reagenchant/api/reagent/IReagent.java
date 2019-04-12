@@ -37,26 +37,33 @@ public interface IReagent
     /**
      * Called to associate an Enchantment with this Reagent.
      *
-     * @param enchantment                The Enchantment to be associated with the Reagent.
+     * @param enchantment                The Enchantment to be associated with this Reagent.
      * @param baseEnchantmentProbability The base probability for the Enchantment being applied.
      * @param baseReagentCost            The base Reagent cost required to apply the Enchantment.
      */
-    void addEnchantment(Enchantment enchantment, float baseEnchantmentProbability, int baseReagentCost);
+    void addEnchantment(Enchantment enchantment, double baseEnchantmentProbability, int baseReagentCost);
+
+    /**
+     * Called to unassociated an Enchantment with this Reagent.
+     *
+     * @param enchantment The Enchantment to be unassociated with this Reagent.
+     */
+    void removeEnchantment(Enchantment enchantment);
 
     /**
      * Returns a list of the Enchantments that are to be applied to the unenchantedStack.
      *
-     * @param world            The world the Enchantment Table is in.
-     * @param pos              The position of the Enchantment Table in the world.
-     * @param player           The player that is using the Enchantment Table.
-     * @param unenchantedStack The Itemstack that is being enchanted.
-     * @param reagentStack     The Itemstack that contains the Reagent.
-     * @param enchantmentTier  The tier of the enchantment from 1 to 3.
-     * @param experienceLevel  The level of experience required to unlock the enchantment.
-     * @param random           The random number generator.
+     * @param world               The world the Enchantment Table is in.
+     * @param pos                 The position of the Enchantment Table in the world.
+     * @param player              The player that is using the Enchantment Table.
+     * @param unenchantedStack    The Itemstack that is being enchanted.
+     * @param reagentStack        The Itemstack that contains the Reagent.
+     * @param enchantmentTier     The tier of the enchantment from 1 to 3.
+     * @param enchantabilityLevel The level of experience required to unlock the enchantmentTier.
+     * @param random              The random number generator.
      * @return A list of the Enchantments that are going to be applied.
      */
-    List<EnchantmentData> createEnchantmentList(World world, BlockPos pos, EntityPlayer player, ItemStack unenchantedStack, ItemStack reagentStack, int enchantmentTier, int experienceLevel, Random random);
+    List<EnchantmentData> createEnchantmentList(World world, BlockPos pos, EntityPlayer player, ItemStack unenchantedStack, ItemStack reagentStack, int enchantmentTier, int enchantabilityLevel, Random random);
 
     /**
      * Called to check if this Reagent has Enchantments that are applicable to the unenchantedStack.
@@ -86,18 +93,18 @@ public interface IReagent
     boolean consumeReagent(World world, BlockPos pos, EntityPlayer player, ItemStack enchantedStack, ItemStack reagentStack, List<EnchantmentData> enchantmentList, Random random);
 
     /**
-     * Returns the item that is associated with this Reagent.
-     *
-     * @return The item that is associated with this Reagent.
-     */
-    Item getAssociatedItem();
-
-    /**
      * Returns the name of the Reagent as a ResourceLocation.
      *
      * @return The name of the Reagent as a ResourceLocation.
      */
     ResourceLocation getName();
+
+    /**
+     * Returns the item that is associated with this Reagent.
+     *
+     * @return The item that is associated with this Reagent.
+     */
+    Item getAssociatedItem();
 
     /**
      * Returns a list containing the associated Enchantments.
@@ -126,7 +133,7 @@ public interface IReagent
      * @param enchantment The Enchantment to get the probability for.
      * @return The base probability for the Enchantment being applied.
      */
-    float getBaseEnchantmentProbability(Enchantment enchantment);
+    double getBaseEnchantmentProbability(Enchantment enchantment);
 
     /**
      * Called when creating the list of Enchantments that can be applied to the unenchantedStack and allows for modification of the base probability.
@@ -141,7 +148,7 @@ public interface IReagent
      * @param random           The random number generator.
      * @return The probability of the Enchantment being applied.
      */
-    float getEnchantmentProbability(World world, BlockPos pos, EntityPlayer player, ItemStack unenchantedStack, ItemStack reagentStack, EnchantmentData enchantmentData, Random random);
+    double getEnchantmentProbability(World world, BlockPos pos, EntityPlayer player, ItemStack unenchantedStack, ItemStack reagentStack, EnchantmentData enchantmentData, Random random);
 
     /**
      * The base Reagent cost required to apply the Enchantment.

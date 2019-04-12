@@ -54,7 +54,7 @@ public class ReagentTableManager
     private int xpSeed;
     private int[] enchantments;
     private int[] enchantmentLevels;
-    private int[] experienceLevels;
+    private int[] enchantabilityLevels;
 
     public ReagentTableManager(World world, BlockPos pos, EntityPlayer player, TileEntityReagentTable reagentTable)
     {
@@ -67,14 +67,14 @@ public class ReagentTableManager
         this.xpSeed = player.inventory.player.getXPSeed();
         this.enchantments = new int[]{-1, -1, -1};
         this.enchantmentLevels = new int[]{-1, -1, -1};
-        this.experienceLevels = new int[3];
+        this.enchantabilityLevels = new int[3];
     }
 
     public void onContentsChanged(ContainerReagentTable containerReagentTable)
     {
         ItemStack unenchantedStack = this.inventory.getStackInSlot(0);
 
-        if(!unenchantedStack.isEmpty() && !unenchantedStack.isItemEnchanted() && !this.inventory.getStackInSlot(1).isEmpty())
+        if(unenchantedStack.isItemEnchantable() && !this.inventory.getStackInSlot(1).isEmpty())
         {
             if(!this.world.isRemote)
             {
@@ -84,7 +84,7 @@ public class ReagentTableManager
                 {
                     for(int x = -1; x <= 1; x++)
                     {
-                        if((z != 0 || x != 0) && this.world.isAirBlock(this.pos.add(x, 0, z)) && this.world.isAirBlock(this.pos.add(x, 1, z)))
+                        if((z != 0 || x != 0) && !this.world.getBlockState(this.pos.add(x, 0, z)).isOpaqueCube() && !this.world.getBlockState(this.pos.add(x, 1, z)).isOpaqueCube())
                         {
                             power += ForgeHooks.getEnchantPower(this.world, this.pos.add(x * 2, 0, z * 2));
                             power += ForgeHooks.getEnchantPower(this.world, this.pos.add(x * 2, 1, z * 2));
@@ -104,20 +104,21 @@ public class ReagentTableManager
 
                 for(int i = 0; i < 3; i++)
                 {
-                    this.experienceLevels[i] = EnchantmentHelper.calcItemStackEnchantability(this.random, i, (int) power, unenchantedStack);
                     this.enchantments[i] = -1;
                     this.enchantmentLevels[i] = -1;
+                    this.enchantabilityLevels[i] = EnchantmentHelper.calcItemStackEnchantability(this.random, i, (int) power, unenchantedStack);
 
-                    if(this.experienceLevels[i] < i + 1)
+                    if(this.enchantabilityLevels[i] < i + 1)
                     {
-                        this.experienceLevels[i] = 0;
+                        this.enchantabilityLevels[i] = 0;
                     }
-                    this.experienceLevels[i] = ForgeEventFactory.onEnchantmentLevelSet(this.world, this.pos, i, (int) power, unenchantedStack, this.experienceLevels[i]);
+
+                    this.enchantabilityLevels[i] = ForgeEventFactory.onEnchantmentLevelSet(this.world, this.pos, i, (int) power, unenchantedStack, this.enchantabilityLevels[i]);
                 }
 
                 for(int i = 0; i < 3; i++)
                 {
-                    if(this.experienceLevels[i] > 0)
+                    if(this.enchantabilityLevels[i] > 0)
                     {
                         List<EnchantmentData> enchantmentList = this.createEnchantmentList(i);
 
@@ -139,7 +140,7 @@ public class ReagentTableManager
             {
                 this.enchantments[i] = -1;
                 this.enchantmentLevels[i] = -1;
-                this.experienceLevels[i] = 0;
+                this.enchantabilityLevels[i] = 0;
             }
         }
     }
@@ -148,18 +149,18 @@ public class ReagentTableManager
     {
         ItemStack unenchantedStack = this.inventory.getStackInSlot(0);
         ItemStack reagentStack = this.inventory.getStackInSlot(2);
-        int experienceLevel = this.experienceLevels[enchantmentTier];
+        int enchantabilityLevel = this.enchantabilityLevels[enchantmentTier];
 
         this.random.setSeed((long) (this.xpSeed + enchantmentTier));
-        List<EnchantmentData> enchantmentData = EnchantmentHelper.buildEnchantmentList(this.random, unenchantedStack, experienceLevel, false);
+        List<EnchantmentData> enchantmentData = EnchantmentHelper.buildEnchantmentList(this.random, unenchantedStack, enchantabilityLevel, false);
 
         if(!reagentStack.isEmpty())
         {
-            IReagent reagent = ReagenchantAPI.getInstance().getReagent(reagentStack.getItem());
+            IReagent reagent = ReagenchantAPI.getInstance().getReagentRegistry().getReagent(reagentStack.getItem());
 
             if(reagent.hasApplicableEnchantments(this.world, this.pos, this.player, unenchantedStack, reagentStack, this.random))
             {
-                enchantmentData = reagent.createEnchantmentList(this.world, this.pos, this.player, unenchantedStack, reagentStack, enchantmentTier, experienceLevel, this.random);
+                enchantmentData = reagent.createEnchantmentList(this.world, this.pos, this.player, unenchantedStack, reagentStack, enchantmentTier, enchantabilityLevel, this.random);
             }
         }
 
@@ -182,7 +183,7 @@ public class ReagentTableManager
         {
             return false;
         }
-        else if(this.experienceLevels[enchantmentTier] > 0 && !unenchantedStack.isEmpty() && (player.experienceLevel >= i && player.experienceLevel >= this.experienceLevels[enchantmentTier] || player.capabilities.isCreativeMode))
+        else if(this.enchantabilityLevels[enchantmentTier] > 0 && !unenchantedStack.isEmpty() && (player.experienceLevel >= i && player.experienceLevel >= this.enchantabilityLevels[enchantmentTier] || player.capabilities.isCreativeMode))
         {
             if(!this.world.isRemote)
             {
@@ -203,10 +204,10 @@ public class ReagentTableManager
 
                     if(!reagentStack.isEmpty())
                     {
-                        reagent = ReagenchantAPI.getInstance().getReagent(reagentStack.getItem());
+                        reagent = ReagenchantAPI.getInstance().getReagentRegistry().getReagent(reagentStack.getItem());
                     }
 
-                    int maxReagentCost = 1;
+                    int maxReagentCost = 0;
 
                     for(EnchantmentData enchantmentData : enchantmentList)
                     {
@@ -345,9 +346,9 @@ public class ReagentTableManager
         return this.enchantmentLevels;
     }
 
-    public int[] getExperienceLevels()
+    public int[] getEnchantabilityLevels()
     {
-        return this.experienceLevels;
+        return this.enchantabilityLevels;
     }
 
     public int getLapisAmount()

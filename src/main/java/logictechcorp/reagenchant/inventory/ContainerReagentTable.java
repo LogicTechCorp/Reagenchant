@@ -103,7 +103,7 @@ public class ContainerReagentTable extends Container
             @Override
             public boolean isItemValid(ItemStack stack)
             {
-                return ReagenchantAPI.getInstance().isReagentItem(stack.getItem());
+                return ReagenchantAPI.getInstance().getReagentRegistry().isReagentItem(stack.getItem());
             }
 
             @Override
@@ -135,7 +135,7 @@ public class ContainerReagentTable extends Container
     {
         if(id >= 0 && id <= 2)
         {
-            this.reagentTableManager.getExperienceLevels()[id] = data;
+            this.reagentTableManager.getEnchantabilityLevels()[id] = data;
         }
         else if(id == 3)
         {
@@ -191,9 +191,9 @@ public class ContainerReagentTable extends Container
 
     private void broadcastData(IContainerListener listener)
     {
-        listener.sendWindowProperty(this, 0, this.reagentTableManager.getExperienceLevels()[0]);
-        listener.sendWindowProperty(this, 1, this.reagentTableManager.getExperienceLevels()[1]);
-        listener.sendWindowProperty(this, 2, this.reagentTableManager.getExperienceLevels()[2]);
+        listener.sendWindowProperty(this, 0, this.reagentTableManager.getEnchantabilityLevels()[0]);
+        listener.sendWindowProperty(this, 1, this.reagentTableManager.getEnchantabilityLevels()[1]);
+        listener.sendWindowProperty(this, 2, this.reagentTableManager.getEnchantabilityLevels()[2]);
         listener.sendWindowProperty(this, 3, this.reagentTableManager.getXpSeed() & -16);
         listener.sendWindowProperty(this, 4, this.reagentTableManager.getEnchantments()[0]);
         listener.sendWindowProperty(this, 5, this.reagentTableManager.getEnchantments()[1]);

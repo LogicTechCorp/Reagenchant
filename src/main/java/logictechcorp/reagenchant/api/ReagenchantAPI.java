@@ -17,25 +17,31 @@
 
 package logictechcorp.reagenchant.api;
 
+import logictechcorp.reagenchant.api.internal.IReagenchantAPI;
+import logictechcorp.reagenchant.api.internal.ReagenchantAPIStub;
 import net.minecraftforge.fml.common.Loader;
 import net.minecraftforge.fml.common.ModContainer;
 
-public class ReagenchantAPI
+public final class ReagenchantAPI
 {
     private static IReagenchantAPI instance = ReagenchantAPIStub.INSTANCE;
+
+    private ReagenchantAPI()
+    {
+    }
 
     public static IReagenchantAPI getInstance()
     {
         return instance;
     }
 
-    public static void setInstance(IReagenchantAPI reagenchantAPI)
+    public static void setInstance(IReagenchantAPI instance)
     {
         ModContainer mod = Loader.instance().activeModContainer();
 
         if(mod != null && mod.getModId().equals("reagenchant"))
         {
-            instance = reagenchantAPI;
+            ReagenchantAPI.instance = instance;
         }
     }
 }

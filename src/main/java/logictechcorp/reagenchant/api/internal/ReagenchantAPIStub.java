@@ -15,17 +15,11 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package logictechcorp.reagenchant.api;
+package logictechcorp.reagenchant.api.internal;
 
-import com.google.common.collect.ImmutableList;
-import logictechcorp.reagenchant.api.reagent.IReagent;
-import net.minecraft.item.Item;
-
-import java.util.ArrayList;
-
-public class ReagenchantAPIStub implements IReagenchantAPI
+public final class ReagenchantAPIStub implements IReagenchantAPI
 {
-    static final IReagenchantAPI INSTANCE = new ReagenchantAPIStub();
+    public static final IReagenchantAPI INSTANCE = new ReagenchantAPIStub();
 
     private ReagenchantAPIStub()
     {
@@ -38,26 +32,14 @@ public class ReagenchantAPIStub implements IReagenchantAPI
     }
 
     @Override
-    public void registerReagent(IReagent reagent)
+    public IReagentRegistry getReagentRegistry()
     {
-
+        return ReagentRegistryStub.INSTANCE;
     }
 
     @Override
-    public boolean isReagentItem(Item item)
+    public IReagentManager getReagentManager()
     {
-        return false;
-    }
-
-    @Override
-    public IReagent getReagent(Item associatedItem)
-    {
-        return null;
-    }
-
-    @Override
-    public ImmutableList<IReagent> getReagents()
-    {
-        return ImmutableList.copyOf(new ArrayList<>());
+        return ReagentManagerStub.INSTANCE;
     }
 }

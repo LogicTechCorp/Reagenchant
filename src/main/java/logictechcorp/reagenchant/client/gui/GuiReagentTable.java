@@ -73,6 +73,13 @@ public class GuiReagentTable extends GuiContainer
     }
 
     @Override
+    public void updateScreen()
+    {
+        super.updateScreen();
+        this.tickBook();
+    }
+
+    @Override
     protected void drawGuiContainerForegroundLayer(int mouseX, int mouseY)
     {
         ITextComponent textComponent = this.reagentTableManager.getReagentTable().getDisplayName();
@@ -181,22 +188,22 @@ public class GuiReagentTable extends GuiContainer
             int textPosX = rectanglePosX + 20;
             this.zLevel = 0.0F;
             this.mc.getTextureManager().bindTexture(ReagenchantTextures.REAGENT_ENCHANTMENT_TABLE_GUI);
-            int enchantmentLevel = this.reagentTableManager.getExperienceLevels()[i];
+            int enchantabilityLevel = this.reagentTableManager.getEnchantabilityLevels()[i];
             GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
 
-            if(enchantmentLevel == 0)
+            if(enchantabilityLevel == 0)
             {
                 this.drawTexturedModalRect(rectanglePosX, height + 14 + 19 * i, 0, 185, 108, 19);
             }
             else
             {
-                String enchantLevelString = "" + enchantmentLevel;
+                String enchantLevelString = "" + enchantabilityLevel;
                 int textWrapWidth = 86 - this.fontRenderer.getStringWidth(enchantLevelString);
                 String randomEnchantmentName = EnchantmentNameParts.getInstance().generateNewRandomName(this.fontRenderer, textWrapWidth);
                 FontRenderer fontrenderer = this.mc.standardGalacticFontRenderer;
                 int color = 6839882;
 
-                if(((this.reagentTableManager.getLapisAmount() < i + 1 || this.mc.player.experienceLevel < enchantmentLevel) && !this.mc.player.capabilities.isCreativeMode) || this.reagentTableManager.getEnchantments()[i] == -1)
+                if(((this.reagentTableManager.getLapisAmount() < i + 1 || this.mc.player.experienceLevel < enchantabilityLevel) && !this.mc.player.capabilities.isCreativeMode) || this.reagentTableManager.getEnchantments()[i] == -1)
                 {
                     this.drawTexturedModalRect(rectanglePosX, height + 14 + 19 * i, 0, 185, 108, 19);
                     this.drawTexturedModalRect(rectanglePosX + 1, height + 15 + 19 * i, 16 * i, 239, 16, 16);
@@ -241,10 +248,10 @@ public class GuiReagentTable extends GuiContainer
         {
             Enchantment enchantment = Enchantment.getEnchantmentByID(this.reagentTableManager.getEnchantments()[i]);
             int enchantmentLevel = this.reagentTableManager.getEnchantmentLevels()[i];
-            int experienceLevel = this.reagentTableManager.getExperienceLevels()[i];
+            int enchantabilityLevel = this.reagentTableManager.getEnchantabilityLevels()[i];
             int enchantmentTier = i + 1;
 
-            if(this.isPointInRegion(62, 14 + 19 * i, 108, 17, mouseX, mouseY) && experienceLevel > 0)
+            if(this.isPointInRegion(62, 14 + 19 * i, 108, 17, mouseX, mouseY) && enchantabilityLevel > 0)
             {
                 List<String> list = new ArrayList<>();
                 list.add("" + TextFormatting.WHITE + TextFormatting.ITALIC + I18n.format("gui.reagenchant:reagent_table.enchantment.clue", enchantment == null ? "" : enchantment.getTranslatedName(enchantmentLevel)));
@@ -257,9 +264,9 @@ public class GuiReagentTable extends GuiContainer
                 {
                     list.add("");
 
-                    if(this.mc.player.experienceLevel < experienceLevel)
+                    if(this.mc.player.experienceLevel < enchantabilityLevel)
                     {
-                        list.add(TextFormatting.RED + I18n.format("gui.reagenchant:reagent_table.experience.requirement", experienceLevel));
+                        list.add(TextFormatting.RED + I18n.format("gui.reagenchant:reagent_table.experience.requirement", enchantabilityLevel));
                     }
                     else
                     {
@@ -270,7 +277,7 @@ public class GuiReagentTable extends GuiContainer
 
                         if(!reagentStack.isEmpty())
                         {
-                            IReagent reagent = ReagenchantAPI.getInstance().getReagent(reagentStack.getItem());
+                            IReagent reagent = ReagenchantAPI.getInstance().getReagentRegistry().getReagent(reagentStack.getItem());
 
                             if(reagent.getAssociatedEnchantments().contains(enchantment))
                             {
@@ -321,7 +328,7 @@ public class GuiReagentTable extends GuiContainer
 
         for(int i = 0; i < 3; i++)
         {
-            if(this.reagentTableManager.getExperienceLevels()[i] != 0)
+            if(this.reagentTableManager.getEnchantabilityLevels()[i] != 0)
             {
                 flag = true;
             }

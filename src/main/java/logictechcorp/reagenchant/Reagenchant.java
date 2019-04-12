@@ -17,22 +17,19 @@
 
 package logictechcorp.reagenchant;
 
-import com.google.common.collect.ImmutableList;
 import logictechcorp.libraryex.IModData;
 import logictechcorp.libraryex.proxy.IProxy;
-import logictechcorp.reagenchant.api.IReagenchantAPI;
 import logictechcorp.reagenchant.api.ReagenchantAPI;
-import logictechcorp.reagenchant.api.reagent.IReagent;
+import logictechcorp.reagenchant.api.internal.IReagenchantAPI;
+import logictechcorp.reagenchant.api.internal.IReagentManager;
+import logictechcorp.reagenchant.api.internal.IReagentRegistry;
 import logictechcorp.reagenchant.handler.GuiHandler;
 import logictechcorp.reagenchant.init.ReagenchantReagents;
 import net.minecraft.creativetab.CreativeTabs;
-import net.minecraft.item.Item;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.SidedProxy;
-import net.minecraftforge.fml.common.event.FMLInitializationEvent;
-import net.minecraftforge.fml.common.event.FMLPostInitializationEvent;
-import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
+import net.minecraftforge.fml.common.event.*;
 import net.minecraftforge.fml.common.network.NetworkRegistry;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -74,6 +71,18 @@ public class Reagenchant implements IModData, IReagenchantAPI
         proxy.postInit();
     }
 
+    @Mod.EventHandler
+    public void onFMLServerStarting(FMLServerStartingEvent event)
+    {
+        ReagenchantAPI.getInstance().getReagentManager().readReagentConfigs(event);
+    }
+
+    @Mod.EventHandler
+    public void onFMLServerStopping(FMLServerStoppingEvent event)
+    {
+        ReagenchantAPI.getInstance().getReagentManager().writeReagentConfigs(event);
+    }
+
     @Override
     public String getModId()
     {
@@ -104,26 +113,14 @@ public class Reagenchant implements IModData, IReagenchantAPI
     }
 
     @Override
-    public void registerReagent(IReagent reagent)
+    public IReagentRegistry getReagentRegistry()
     {
-        ReagentRegistry.registerReagent(reagent);
+        return ReagentRegistry.INSTANCE;
     }
 
     @Override
-    public boolean isReagentItem(Item item)
+    public IReagentManager getReagentManager()
     {
-        return ReagentRegistry.isReagentItem(item);
-    }
-
-    @Override
-    public IReagent getReagent(Item associatedItem)
-    {
-        return ReagentRegistry.getReagent(associatedItem);
-    }
-
-    @Override
-    public ImmutableList<IReagent> getReagents()
-    {
-        return ReagentRegistry.getReagents();
+        return ReagentManager.INSTANCE;
     }
 }

@@ -15,21 +15,16 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package logictechcorp.reagenchant.api;
+package logictechcorp.reagenchant.api.internal;
 
-import com.google.common.collect.ImmutableList;
 import logictechcorp.reagenchant.api.reagent.IReagent;
 import net.minecraft.item.Item;
+import net.minecraft.util.ResourceLocation;
 
-public interface IReagenchantAPI
+import java.util.Map;
+
+public interface IReagentRegistry
 {
-    /**
-     * Returns false if the actual mod is loaded.
-     *
-     * @return Whether this API instance is created by the mod.
-     */
-    boolean isStub();
-
     /**
      * Called to register a Reagent.
      *
@@ -54,9 +49,9 @@ public interface IReagenchantAPI
     IReagent getReagent(Item associatedItem);
 
     /**
-     * Called to get a list of all registered Reagents.
+     * Called to get a map containing the Reagent's registry name and instance.
      *
-     * @return A list of the registered Reagents.
+     * @return A map containing the Reagent's registry name and instance.
      */
-    ImmutableList<IReagent> getReagents();
+    Map<ResourceLocation, IReagent> getReagents();
 }

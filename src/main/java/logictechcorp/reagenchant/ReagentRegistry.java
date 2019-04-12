@@ -17,44 +17,53 @@
 
 package logictechcorp.reagenchant;
 
-import com.google.common.collect.ImmutableList;
+import logictechcorp.reagenchant.api.internal.IReagentRegistry;
 import logictechcorp.reagenchant.api.reagent.IReagent;
+import logictechcorp.reagenchant.api.reagent.IReagentConfigurable;
 import net.minecraft.enchantment.Enchantment;
 import net.minecraft.item.Item;
 import net.minecraft.util.ResourceLocation;
 import org.apache.logging.log4j.Marker;
 import org.apache.logging.log4j.MarkerManager;
 
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
-class ReagentRegistry
+final class ReagentRegistry implements IReagentRegistry
 {
-    private static final Map<ResourceLocation, IReagent> REAGENTS = new HashMap<>();
-    private static final Marker MARKER = MarkerManager.getMarker("ReagentRegistry");
+    static final IReagentRegistry INSTANCE = new ReagentRegistry();
 
-    static void registerReagent(IReagent reagent)
+    private final Map<ResourceLocation, IReagent> reagents = new HashMap<>();
+    private final Marker marker = MarkerManager.getMarker("ReagentRegistry");
+
+    private ReagentRegistry()
+    {
+    }
+
+    @Override
+    public void registerReagent(IReagent reagent)
     {
         ResourceLocation associatedItem = reagent.getAssociatedItem().getRegistryName();
 
         if(associatedItem == null)
         {
-            Reagenchant.LOGGER.warn(MARKER, "The {} Reagent was not able to registered because it has an invalid associated item.", reagent.getName().toString());
+            Reagenchant.LOGGER.warn(this.marker, "The {} Reagent was not able to registered because it has an invalid associated item.", reagent.getName().toString());
             return;
         }
 
-        if(REAGENTS.containsKey(associatedItem))
+        if(this.reagents.containsKey(associatedItem))
         {
-            IReagent registeredReagent = REAGENTS.get(associatedItem);
+            IReagent registeredReagent = this.reagents.get(associatedItem);
 
             for(Enchantment enchantment : reagent.getAssociatedEnchantments())
             {
-                if(registeredReagent.getAssociatedEnchantments().contains(enchantment))
+                if(registeredReagent.getAssociatedEnchantments().contains(enchantment) && !(registeredReagent instanceof IReagentConfigurable))
                 {
                     continue;
                 }
 
-                float baseEnchantmentProbability = reagent.getBaseEnchantmentProbability(enchantment);
+                double baseEnchantmentProbability = reagent.getBaseEnchantmentProbability(enchantment);
                 int baseReagentCost = reagent.getBaseReagentCost(enchantment);
 
                 registeredReagent.addEnchantment(enchantment, baseEnchantmentProbability, baseReagentCost);
@@ -63,21 +72,24 @@ class ReagentRegistry
             return;
         }
 
-        REAGENTS.put(associatedItem, reagent);
+        this.reagents.put(associatedItem, reagent);
     }
 
-    static boolean isReagentItem(Item item)
+    @Override
+    public boolean isReagentItem(Item item)
     {
-        return REAGENTS.containsKey(item.getRegistryName());
+        return item instanceof IReagent || this.reagents.containsKey(item.getRegistryName());
     }
 
-    static IReagent getReagent(Item associatedItem)
+    @Override
+    public IReagent getReagent(Item associatedItem)
     {
-        return REAGENTS.get(associatedItem.getRegistryName());
+        return this.reagents.get(associatedItem.getRegistryName());
     }
 
-    static ImmutableList<IReagent> getReagents()
+    @Override
+    public Map<ResourceLocation, IReagent> getReagents()
     {
-        return ImmutableList.copyOf(REAGENTS.values());
+        return Collections.unmodifiableMap(this.reagents);
     }
 }
