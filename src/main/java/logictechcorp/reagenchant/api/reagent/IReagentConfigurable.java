@@ -19,8 +19,6 @@ package logictechcorp.reagenchant.api.reagent;
 
 import com.electronwill.nightconfig.core.Config;
 
-import java.io.File;
-
 public interface IReagentConfigurable extends IReagent
 {
     /**
@@ -38,9 +36,9 @@ public interface IReagentConfigurable extends IReagent
     void writeToConfig(Config config);
 
     /**
-     * Called to get the Reagents save file.
+     * Called to get the Reagents relative save file.
      *
-     * @return The Reagents save file
+     * @return The Reagents save relative save file.
      */
-    File getSaveFile();
+    String getRelativeSaveFile();
 }

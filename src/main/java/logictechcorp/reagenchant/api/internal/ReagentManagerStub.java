@@ -17,8 +17,7 @@
 
 package logictechcorp.reagenchant.api.internal;
 
-import net.minecraftforge.fml.common.event.FMLServerStartingEvent;
-import net.minecraftforge.fml.common.event.FMLServerStoppingEvent;
+import net.minecraftforge.event.world.WorldEvent;
 
 final class ReagentManagerStub implements IReagentManager
 {
@@ -29,13 +28,13 @@ final class ReagentManagerStub implements IReagentManager
     }
 
     @Override
-    public void readReagentConfigs(FMLServerStartingEvent event)
+    public void readReagentConfigs(WorldEvent.Load event)
     {
 
     }
 
     @Override
-    public void writeReagentConfigs(FMLServerStoppingEvent event)
+    public void writeReagentConfigs(WorldEvent.Unload event)
     {
 
     }

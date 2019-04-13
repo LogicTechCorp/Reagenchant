@@ -29,7 +29,9 @@ import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.SidedProxy;
-import net.minecraftforge.fml.common.event.*;
+import net.minecraftforge.fml.common.event.FMLInitializationEvent;
+import net.minecraftforge.fml.common.event.FMLPostInitializationEvent;
+import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
 import net.minecraftforge.fml.common.network.NetworkRegistry;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -69,18 +71,6 @@ public class Reagenchant implements IModData, IReagenchantAPI
     public void onFMLPostInitialization(FMLPostInitializationEvent event)
     {
         proxy.postInit();
-    }
-
-    @Mod.EventHandler
-    public void onFMLServerStarting(FMLServerStartingEvent event)
-    {
-        ReagenchantAPI.getInstance().getReagentManager().readReagentConfigs(event);
-    }
-
-    @Mod.EventHandler
-    public void onFMLServerStopping(FMLServerStoppingEvent event)
-    {
-        ReagenchantAPI.getInstance().getReagentManager().writeReagentConfigs(event);
     }
 
     @Override

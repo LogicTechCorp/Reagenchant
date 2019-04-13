@@ -17,7 +17,6 @@
 
 package logictechcorp.reagenchant;
 
-import com.electronwill.nightconfig.core.Config;
 import com.electronwill.nightconfig.core.file.FileConfig;
 import logictechcorp.libraryex.config.ModJsonConfigFormat;
 import logictechcorp.libraryex.utility.FileHelper;
@@ -31,8 +30,9 @@ import logictechcorp.reagenchant.api.reagent.ReagentConfigurable;
 import net.minecraft.init.Items;
 import net.minecraft.item.Item;
 import net.minecraft.util.ResourceLocation;
-import net.minecraftforge.fml.common.event.FMLServerStartingEvent;
-import net.minecraftforge.fml.common.event.FMLServerStoppingEvent;
+import net.minecraft.world.DimensionType;
+import net.minecraft.world.World;
+import net.minecraftforge.event.world.WorldEvent;
 import org.apache.logging.log4j.Marker;
 import org.apache.logging.log4j.MarkerManager;
 
@@ -52,94 +52,100 @@ final class ReagentManager implements IReagentManager
     }
 
     @Override
-    public void readReagentConfigs(FMLServerStartingEvent event)
+    public void readReagentConfigs(WorldEvent.Load event)
     {
-        Reagenchant.LOGGER.info(this.marker, "Reading Reagent configs from disk.");
-        Path path = new File(WorldHelper.getSaveFile(), "/config/reagenchant/reagents").toPath();
+        World world = event.getWorld();
 
-        try
+        if(!world.isRemote && world.provider.getDimension() == DimensionType.OVERWORLD.getId())
         {
-            Files.createDirectories(path);
-            Iterator<Path> pathIter = Files.walk(path).iterator();
+            Reagenchant.LOGGER.info(this.marker, "Reading Reagent configs from disk.");
+            Path path = new File(WorldHelper.getSaveDirectory(event.getWorld()), "/config/reagenchant/reagents").toPath();
 
-            while(pathIter.hasNext())
+            try
             {
-                File configFile = pathIter.next().toFile();
+                Files.createDirectories(path);
+                Iterator<Path> pathIter = Files.walk(path).iterator();
 
-                if(FileHelper.getFileExtension(configFile).equals("json"))
+                while(pathIter.hasNext())
                 {
-                    FileConfig config = FileConfig.of(configFile, ModJsonConfigFormat.instance());
-                    config.load();
+                    File configFile = pathIter.next().toFile();
 
-                    Item associatedItem = Item.getByNameOrId(config.getOrElse("associatedItem", "minecraft:air"));
-
-                    if(associatedItem != null && associatedItem != Items.AIR)
+                    if(FileHelper.getFileExtension(configFile).equals("json"))
                     {
-                        IReagentRegistry reagentRegistry = ReagenchantAPI.getInstance().getReagentRegistry();
-                        IReagent reagent;
+                        FileConfig config = FileConfig.of(configFile, ModJsonConfigFormat.instance());
+                        config.load();
 
-                        if(reagentRegistry.isReagentItem(associatedItem))
+                        Item associatedItem = Item.getByNameOrId(config.getOrElse("associatedItem", "minecraft:air"));
+
+                        if(associatedItem != null && associatedItem != Items.AIR)
                         {
-                            reagent = reagentRegistry.getReagent(associatedItem);
+                            IReagentRegistry reagentRegistry = ReagenchantAPI.getInstance().getReagentRegistry();
+                            IReagent reagent;
 
-                            if(!(reagent instanceof IReagentConfigurable))
+                            if(reagentRegistry.isReagentItem(associatedItem))
                             {
-                                continue;
+                                reagent = reagentRegistry.getReagent(associatedItem);
+
+                                if(!(reagent instanceof IReagentConfigurable))
+                                {
+                                    continue;
+                                }
+
+                                ((IReagentConfigurable) reagent).readFromConfig(config);
                             }
+                            else
+                            {
+                                reagent = new ReagentConfigurable(new ResourceLocation(config.getOrElse("name", "missing:no")), associatedItem);
+                                ((IReagentConfigurable) reagent).readFromConfig(config);
+                                reagentRegistry.registerReagent(reagent);
+                            }
+                        }
 
-                            ((IReagentConfigurable) reagent).readFromConfig(config);
-                        }
-                        else
-                        {
-                            reagent = new ReagentConfigurable(new ResourceLocation(config.getOrElse("name", "missing:no")), associatedItem);
-                            reagentRegistry.registerReagent(reagent);
-                        }
+                        config.close();
                     }
-
-                    config.close();
-                }
-                else if(!configFile.isDirectory())
-                {
-                    Reagenchant.LOGGER.info(this.marker, "Skipping file located at, {}, as it is not a json file.", configFile.getPath());
+                    else if(!configFile.isDirectory())
+                    {
+                        Reagenchant.LOGGER.info(this.marker, "Skipping file located at, {}, as it is not a json file.", configFile.getPath());
+                    }
                 }
             }
-        }
-        catch(IOException e)
-        {
-            e.printStackTrace();
+            catch(IOException e)
+            {
+                e.printStackTrace();
+            }
         }
     }
 
     @Override
-    public void writeReagentConfigs(FMLServerStoppingEvent event)
+    public void writeReagentConfigs(WorldEvent.Unload event)
     {
-        Reagenchant.LOGGER.info(this.marker, "Writing Reagent configs to disk.");
+        World world = event.getWorld();
 
-        for(IReagent reagent : ReagenchantAPI.getInstance().getReagentRegistry().getReagents().values())
+        if(!world.isRemote && world.provider.getDimension() == DimensionType.OVERWORLD.getId())
         {
-            if(!(reagent instanceof IReagentConfigurable))
+            Reagenchant.LOGGER.info(this.marker, "Writing Reagent configs to disk.");
+
+            for(IReagent reagent : ReagenchantAPI.getInstance().getReagentRegistry().getReagents().values())
             {
-                continue;
+                if(!(reagent instanceof IReagentConfigurable))
+                {
+                    continue;
+                }
+
+                IReagentConfigurable reagentConfigurable = (IReagentConfigurable) reagent;
+                File configFile = new File(WorldHelper.getSaveDirectory(event.getWorld()), reagentConfigurable.getRelativeSaveFile());
+                FileConfig fileConfig = FileConfig.of(configFile, ModJsonConfigFormat.instance());
+
+                if(!configFile.getParentFile().mkdirs() && configFile.exists() || configFile.exists())
+                {
+                    fileConfig.load();
+                    reagentConfigurable.readFromConfig(fileConfig);
+                }
+
+                reagentConfigurable.writeToConfig(fileConfig);
+                fileConfig.save();
+                fileConfig.close();
             }
-
-            IReagentConfigurable reagentConfigurable = (IReagentConfigurable) reagent;
-
-            File configFile = reagentConfigurable.getSaveFile();
-            FileConfig fileConfig = FileConfig.of(configFile, ModJsonConfigFormat.instance());
-
-            if(!configFile.exists() && configFile.getParentFile().mkdirs() || !configFile.exists())
-            {
-                Config config = ModJsonConfigFormat.newConfig();
-                reagentConfigurable.writeToConfig(config);
-                config.entrySet().forEach(entry -> fileConfig.add(entry.getKey(), entry.getValue()));
-            }
-            else
-            {
-                fileConfig.load();
-                reagentConfigurable.readFromConfig(fileConfig);
-            }
-
-            fileConfig.save();
         }
     }
 }

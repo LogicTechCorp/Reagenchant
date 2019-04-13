@@ -15,23 +15,26 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package logictechcorp.reagenchant.api.internal;
+package logictechcorp.reagenchant.handler;
 
+import logictechcorp.reagenchant.Reagenchant;
+import logictechcorp.reagenchant.api.ReagenchantAPI;
 import net.minecraftforge.event.world.WorldEvent;
+import net.minecraftforge.fml.common.Mod;
+import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 
-public interface IReagentManager
+@Mod.EventBusSubscriber(modid = Reagenchant.MOD_ID)
+public class WorldHandler
 {
-    /**
-     * Reads Reagent configs from disk and then configures them.
-     *
-     * @param event To ensure that this is only called after the server has started.
-     */
-    void readReagentConfigs(WorldEvent.Load event);
+    @SubscribeEvent
+    public static void onWorldLoad(WorldEvent.Load event)
+    {
+        ReagenchantAPI.getInstance().getReagentManager().readReagentConfigs(event);
+    }
 
-    /**
-     * Writes Reagent configs to disk.
-     *
-     * @param event To ensure that this is only called before the server has stopped.
-     */
-    void writeReagentConfigs(WorldEvent.Unload event);
+    @SubscribeEvent
+    public static void onWorldUnload(WorldEvent.Unload event)
+    {
+        ReagenchantAPI.getInstance().getReagentManager().writeReagentConfigs(event);
+    }
 }

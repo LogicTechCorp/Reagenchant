@@ -19,13 +19,11 @@ package logictechcorp.reagenchant.api.reagent;
 
 import com.electronwill.nightconfig.core.Config;
 import logictechcorp.libraryex.config.ModJsonConfigFormat;
-import logictechcorp.libraryex.utility.WorldHelper;
 import net.minecraft.enchantment.Enchantment;
 import net.minecraft.item.Item;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.Tuple;
 
-import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -73,8 +71,8 @@ public class ReagentConfigurable extends Reagent implements IReagentConfigurable
     public void writeToConfig(Config config)
     {
         List<Config> enchantmentConfigs = new ArrayList<>();
-        config.add("name", this.name.toString());
-        config.add("associatedItem", this.associatedItem.getRegistryName().toString());
+        config.set("name", this.name.toString());
+        config.set("associatedItem", this.associatedItem.getRegistryName().toString());
 
         for(Map.Entry<ResourceLocation, Tuple<Double, Integer>> entry : this.enchantments.entrySet())
         {
@@ -87,12 +85,12 @@ public class ReagentConfigurable extends Reagent implements IReagentConfigurable
             enchantmentConfigs.add(enchantmentConfig);
         }
 
-        config.add("enchantments", enchantmentConfigs);
+        config.set("enchantments", enchantmentConfigs);
     }
 
     @Override
-    public File getSaveFile()
+    public String getRelativeSaveFile()
     {
-        return new File(WorldHelper.getSaveFile(), "/config/reagenchant/reagents/" + this.name.toString().replace(":", "/") + ".json");
+        return "config/reagenchant/reagents/" + this.name.toString().replace(":", "/") + ".json";
     }
 }
