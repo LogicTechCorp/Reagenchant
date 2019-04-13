@@ -56,7 +56,7 @@ final class ReagentManager implements IReagentManager
     {
         World world = event.getWorld();
 
-        if(!world.isRemote && world.provider.getDimension() == DimensionType.OVERWORLD.getId())
+        if(world.provider.getDimension() == DimensionType.OVERWORLD.getId())
         {
             Reagenchant.LOGGER.info(this.marker, "Reading Reagent configs from disk.");
             Path path = new File(WorldHelper.getSaveDirectory(event.getWorld()), "/config/reagenchant/reagents").toPath();
@@ -121,7 +121,7 @@ final class ReagentManager implements IReagentManager
     {
         World world = event.getWorld();
 
-        if(!world.isRemote && world.provider.getDimension() == DimensionType.OVERWORLD.getId())
+        if(world.provider.getDimension() == DimensionType.OVERWORLD.getId())
         {
             Reagenchant.LOGGER.info(this.marker, "Writing Reagent configs to disk.");
 

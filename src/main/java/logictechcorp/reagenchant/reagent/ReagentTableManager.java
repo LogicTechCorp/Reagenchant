@@ -211,49 +211,49 @@ public class ReagentTableManager
 
                     for(EnchantmentData enchantmentData : enchantmentList)
                     {
-                        if(reagent != null)
+                        if(!EnchantmentHelper.getEnchantments(unenchantedStack).keySet().contains(enchantmentData.enchantment))
                         {
-                            if(flag)
+                            if(reagent != null)
                             {
                                 int reagentCost = reagent.getReagentCost(this.world, this.pos, player, unenchantedStack, reagentStack, enchantmentData, this.random);
 
-                                if(reagentCost <= reagentStack.getCount())
+                                if(flag)
                                 {
-                                    if(maxReagentCost < reagentCost)
+                                    if(reagentCost <= reagentStack.getCount())
                                     {
-                                        maxReagentCost = reagentCost;
-                                    }
+                                        if(maxReagentCost < reagentCost)
+                                        {
+                                            maxReagentCost = reagentCost;
+                                        }
 
-                                    ItemEnchantedBook.addEnchantment(unenchantedStack, enchantmentData);
+                                        ItemEnchantedBook.addEnchantment(unenchantedStack, enchantmentData);
+                                    }
+                                }
+                                else
+                                {
+                                    if(reagentCost <= reagentStack.getCount())
+                                    {
+                                        if(maxReagentCost < reagentCost)
+                                        {
+                                            maxReagentCost = reagentCost;
+                                        }
+
+                                        unenchantedStack.addEnchantment(enchantmentData.enchantment, enchantmentData.enchantmentLevel);
+                                    }
                                 }
                             }
                             else
                             {
-                                int reagentCost = reagent.getReagentCost(this.world, this.pos, player, unenchantedStack, reagentStack, enchantmentData, this.random);
-
-                                if(reagentCost <= reagentStack.getCount())
+                                if(flag)
                                 {
-                                    if(maxReagentCost < reagentCost)
-                                    {
-                                        maxReagentCost = reagentCost;
-                                    }
-
+                                    ItemEnchantedBook.addEnchantment(unenchantedStack, enchantmentData);
+                                }
+                                else
+                                {
                                     unenchantedStack.addEnchantment(enchantmentData.enchantment, enchantmentData.enchantmentLevel);
                                 }
                             }
                         }
-                        else
-                        {
-                            if(flag)
-                            {
-                                ItemEnchantedBook.addEnchantment(unenchantedStack, enchantmentData);
-                            }
-                            else
-                            {
-                                unenchantedStack.addEnchantment(enchantmentData.enchantment, enchantmentData.enchantmentLevel);
-                            }
-                        }
-
                     }
 
                     if(!player.capabilities.isCreativeMode)
