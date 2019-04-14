@@ -33,7 +33,7 @@ import net.minecraftforge.fml.common.registry.GameRegistry;
 public class ReagenchantBlocks
 {
     @GameRegistry.ObjectHolder("minecraft:enchanting_table")
-    public static final BlockReagentTable REAGENT_ENCHANTMENT_TABLE = InjectionHelper.nullValue();
+    public static final BlockReagentTable REAGENT_TABLE = InjectionHelper.nullValue();
 
     private static final ItemBuilder DEFAULT_ITEM_BLOCK_BUILDER = new ItemBuilder();
 

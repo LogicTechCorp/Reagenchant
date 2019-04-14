@@ -30,6 +30,7 @@ import net.minecraft.util.WeightedRandom;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.world.World;
+import net.minecraftforge.fml.common.registry.ForgeRegistries;
 
 import java.util.*;
 
@@ -45,7 +46,31 @@ public class Reagent implements IReagent
     public Reagent(ResourceLocation name, Item associatedItem)
     {
         this.name = name;
-        this.associatedItem = associatedItem;
+
+        if(associatedItem != null)
+        {
+            this.associatedItem = associatedItem;
+        }
+        else
+        {
+            this.associatedItem = Items.AIR;
+        }
+    }
+
+    public Reagent(ResourceLocation name, ResourceLocation associatedItemRegistryName)
+    {
+        this.name = name;
+
+        Item associatedItem = ForgeRegistries.ITEMS.getValue(associatedItemRegistryName);
+
+        if(associatedItem != null)
+        {
+            this.associatedItem = associatedItem;
+        }
+        else
+        {
+            this.associatedItem = Items.AIR;
+        }
     }
 
     @Override

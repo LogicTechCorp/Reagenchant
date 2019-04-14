@@ -27,16 +27,16 @@ public interface IReagenchantAPI
     boolean isStub();
 
     /**
-     * Returns the Reagent Registry.
+     * Returns the reagent registry.
      *
-     * @return The Reagent Registry.
+     * @return The reagent registry.
      */
     IReagentRegistry getReagentRegistry();
 
     /**
-     * Returns the Reagent Manager.
+     * Returns the reagent manager.
      *
-     * @return The Reagent Manager
+     * @return The reagent manager
      */
     IReagentManager getReagentManager();
 }

@@ -119,7 +119,7 @@ public class GuiReagentTable extends GuiContainer
     protected void drawGuiContainerBackgroundLayer(float partialTicks, int mouseX, int mouseY)
     {
         GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
-        this.mc.getTextureManager().bindTexture(ReagenchantTextures.REAGENT_ENCHANTMENT_TABLE_GUI);
+        this.mc.getTextureManager().bindTexture(ReagenchantTextures.REAGENT_TABLE_GUI);
         int width = (this.width - this.xSize) / 2;
         int height = (this.height - this.ySize) / 2;
         this.drawTexturedModalRect(width, height, 0, 0, this.xSize, this.ySize);
@@ -138,7 +138,7 @@ public class GuiReagentTable extends GuiContainer
         GlStateManager.scale(1.0F, 1.0F, 1.0F);
         GlStateManager.scale(5.0F, 5.0F, 5.0F);
         GlStateManager.rotate(180.0F, 0.0F, 0.0F, 1.0F);
-        this.mc.getTextureManager().bindTexture(ReagenchantTextures.REAGENT_ENCHANTMENT_TABLE_BOOK);
+        this.mc.getTextureManager().bindTexture(ReagenchantTextures.REAGENT_TABLE_BOOK);
         GlStateManager.rotate(20.0F, 1.0F, 0.0F, 0.0F);
         float openFlip = this.openPrev + (this.open - this.openPrev) * partialTicks;
         GlStateManager.translate((1.0F - openFlip) * 0.2F, (1.0F - openFlip) * 0.1F, (1.0F - openFlip) * 0.25F);
@@ -187,7 +187,7 @@ public class GuiReagentTable extends GuiContainer
             int rectanglePosX = width + 62;
             int textPosX = rectanglePosX + 20;
             this.zLevel = 0.0F;
-            this.mc.getTextureManager().bindTexture(ReagenchantTextures.REAGENT_ENCHANTMENT_TABLE_GUI);
+            this.mc.getTextureManager().bindTexture(ReagenchantTextures.REAGENT_TABLE_GUI);
             int enchantabilityLevel = this.reagentTableManager.getEnchantabilityLevels()[i];
             GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
 

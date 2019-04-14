@@ -33,7 +33,13 @@ final class ReagentRegistryStub implements IReagentRegistry
     }
 
     @Override
-    public void registerReagent(IReagent reagent)
+    public void registerReagent(IReagent unregisteredReagent)
+    {
+
+    }
+
+    @Override
+    public void unregisterReagent(Item associatedItem)
     {
 
     }

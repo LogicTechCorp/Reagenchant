@@ -38,6 +38,11 @@ public class ReagentConfigurable extends Reagent implements IReagentConfigurable
         super(name, associatedItem);
     }
 
+    public ReagentConfigurable(ResourceLocation name, ResourceLocation associatedItemRegistryName)
+    {
+        super(name, associatedItemRegistryName);
+    }
+
     @Override
     public void readFromConfig(Config config)
     {

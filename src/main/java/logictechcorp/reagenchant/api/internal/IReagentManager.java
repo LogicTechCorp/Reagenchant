@@ -22,14 +22,14 @@ import net.minecraftforge.event.world.WorldEvent;
 public interface IReagentManager
 {
     /**
-     * Reads Reagent configs from disk and then configures them.
+     * Reads reagent configs from disk and then configures them.
      *
      * @param event To ensure that this is only called after the server has started.
      */
     void readReagentConfigs(WorldEvent.Load event);
 
     /**
-     * Writes Reagent configs to disk.
+     * Writes reagent configs to disk.
      *
      * @param event To ensure that this is only called before the server has stopped.
      */

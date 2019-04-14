@@ -28,10 +28,21 @@ minecraft {
 }
 
 repositories {
+    maven {
+        name = "Progwml6 maven"
+        url = "https://dvs1.progwml6.com/files/maven/"
+    }
+    maven {
+        name = "ModMaven"
+        url = "https://modmaven.k-4u.nl"
+    }
 }
 
 dependencies {
     compile project(':LibraryEx')
+
+    deobfProvided "mezz.jei:jei_${minecraft_version}:${jei_version}:api"
+    runtime "mezz.jei:jei_${minecraft_version}:${jei_version}"
 }
 
 processResources {

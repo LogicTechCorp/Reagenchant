@@ -11,4 +11,6 @@ gui.reagenchant:reagent_table.experience.requirement=Experience required to unlo
 gui.reagenchant:reagent_table.experience.cost=Experience Level cost: %s
 gui.reagenchant:reagent_table.enchantment.clue=%s . . . ?
 gui.reagenchant:reagent_table.enchantment.limited=Limited Enchantability
+gui.reagenchant:reagent_table.probability.base=Base Probability: %s%%
+gui.reagenchant:reagent_table.reagent.base_cost=Base Reagent cost: %s
 

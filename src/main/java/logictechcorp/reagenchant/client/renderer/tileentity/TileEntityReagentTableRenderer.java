@@ -52,7 +52,7 @@ public class TileEntityReagentTableRenderer extends TileEntitySpecialRenderer<Ti
         float previousBookRotation = reagentTable.getBookRotationPrev() + bookRotation * partialTicks;
         GlStateManager.rotate(-previousBookRotation * (180F / (float) Math.PI), 0.0F, 1.0F, 0.0F);
         GlStateManager.rotate(80.0F, 0.0F, 0.0F, 1.0F);
-        this.bindTexture(ReagenchantTextures.REAGENT_ENCHANTMENT_TABLE_BOOK);
+        this.bindTexture(ReagenchantTextures.REAGENT_TABLE_BOOK);
         float pageOneFlip = reagentTable.getPageFlipPrev() + (reagentTable.getPageFlip() - reagentTable.getPageFlipPrev()) * partialTicks + 0.25F;
         float pageTwoFlip = reagentTable.getPageFlipPrev() + (reagentTable.getPageFlip() - reagentTable.getPageFlipPrev()) * partialTicks + 0.75F;
         pageOneFlip = (pageOneFlip - (float) MathHelper.fastFloor((double) pageOneFlip)) * 1.6F - 0.3F;

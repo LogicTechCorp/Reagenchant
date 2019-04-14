@@ -26,32 +26,39 @@ import java.util.Map;
 public interface IReagentRegistry
 {
     /**
-     * Called to register a Reagent.
+     * Called to register a reagent.
      *
-     * @param reagent The reagent that is to be registered.
+     * @param unregisteredReagent The reagent that is to be registered.
      */
-    void registerReagent(IReagent reagent);
+    void registerReagent(IReagent unregisteredReagent);
 
     /**
-     * Called to check if an item is associated with a Reagent.
+     * Called to unregister a reagent.
+     *
+     * @param associatedItem The item that is associated with the reagent.
+     */
+    void unregisterReagent(Item associatedItem);
+
+    /**
+     * Called to check if an item is associated with a reagent.
      *
      * @param item The item to check against.
-     * @return Whether the item is associated with a Reagent.
+     * @return Whether the item is associated with a reagent.
      */
     boolean isReagentItem(Item item);
 
     /**
-     * Called to get a Reagent associated with an item.
+     * Called to get a reagent associated with an item.
      *
-     * @param associatedItem The item to get the Reagent for.
-     * @return The Reagent associated with the item.
+     * @param associatedItem The item to get the reagent for.
+     * @return The reagent associated with the item.
      */
     IReagent getReagent(Item associatedItem);
 
     /**
-     * Called to get a map containing the Reagent's registry name and instance.
+     * Called to get a map containing reagent registry name's and instances.
      *
-     * @return A map containing the Reagent's registry name and instance.
+     * @return A map containing the reagent registry name's and instances.
      */
     Map<ResourceLocation, IReagent> getReagents();
 }
