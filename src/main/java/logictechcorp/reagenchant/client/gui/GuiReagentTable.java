@@ -34,6 +34,7 @@ import net.minecraft.enchantment.EnchantmentData;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.EnchantmentNameParts;
+import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.text.ITextComponent;
@@ -118,8 +119,19 @@ public class GuiReagentTable extends GuiContainer
     @Override
     protected void drawGuiContainerBackgroundLayer(float partialTicks, int mouseX, int mouseY)
     {
+        ResourceLocation guiTexture;
+
+        if(!this.reagentTableManager.getInventory().getStackInSlot(2).isEmpty())
+        {
+            guiTexture = ReagenchantTextures.REAGENT_TABLE_WITH_REAGENT_GUI;
+        }
+        else
+        {
+            guiTexture = ReagenchantTextures.REAGENT_TABLE_WITHOUT_REAGENT_GUI;
+        }
+
         GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
-        this.mc.getTextureManager().bindTexture(ReagenchantTextures.REAGENT_TABLE_GUI);
+        this.mc.getTextureManager().bindTexture(guiTexture);
         int width = (this.width - this.xSize) / 2;
         int height = (this.height - this.ySize) / 2;
         this.drawTexturedModalRect(width, height, 0, 0, this.xSize, this.ySize);
@@ -187,7 +199,7 @@ public class GuiReagentTable extends GuiContainer
             int rectanglePosX = width + 62;
             int textPosX = rectanglePosX + 20;
             this.zLevel = 0.0F;
-            this.mc.getTextureManager().bindTexture(ReagenchantTextures.REAGENT_TABLE_GUI);
+            this.mc.getTextureManager().bindTexture(guiTexture);
             int enchantabilityLevel = this.reagentTableManager.getEnchantabilityLevels()[i];
             GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
 

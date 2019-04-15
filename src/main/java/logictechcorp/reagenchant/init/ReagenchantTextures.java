@@ -22,7 +22,8 @@ import net.minecraft.util.ResourceLocation;
 
 public class ReagenchantTextures
 {
-    public static final ResourceLocation REAGENT_TABLE_GUI = Reagenchant.getResource("textures/gui/container/reagent_table.png");
+    public static final ResourceLocation REAGENT_TABLE_WITH_REAGENT_GUI = Reagenchant.getResource("textures/gui/container/reagent_table_with_reagent.png");
+    public static final ResourceLocation REAGENT_TABLE_WITHOUT_REAGENT_GUI = Reagenchant.getResource("textures/gui/container/reagent_table_without_reagent.png");
     public static final ResourceLocation REAGENT_TABLE_BOOK = Reagenchant.getResource("textures/entity/reagent_table_book.png");
     public static final ResourceLocation REAGENT_TABLE_RECIPE_GUI = Reagenchant.getResource("textures/gui/container/reagent_table_recipe.png");
 }

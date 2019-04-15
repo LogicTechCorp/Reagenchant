@@ -17,6 +17,7 @@
 
 package logictechcorp.reagenchant.reagent;
 
+import logictechcorp.libraryex.utility.RandomHelper;
 import logictechcorp.reagenchant.api.ReagenchantAPI;
 import logictechcorp.reagenchant.api.reagent.IReagent;
 import logictechcorp.reagenchant.inventory.ContainerReagentTable;
@@ -153,6 +154,7 @@ public class ReagentTableManager
 
         this.random.setSeed((long) (this.xpSeed + enchantmentTier));
         List<EnchantmentData> enchantmentData = EnchantmentHelper.buildEnchantmentList(this.random, unenchantedStack, enchantabilityLevel, false);
+        boolean usedReagentEnchantments = false;
 
         if(!reagentStack.isEmpty())
         {
@@ -161,12 +163,20 @@ public class ReagentTableManager
             if(reagent.hasApplicableEnchantments(this.world, this.pos, this.player, unenchantedStack, reagentStack, this.random))
             {
                 enchantmentData = reagent.createEnchantmentList(this.world, this.pos, this.player, unenchantedStack, reagentStack, enchantmentTier, enchantabilityLevel, this.random);
+                usedReagentEnchantments = true;
             }
         }
 
         if(unenchantedStack.getItem() == Items.BOOK && enchantmentData.size() > 1)
         {
-            enchantmentData.remove(this.random.nextInt(enchantmentData.size()));
+            if(usedReagentEnchantments)
+            {
+                enchantmentData.remove(RandomHelper.getNumberInRange(1, enchantmentData.size() - 1, this.random));
+            }
+            else
+            {
+                enchantmentData.remove(this.random.nextInt(enchantmentData.size()));
+            }
         }
 
         return enchantmentData;
@@ -191,8 +201,9 @@ public class ReagentTableManager
 
                 if(!enchantmentList.isEmpty())
                 {
-                    player.onEnchant(unenchantedStack, i);
+                    ItemStack unenchantedStackCopy = unenchantedStack.copy();
                     boolean flag = unenchantedStack.getItem() == Items.BOOK;
+                    player.onEnchant(unenchantedStack, i);
 
                     if(flag)
                     {
@@ -267,7 +278,7 @@ public class ReagentTableManager
 
                         if(reagent != null)
                         {
-                            if(reagent.consumeReagent(this.world, this.pos, player, unenchantedStack, reagentStack, enchantmentList, this.random))
+                            if(reagent.consumeReagent(this.world, this.pos, player, flag ? unenchantedStackCopy : unenchantedStack, reagentStack, enchantmentList, this.random))
                             {
                                 reagentStack.shrink(maxReagentCost);
 

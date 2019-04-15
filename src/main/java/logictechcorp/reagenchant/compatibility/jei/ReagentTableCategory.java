@@ -35,7 +35,7 @@ import net.minecraft.item.ItemStack;
 import java.util.List;
 import java.util.Map;
 
-public class ReagentTableCategory implements IRecipeCategory<ReagentWrapper>
+class ReagentTableCategory implements IRecipeCategory<ReagentWrapper>
 {
     static final String ID = Reagenchant.MOD_ID + ":reagent_table";
     private static final int INPUT_SLOT = 0;
@@ -45,7 +45,7 @@ public class ReagentTableCategory implements IRecipeCategory<ReagentWrapper>
     private final IDrawable icon;
     private final String title;
 
-    public ReagentTableCategory(IGuiHelper guiHelper)
+    ReagentTableCategory(IGuiHelper guiHelper)
     {
         this.background = guiHelper.createDrawable(ReagenchantTextures.REAGENT_TABLE_RECIPE_GUI, 0, 0, 79, 25);
         this.icon = guiHelper.createDrawableIngredient(new ItemStack(ReagenchantBlocks.REAGENT_TABLE));

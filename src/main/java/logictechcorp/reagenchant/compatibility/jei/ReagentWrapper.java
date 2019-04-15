@@ -30,7 +30,7 @@ import net.minecraft.item.ItemStack;
 import java.util.ArrayList;
 import java.util.List;
 
-public class ReagentWrapper implements IRecipeWrapper
+class ReagentWrapper implements IRecipeWrapper
 {
     private final IReagent reagent;
 

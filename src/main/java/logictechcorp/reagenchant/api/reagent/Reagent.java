@@ -106,21 +106,18 @@ public class Reagent implements IReagent
 
             for(Enchantment enchantment : applicableEnchantments)
             {
-                if(enchantment.canApplyAtEnchantingTable(unenchantedStack) || (unenchantedStack.getItem() == Items.BOOK && enchantment.isAllowedOnBooks()))
+                for(int enchantmentLevel = enchantment.getMaxLevel(); enchantmentLevel > enchantment.getMinLevel() - 1; enchantmentLevel--)
                 {
-                    for(int enchantmentLevel = enchantment.getMaxLevel(); enchantmentLevel > enchantment.getMinLevel() - 1; enchantmentLevel--)
+                    if(enchantabilityLevel >= enchantment.getMinEnchantability(enchantmentLevel) && enchantabilityLevel <= enchantment.getMaxEnchantability(enchantmentLevel))
                     {
-                        if(enchantabilityLevel >= enchantment.getMinEnchantability(enchantmentLevel) && enchantabilityLevel <= enchantment.getMaxEnchantability(enchantmentLevel))
+                        EnchantmentData enchantmentData = new EnchantmentData(enchantment, enchantmentLevel);
+
+                        if(this.getEnchantmentProbability(world, pos, player, unenchantedStack, reagentStack, enchantmentData, random) >= random.nextDouble())
                         {
-                            EnchantmentData enchantmentData = new EnchantmentData(enchantment, enchantmentLevel);
-
-                            if(this.getEnchantmentProbability(world, pos, player, unenchantedStack, reagentStack, enchantmentData, random) >= random.nextDouble())
-                            {
-                                aggregateEnchantmentData.add(enchantmentData);
-                            }
-
-                            break;
+                            aggregateEnchantmentData.add(enchantmentData);
                         }
+
+                        break;
                     }
                 }
             }
@@ -156,7 +153,7 @@ public class Reagent implements IReagent
     {
         for(Enchantment enchantment : this.getAssociatedEnchantments())
         {
-            if(enchantment.canApplyAtEnchantingTable(unenchantedStack))
+            if(enchantment.canApplyAtEnchantingTable(unenchantedStack) || (unenchantedStack.getItem() == Items.BOOK && enchantment.isAllowedOnBooks()))
             {
                 return true;
             }
@@ -213,7 +210,7 @@ public class Reagent implements IReagent
 
         for(Enchantment enchantment : this.getAssociatedEnchantments())
         {
-            if(enchantment.canApplyAtEnchantingTable(unenchantedStack))
+            if(enchantment.canApplyAtEnchantingTable(unenchantedStack) || (unenchantedStack.getItem() == Items.BOOK && enchantment.isAllowedOnBooks()))
             {
                 enchantments.add(enchantment);
             }

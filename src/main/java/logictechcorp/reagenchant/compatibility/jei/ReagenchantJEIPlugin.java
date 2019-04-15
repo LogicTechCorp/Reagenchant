@@ -19,6 +19,7 @@ package logictechcorp.reagenchant.compatibility.jei;
 
 import logictechcorp.reagenchant.api.ReagenchantAPI;
 import logictechcorp.reagenchant.api.reagent.IReagent;
+import logictechcorp.reagenchant.client.gui.GuiReagentTable;
 import logictechcorp.reagenchant.init.ReagenchantBlocks;
 import mezz.jei.api.IModPlugin;
 import mezz.jei.api.IModRegistry;
@@ -35,8 +36,6 @@ public class ReagenchantJEIPlugin implements IModPlugin
     @Override
     public void register(IModRegistry registry)
     {
-        registry.addRecipeCatalyst(new ItemStack(ReagenchantBlocks.REAGENT_TABLE), ReagentTableCategory.ID);
-
         List<ReagentWrapper> reagentWrappers = new ArrayList<>();
 
         for(IReagent reagent : ReagenchantAPI.getInstance().getReagentRegistry().getReagents().values())
@@ -44,6 +43,8 @@ public class ReagenchantJEIPlugin implements IModPlugin
             reagentWrappers.add(new ReagentWrapper(reagent));
         }
 
+        registry.addRecipeCatalyst(new ItemStack(ReagenchantBlocks.REAGENT_TABLE), ReagentTableCategory.ID);
+        registry.addRecipeClickArea(GuiReagentTable.class, 2, 2, 51, 39, ReagentTableCategory.ID);
         registry.addRecipes(reagentWrappers, ReagentTableCategory.ID);
     }
 
