@@ -21,7 +21,6 @@ import logictechcorp.libraryex.proxy.IProxy;
 import logictechcorp.reagenchant.client.renderer.tileentity.TileEntityReagentTableRenderer;
 import logictechcorp.reagenchant.tileentity.TileEntityReagentTable;
 import net.minecraft.client.Minecraft;
-import net.minecraft.world.World;
 import net.minecraftforge.fml.client.registry.ClientRegistry;
 
 public class ClientProxy implements IProxy
@@ -47,7 +46,7 @@ public class ClientProxy implements IProxy
     }
 
     @Override
-    public void spawnParticle(World world, int particleId, double posX, double posY, double posZ, double speedX, double speedY, double speedZ)
+    public void spawnParticle(int particleId, double posX, double posY, double posZ, double speedX, double speedY, double speedZ)
     {
     }
 }

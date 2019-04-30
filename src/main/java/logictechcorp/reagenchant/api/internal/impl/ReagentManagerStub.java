@@ -15,31 +15,28 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package logictechcorp.reagenchant.api.internal;
+package logictechcorp.reagenchant.api.internal.impl;
 
-public final class ReagenchantAPIStub implements IReagenchantAPI
+import logictechcorp.reagenchant.api.internal.iface.IReagentManager;
+import net.minecraftforge.event.world.WorldEvent;
+
+final class ReagentManagerStub implements IReagentManager
 {
-    public static final IReagenchantAPI INSTANCE = new ReagenchantAPIStub();
+    static final IReagentManager INSTANCE = new ReagentManagerStub();
 
-    private ReagenchantAPIStub()
+    private ReagentManagerStub()
     {
     }
 
     @Override
-    public boolean isStub()
+    public void readReagentConfigs(WorldEvent.Load event)
     {
-        return true;
+
     }
 
     @Override
-    public IReagentRegistry getReagentRegistry()
+    public void writeReagentConfigs(WorldEvent.Unload event)
     {
-        return ReagentRegistryStub.INSTANCE;
-    }
 
-    @Override
-    public IReagentManager getReagentManager()
-    {
-        return ReagentManagerStub.INSTANCE;
     }
 }

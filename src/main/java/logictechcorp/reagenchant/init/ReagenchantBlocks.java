@@ -17,7 +17,7 @@
 
 package logictechcorp.reagenchant.init;
 
-import logictechcorp.libraryex.item.builder.ItemBuilder;
+import logictechcorp.libraryex.item.builder.ItemProperties;
 import logictechcorp.libraryex.utility.InjectionHelper;
 import logictechcorp.reagenchant.Reagenchant;
 import logictechcorp.reagenchant.block.BlockReagentTable;
@@ -35,7 +35,7 @@ public class ReagenchantBlocks
     @GameRegistry.ObjectHolder("minecraft:enchanting_table")
     public static final BlockReagentTable REAGENT_TABLE = InjectionHelper.nullValue();
 
-    private static final ItemBuilder DEFAULT_ITEM_BLOCK_BUILDER = new ItemBuilder();
+    private static final ItemProperties DEFAULT_ITEM_BLOCK_BUILDER = new ItemProperties().creativeTab(Reagenchant.instance.getCreativeTab());
 
     @Mod.EventBusSubscriber(modid = Reagenchant.MOD_ID)
     public static class EventHandler
@@ -57,7 +57,7 @@ public class ReagenchantBlocks
         }
     }
 
-    public static ItemBuilder getDefaultItemBlockBuilder()
+    public static ItemProperties getDefaultItemBlockBuilder()
     {
         return DEFAULT_ITEM_BLOCK_BUILDER;
     }

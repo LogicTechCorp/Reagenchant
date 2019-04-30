@@ -15,7 +15,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package logictechcorp.reagenchant.api.reagent;
+package logictechcorp.reagenchant.api.reagent.iface;
 
 import net.minecraft.enchantment.Enchantment;
 import net.minecraft.enchantment.EnchantmentData;
@@ -37,11 +37,10 @@ public interface IReagent
     /**
      * Called to associate an enchantment with this reagent.
      *
-     * @param enchantment                The enchantment to be associated with this reagent.
-     * @param baseEnchantmentProbability The base probability for the enchantment being applied.
-     * @param baseReagentCost            The base reagent cost required to apply the enchantment.
+     * @param enchantment            The enchantment to be associated with this reagent.
+     * @param reagentEnchantmentData The data that represents the enchantment.
      */
-    void addEnchantment(Enchantment enchantment, double baseEnchantmentProbability, int baseReagentCost);
+    void addEnchantment(Enchantment enchantment, IReagentEnchantmentData reagentEnchantmentData);
 
     /**
      * Called to unassociated an enchantment with this reagent.
@@ -128,12 +127,12 @@ public interface IReagent
     List<Enchantment> getApplicableEnchantments(World world, BlockPos pos, EntityPlayer player, ItemStack unenchantedStack, ItemStack reagentStack, Random random);
 
     /**
-     * Returns the base probability for the enchantment being applied.
+     * Called to get the data associated with the enchantment.
      *
-     * @param enchantment The enchantment to get the probability for.
-     * @return The base probability for the enchantment being applied.
+     * @param enchantment The enchantment to get the data for.
+     * @return The data associated with the enchantment.
      */
-    double getBaseEnchantmentProbability(Enchantment enchantment);
+    IReagentEnchantmentData getReagentEnchantmentData(Enchantment enchantment);
 
     /**
      * Called when creating the list of enchantments that can be applied to the unenchantedStack and allows for modification of the base probability.
@@ -149,14 +148,6 @@ public interface IReagent
      * @return The probability of the enchantment being applied.
      */
     double getEnchantmentProbability(World world, BlockPos pos, EntityPlayer player, ItemStack unenchantedStack, ItemStack reagentStack, EnchantmentData enchantmentData, Random random);
-
-    /**
-     * The base reagent cost required to apply the enchantment.
-     *
-     * @param enchantment The enchantment to get the reagent cost for.
-     * @return The base reagent cost required to apply the enchantment.
-     */
-    int getBaseReagentCost(Enchantment enchantment);
 
     /**
      * Called when applying enchantments to the unenchantedStack and allows for modification of the base reagent cost.

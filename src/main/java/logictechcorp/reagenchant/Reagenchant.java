@@ -20,9 +20,9 @@ package logictechcorp.reagenchant;
 import logictechcorp.libraryex.IModData;
 import logictechcorp.libraryex.proxy.IProxy;
 import logictechcorp.reagenchant.api.ReagenchantAPI;
-import logictechcorp.reagenchant.api.internal.IReagenchantAPI;
-import logictechcorp.reagenchant.api.internal.IReagentManager;
-import logictechcorp.reagenchant.api.internal.IReagentRegistry;
+import logictechcorp.reagenchant.api.internal.iface.IReagenchantAPI;
+import logictechcorp.reagenchant.api.internal.iface.IReagentManager;
+import logictechcorp.reagenchant.api.internal.iface.IReagentRegistry;
 import logictechcorp.reagenchant.handler.GuiHandler;
 import logictechcorp.reagenchant.init.ReagenchantReagents;
 import net.minecraft.creativetab.CreativeTabs;
@@ -91,11 +91,6 @@ public class Reagenchant implements IModData, IReagenchantAPI
         return false;
     }
 
-    public static ResourceLocation getResource(String name)
-    {
-        return new ResourceLocation(Reagenchant.MOD_ID + ":" + name);
-    }
-
     @Override
     public boolean isStub()
     {
@@ -112,5 +107,10 @@ public class Reagenchant implements IModData, IReagenchantAPI
     public IReagentManager getReagentManager()
     {
         return ReagentManager.INSTANCE;
+    }
+
+    public static ResourceLocation getResource(String name)
+    {
+        return new ResourceLocation(Reagenchant.MOD_ID + ":" + name);
     }
 }

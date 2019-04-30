@@ -15,14 +15,15 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package logictechcorp.reagenchant.api.reagent;
+package logictechcorp.reagenchant.api.reagent.impl;
 
 import com.electronwill.nightconfig.core.Config;
 import logictechcorp.libraryex.config.ModJsonConfigFormat;
+import logictechcorp.reagenchant.api.reagent.iface.IReagentConfigurable;
+import logictechcorp.reagenchant.api.reagent.iface.IReagentEnchantmentData;
 import net.minecraft.enchantment.Enchantment;
 import net.minecraft.item.Item;
 import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.Tuple;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -67,7 +68,19 @@ public class ReagentConfigurable extends Reagent implements IReagentConfigurable
                     reagentCost = 1;
                 }
 
-                this.enchantments.put(enchantment.getRegistryName(), new Tuple<>(probability, reagentCost));
+                int minimumEnchantmentLevel = enchantmentConfig.getOrElse("minimumEnchantmentLevel", enchantment.getMinLevel());
+                int maximumEnchantmentLevel = enchantmentConfig.getOrElse("maximumEnchantmentLevel", enchantment.getMaxLevel());
+
+                if(minimumEnchantmentLevel < 1)
+                {
+                    minimumEnchantmentLevel = 1;
+                }
+                if(maximumEnchantmentLevel > 100)
+                {
+                    maximumEnchantmentLevel = 100;
+                }
+
+                this.enchantments.put(enchantment.getRegistryName(), new ReagentEnchantmentData(enchantment, minimumEnchantmentLevel, maximumEnchantmentLevel, probability, reagentCost));
             }
         }
     }
@@ -79,14 +92,16 @@ public class ReagentConfigurable extends Reagent implements IReagentConfigurable
         config.set("name", this.name.toString());
         config.set("associatedItem", this.associatedItem.getRegistryName().toString());
 
-        for(Map.Entry<ResourceLocation, Tuple<Double, Integer>> entry : this.enchantments.entrySet())
+        for(Map.Entry<ResourceLocation, IReagentEnchantmentData> entry : this.enchantments.entrySet())
         {
-            Tuple<Double, Integer> data = entry.getValue();
+            IReagentEnchantmentData reagentEnchantmentData = entry.getValue();
 
             Config enchantmentConfig = ModJsonConfigFormat.newConfig();
             enchantmentConfig.add("enchantment", entry.getKey().toString());
-            enchantmentConfig.add("probability", data.getFirst());
-            enchantmentConfig.add("reagentCost", data.getSecond());
+            enchantmentConfig.add("probability", reagentEnchantmentData.getEnchantmentProbability());
+            enchantmentConfig.add("reagentCost", reagentEnchantmentData.getReagentCost());
+            enchantmentConfig.add("minimumEnchantmentLevel", reagentEnchantmentData.getMinimumEnchantmentLevel());
+            enchantmentConfig.add("maximumEnchantmentLevel", reagentEnchantmentData.getMaximumEnchantmentLevel());
             enchantmentConfigs.add(enchantmentConfig);
         }
 

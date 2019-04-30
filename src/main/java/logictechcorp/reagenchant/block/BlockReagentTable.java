@@ -18,7 +18,7 @@
 package logictechcorp.reagenchant.block;
 
 import logictechcorp.libraryex.block.BlockTileEntity;
-import logictechcorp.libraryex.block.builder.BlockBuilder;
+import logictechcorp.libraryex.block.builder.BlockProperties;
 import logictechcorp.reagenchant.Reagenchant;
 import logictechcorp.reagenchant.handler.GuiHandler;
 import logictechcorp.reagenchant.tileentity.TileEntityReagentTable;
@@ -50,7 +50,7 @@ public class BlockReagentTable extends BlockTileEntity<TileEntityReagentTable>
 
     public BlockReagentTable()
     {
-        super(Blocks.ENCHANTING_TABLE.getRegistryName(), TileEntityReagentTable.class, new BlockBuilder(Material.ROCK, MapColor.RED).hardness(5.0F).resistance(2000.0F).creativeTab(Reagenchant.instance.getCreativeTab()));
+        super(Blocks.ENCHANTING_TABLE.getRegistryName(), TileEntityReagentTable.class, new BlockProperties(Material.ROCK, MapColor.RED).hardness(5.0F).resistance(2000.0F));
         this.setLightOpacity(0);
     }
 

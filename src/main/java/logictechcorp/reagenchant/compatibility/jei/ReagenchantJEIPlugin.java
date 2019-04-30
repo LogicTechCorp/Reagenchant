@@ -18,7 +18,7 @@
 package logictechcorp.reagenchant.compatibility.jei;
 
 import logictechcorp.reagenchant.api.ReagenchantAPI;
-import logictechcorp.reagenchant.api.reagent.IReagent;
+import logictechcorp.reagenchant.api.reagent.iface.IReagent;
 import logictechcorp.reagenchant.client.gui.GuiReagentTable;
 import logictechcorp.reagenchant.init.ReagenchantBlocks;
 import mezz.jei.api.IModPlugin;

@@ -15,9 +15,9 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package logictechcorp.reagenchant.api.internal;
+package logictechcorp.reagenchant.api.internal.iface;
 
-import logictechcorp.reagenchant.api.reagent.IReagent;
+import logictechcorp.reagenchant.api.reagent.iface.IReagent;
 import net.minecraft.item.Item;
 import net.minecraft.util.ResourceLocation;
 

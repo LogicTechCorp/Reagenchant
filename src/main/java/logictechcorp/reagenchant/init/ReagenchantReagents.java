@@ -19,8 +19,9 @@ package logictechcorp.reagenchant.init;
 
 import logictechcorp.reagenchant.Reagenchant;
 import logictechcorp.reagenchant.api.ReagenchantAPI;
-import logictechcorp.reagenchant.api.reagent.IReagent;
-import logictechcorp.reagenchant.api.reagent.ReagentConfigurable;
+import logictechcorp.reagenchant.api.reagent.iface.IReagent;
+import logictechcorp.reagenchant.api.reagent.impl.ReagentConfigurable;
+import logictechcorp.reagenchant.api.reagent.impl.ReagentEnchantmentData;
 import net.minecraft.init.Blocks;
 import net.minecraft.init.Enchantments;
 import net.minecraft.init.Items;
@@ -43,56 +44,56 @@ public class ReagenchantReagents
 
     public static void initReagents()
     {
-        GUNPOWDER.addEnchantment(Enchantments.SMITE, 0.5D, 1);
-        GUNPOWDER.addEnchantment(Enchantments.FEATHER_FALLING, 0.5D, 1);
+        GUNPOWDER.addEnchantment(Enchantments.SMITE, new ReagentEnchantmentData(Enchantments.SMITE, 0.5D, 1));
+        GUNPOWDER.addEnchantment(Enchantments.FEATHER_FALLING, new ReagentEnchantmentData(Enchantments.FEATHER_FALLING, 0.5D, 1));
         ReagenchantAPI.getInstance().getReagentRegistry().registerReagent(GUNPOWDER);
 
-        IRON_INGOT.addEnchantment(Enchantments.PROJECTILE_PROTECTION, 0.5D, 1);
-        IRON_INGOT.addEnchantment(Enchantments.PUNCH, 0.5D, 1);
-        IRON_INGOT.addEnchantment(Enchantments.KNOCKBACK, 0.5D, 1);
+        IRON_INGOT.addEnchantment(Enchantments.PROJECTILE_PROTECTION, new ReagentEnchantmentData(Enchantments.PROJECTILE_PROTECTION, 0.5D, 1));
+        IRON_INGOT.addEnchantment(Enchantments.PUNCH, new ReagentEnchantmentData(Enchantments.PUNCH, 0.5D, 1));
+        IRON_INGOT.addEnchantment(Enchantments.KNOCKBACK, new ReagentEnchantmentData(Enchantments.KNOCKBACK, 0.5D, 1));
         ReagenchantAPI.getInstance().getReagentRegistry().registerReagent(IRON_INGOT);
 
-        GOLD_INGOT.addEnchantment(Enchantments.PROTECTION, 0.5D, 1);
-        GOLD_INGOT.addEnchantment(Enchantments.SILK_TOUCH, 0.5D, 1);
-        GOLD_INGOT.addEnchantment(Enchantments.SWEEPING, 0.5D, 1);
+        GOLD_INGOT.addEnchantment(Enchantments.PROTECTION, new ReagentEnchantmentData(Enchantments.PROTECTION, 0.5D, 1));
+        GOLD_INGOT.addEnchantment(Enchantments.SILK_TOUCH, new ReagentEnchantmentData(Enchantments.SILK_TOUCH, 0.5D, 1));
+        GOLD_INGOT.addEnchantment(Enchantments.SWEEPING, new ReagentEnchantmentData(Enchantments.SWEEPING, 0.5D, 1));
         ReagenchantAPI.getInstance().getReagentRegistry().registerReagent(GOLD_INGOT);
 
-        DIAMOND.addEnchantment(Enchantments.BLAST_PROTECTION, 0.5D, 1);
-        DIAMOND.addEnchantment(Enchantments.FORTUNE, 0.5D, 1);
-        DIAMOND.addEnchantment(Enchantments.LOOTING, 0.5D, 1);
-        DIAMOND.addEnchantment(Enchantments.INFINITY, 0.5D, 1);
+        DIAMOND.addEnchantment(Enchantments.BLAST_PROTECTION, new ReagentEnchantmentData(Enchantments.BLAST_PROTECTION, 0.5D, 1));
+        DIAMOND.addEnchantment(Enchantments.FORTUNE, new ReagentEnchantmentData(Enchantments.FORTUNE, 0.5D, 1));
+        DIAMOND.addEnchantment(Enchantments.LOOTING, new ReagentEnchantmentData(Enchantments.LOOTING, 0.5D, 1));
+        DIAMOND.addEnchantment(Enchantments.INFINITY, new ReagentEnchantmentData(Enchantments.INFINITY, 0.5D, 1));
         ReagenchantAPI.getInstance().getReagentRegistry().registerReagent(DIAMOND);
 
-        OBSIDIAN.addEnchantment(Enchantments.UNBREAKING, 0.5D, 1);
+        OBSIDIAN.addEnchantment(Enchantments.UNBREAKING, new ReagentEnchantmentData(Enchantments.UNBREAKING, 0.5D, 1));
         ReagenchantAPI.getInstance().getReagentRegistry().registerReagent(OBSIDIAN);
 
-        REDSTONE.addEnchantment(Enchantments.THORNS, 0.5D, 1);
-        REDSTONE.addEnchantment(Enchantments.EFFICIENCY, 0.5D, 1);
-        REDSTONE.addEnchantment(Enchantments.SHARPNESS, 0.5D, 1);
-        REDSTONE.addEnchantment(Enchantments.POWER, 0.5D, 1);
+        REDSTONE.addEnchantment(Enchantments.THORNS, new ReagentEnchantmentData(Enchantments.THORNS, 0.5D, 1));
+        REDSTONE.addEnchantment(Enchantments.EFFICIENCY, new ReagentEnchantmentData(Enchantments.EFFICIENCY, 0.5D, 1));
+        REDSTONE.addEnchantment(Enchantments.SHARPNESS, new ReagentEnchantmentData(Enchantments.SHARPNESS, 0.5D, 1));
+        REDSTONE.addEnchantment(Enchantments.POWER, new ReagentEnchantmentData(Enchantments.POWER, 0.5D, 1));
         ReagenchantAPI.getInstance().getReagentRegistry().registerReagent(REDSTONE);
 
-        PACKED_ICE.addEnchantment(Enchantments.FROST_WALKER, 1.0D, 1);
+        PACKED_ICE.addEnchantment(Enchantments.FROST_WALKER, new ReagentEnchantmentData(Enchantments.FROST_WALKER, 1.0D, 1));
         ReagenchantAPI.getInstance().getReagentRegistry().registerReagent(PACKED_ICE);
 
-        PRISMARINE_SHARD.addEnchantment(Enchantments.LURE, 0.5D, 1);
-        PRISMARINE_SHARD.addEnchantment(Enchantments.AQUA_AFFINITY, 0.5D, 1);
+        PRISMARINE_SHARD.addEnchantment(Enchantments.LURE, new ReagentEnchantmentData(Enchantments.LURE, 0.5D, 1));
+        PRISMARINE_SHARD.addEnchantment(Enchantments.AQUA_AFFINITY, new ReagentEnchantmentData(Enchantments.AQUA_AFFINITY, 0.5D, 1));
         ReagenchantAPI.getInstance().getReagentRegistry().registerReagent(PRISMARINE_SHARD);
 
-        PRISMARINE_CRYSTALS.addEnchantment(Enchantments.LUCK_OF_THE_SEA, 0.5D, 1);
-        PRISMARINE_CRYSTALS.addEnchantment(Enchantments.RESPIRATION, 0.5D, 1);
-        PRISMARINE_CRYSTALS.addEnchantment(Enchantments.DEPTH_STRIDER, 0.5D, 1);
+        PRISMARINE_CRYSTALS.addEnchantment(Enchantments.LUCK_OF_THE_SEA, new ReagentEnchantmentData(Enchantments.LUCK_OF_THE_SEA, 0.5D, 1));
+        PRISMARINE_CRYSTALS.addEnchantment(Enchantments.RESPIRATION, new ReagentEnchantmentData(Enchantments.RESPIRATION, 0.5D, 1));
+        PRISMARINE_CRYSTALS.addEnchantment(Enchantments.DEPTH_STRIDER, new ReagentEnchantmentData(Enchantments.DEPTH_STRIDER, 0.5D, 1));
         ReagenchantAPI.getInstance().getReagentRegistry().registerReagent(PRISMARINE_CRYSTALS);
 
-        GLOWSTONE_DUST.addEnchantment(Enchantments.BANE_OF_ARTHROPODS, 0.5D, 1);
+        GLOWSTONE_DUST.addEnchantment(Enchantments.BANE_OF_ARTHROPODS, new ReagentEnchantmentData(Enchantments.BANE_OF_ARTHROPODS, 0.5D, 1));
         ReagenchantAPI.getInstance().getReagentRegistry().registerReagent(GLOWSTONE_DUST);
 
-        BLAZE_POWDER.addEnchantment(Enchantments.FIRE_PROTECTION, 0.5D, 1);
-        BLAZE_POWDER.addEnchantment(Enchantments.FLAME, 0.5D, 1);
-        BLAZE_POWDER.addEnchantment(Enchantments.FIRE_ASPECT, 0.5D, 1);
+        BLAZE_POWDER.addEnchantment(Enchantments.FIRE_PROTECTION, new ReagentEnchantmentData(Enchantments.FIRE_PROTECTION, 0.5D, 1));
+        BLAZE_POWDER.addEnchantment(Enchantments.FLAME, new ReagentEnchantmentData(Enchantments.FLAME, 0.5D, 1));
+        BLAZE_POWDER.addEnchantment(Enchantments.FIRE_ASPECT, new ReagentEnchantmentData(Enchantments.FIRE_ASPECT, 0.5D, 1));
         ReagenchantAPI.getInstance().getReagentRegistry().registerReagent(BLAZE_POWDER);
 
-        NETHER_STAR.addEnchantment(Enchantments.MENDING, 1.0D, 1);
+        NETHER_STAR.addEnchantment(Enchantments.MENDING, new ReagentEnchantmentData(Enchantments.MENDING, 1.0D, 1));
         ReagenchantAPI.getInstance().getReagentRegistry().registerReagent(NETHER_STAR);
     }
 }

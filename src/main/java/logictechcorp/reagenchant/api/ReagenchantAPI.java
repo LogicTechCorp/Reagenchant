@@ -17,8 +17,8 @@
 
 package logictechcorp.reagenchant.api;
 
-import logictechcorp.reagenchant.api.internal.IReagenchantAPI;
-import logictechcorp.reagenchant.api.internal.ReagenchantAPIStub;
+import logictechcorp.reagenchant.api.internal.iface.IReagenchantAPI;
+import logictechcorp.reagenchant.api.internal.impl.ReagenchantAPIStub;
 import net.minecraftforge.fml.common.Loader;
 import net.minecraftforge.fml.common.ModContainer;
 

@@ -15,7 +15,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package logictechcorp.reagenchant.api.internal;
+package logictechcorp.reagenchant.api.internal.iface;
 
 public interface IReagenchantAPI
 {

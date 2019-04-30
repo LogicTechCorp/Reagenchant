@@ -18,7 +18,7 @@
 package logictechcorp.reagenchant.compatibility.jei;
 
 import logictechcorp.reagenchant.Reagenchant;
-import logictechcorp.reagenchant.api.reagent.IReagent;
+import logictechcorp.reagenchant.api.reagent.iface.IReagent;
 import logictechcorp.reagenchant.init.ReagenchantBlocks;
 import logictechcorp.reagenchant.init.ReagenchantTextures;
 import mezz.jei.api.IGuiHelper;
@@ -99,8 +99,8 @@ class ReagentTableCategory implements IRecipeCategory<ReagentWrapper>
 
                 tooltip.add("");
                 tooltip.add(enchantment.getTranslatedName(level));
-                tooltip.add(I18n.format("gui.reagenchant:reagent_table.probability.base", reagent.getBaseEnchantmentProbability(enchantment) * 100.0F));
-                tooltip.add(I18n.format("gui.reagenchant:reagent_table.reagent.base_cost", reagent.getBaseReagentCost(enchantment)));
+                tooltip.add(I18n.format("gui.reagenchant:reagent_table.probability.base", reagent.getReagentEnchantmentData(enchantment).getEnchantmentProbability() * 100.0F));
+                tooltip.add(I18n.format("gui.reagenchant:reagent_table.reagent.base_cost", reagent.getReagentEnchantmentData(enchantment).getReagentCost()));
             }
         });
         recipeLayout.getItemStacks().init(INPUT_SLOT, true, 0, 4);

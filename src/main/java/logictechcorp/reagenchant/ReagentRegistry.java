@@ -17,10 +17,8 @@
 
 package logictechcorp.reagenchant;
 
-import logictechcorp.reagenchant.api.internal.IReagentRegistry;
-import logictechcorp.reagenchant.api.reagent.IReagent;
-import logictechcorp.reagenchant.api.reagent.IReagentConfigurable;
-import net.minecraft.enchantment.Enchantment;
+import logictechcorp.reagenchant.api.internal.iface.IReagentRegistry;
+import logictechcorp.reagenchant.api.reagent.iface.IReagent;
 import net.minecraft.init.Items;
 import net.minecraft.item.Item;
 import net.minecraft.util.ResourceLocation;
@@ -43,39 +41,22 @@ final class ReagentRegistry implements IReagentRegistry
     }
 
     @Override
-    public void registerReagent(IReagent unregisteredReagent)
+    public void registerReagent(IReagent reagent)
     {
-        Item associatedItem = unregisteredReagent.getAssociatedItem();
+        if(reagent == null)
+        {
+            return;
+        }
+
+        Item associatedItem = reagent.getAssociatedItem();
 
         if(associatedItem == Items.AIR)
         {
-            Reagenchant.LOGGER.warn(this.marker, "The {} Reagent was not able to registered because it has an invalid associated item.", unregisteredReagent.getName().toString());
+            Reagenchant.LOGGER.warn(this.marker, "The {} Reagent was not able to registered because it has an invalid associated item.", reagent.getName().toString());
             return;
         }
 
-        ResourceLocation associatedItemRegistryName = associatedItem.getRegistryName();
-
-        if(this.reagents.containsKey(associatedItemRegistryName))
-        {
-            IReagent registeredReagent = this.reagents.get(associatedItemRegistryName);
-
-            for(Enchantment enchantment : unregisteredReagent.getAssociatedEnchantments())
-            {
-                if(registeredReagent.getAssociatedEnchantments().contains(enchantment) && !(registeredReagent instanceof IReagentConfigurable))
-                {
-                    continue;
-                }
-
-                double baseEnchantmentProbability = unregisteredReagent.getBaseEnchantmentProbability(enchantment);
-                int baseReagentCost = unregisteredReagent.getBaseReagentCost(enchantment);
-
-                registeredReagent.addEnchantment(enchantment, baseEnchantmentProbability, baseReagentCost);
-            }
-
-            return;
-        }
-
-        this.reagents.put(associatedItemRegistryName, unregisteredReagent);
+        this.reagents.put(associatedItem.getRegistryName(), reagent);
     }
 
     @Override

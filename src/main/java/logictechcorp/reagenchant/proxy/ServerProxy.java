@@ -18,7 +18,6 @@
 package logictechcorp.reagenchant.proxy;
 
 import logictechcorp.libraryex.proxy.IProxy;
-import net.minecraft.world.World;
 
 public class ServerProxy implements IProxy
 {
@@ -40,7 +39,7 @@ public class ServerProxy implements IProxy
     }
 
     @Override
-    public void spawnParticle(World world, int particleId, double posX, double posY, double posZ, double speedX, double speedY, double speedZ)
+    public void spawnParticle(int particleId, double posX, double posY, double posZ, double speedX, double speedY, double speedZ)
     {
 
     }
