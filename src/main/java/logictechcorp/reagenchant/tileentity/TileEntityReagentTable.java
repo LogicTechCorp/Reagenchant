@@ -27,10 +27,10 @@ import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.TextComponentString;
 import net.minecraft.util.text.TextComponentTranslation;
 
-import java.util.Random;
-
 public class TileEntityReagentTable extends TileEntityInventory implements ITickable
 {
+    private EntityPlayer user;
+    private String customName;
     private int tickCounter;
     private float pageFlip;
     private float pageFlipPrev;
@@ -41,8 +41,6 @@ public class TileEntityReagentTable extends TileEntityInventory implements ITick
     private float bookRotation;
     private float bookRotationPrev;
     private float offsetRotation;
-    private String customName;
-    private static final Random rand = new Random();
 
     public TileEntityReagentTable()
     {
@@ -60,22 +58,32 @@ public class TileEntityReagentTable extends TileEntityInventory implements ITick
     {
         this.bookSpreadPrev = this.bookSpread;
         this.bookRotationPrev = this.bookRotation;
-        EntityPlayer player = this.world.getClosestPlayer((double) ((float) this.pos.getX() + 0.5F), (double) ((float) this.pos.getY() + 0.5F), (double) ((float) this.pos.getZ() + 0.5F), 3.0D, false);
 
-        if(player != null)
+        EntityPlayer playerToFace;
+
+        if(this.user != null)
         {
-            double posX = player.posX - (double) ((float) this.pos.getX() + 0.5F);
-            double posZ = player.posZ - (double) ((float) this.pos.getZ() + 0.5F);
+            playerToFace = this.user;
+        }
+        else
+        {
+            playerToFace = this.world.getClosestPlayer((double) ((float) this.pos.getX() + 0.5F), (double) ((float) this.pos.getY() + 0.5F), (double) ((float) this.pos.getZ() + 0.5F), 3.0D, false);
+        }
+
+        if(playerToFace != null)
+        {
+            double posX = playerToFace.posX - (double) ((float) this.pos.getX() + 0.5F);
+            double posZ = playerToFace.posZ - (double) ((float) this.pos.getZ() + 0.5F);
             this.offsetRotation = (float) MathHelper.atan2(posZ, posX);
             this.bookSpread += 0.1F;
 
-            if(this.bookSpread < 0.5F || rand.nextInt(40) == 0)
+            if(this.bookSpread < 0.5F || this.random.nextInt(40) == 0)
             {
                 float randomFlip = this.flipRandom;
 
                 while(true)
                 {
-                    this.flipRandom += (float) (rand.nextInt(4) - rand.nextInt(4));
+                    this.flipRandom += (float) (this.random.nextInt(4) - this.random.nextInt(4));
 
                     if(randomFlip != this.flipRandom)
                     {
@@ -136,15 +144,44 @@ public class TileEntityReagentTable extends TileEntityInventory implements ITick
         return this.customName != null && !this.customName.isEmpty();
     }
 
-    private String getName()
+    @Override
+    public NBTTagCompound writeToNBT(NBTTagCompound compound)
     {
-        return this.hasCustomName() ? this.customName : "container.enchant";
+        super.writeToNBT(compound);
+
+        if(this.hasCustomName())
+        {
+            compound.setString("CustomName", this.customName);
+        }
+
+        return compound;
+    }
+
+    @Override
+    public void readFromNBT(NBTTagCompound compound)
+    {
+        super.readFromNBT(compound);
+
+        if(compound.hasKey("CustomName", 8))
+        {
+            this.customName = compound.getString("CustomName");
+        }
     }
 
     @Override
     public ITextComponent getDisplayName()
     {
         return (this.hasCustomName() ? new TextComponentString(this.getName()) : new TextComponentTranslation(this.getName()));
+    }
+
+    public EntityPlayer getUser()
+    {
+        return this.user;
+    }
+
+    private String getName()
+    {
+        return this.hasCustomName() ? this.customName : "container.enchant";
     }
 
     public int getTickCounter()
@@ -182,32 +219,20 @@ public class TileEntityReagentTable extends TileEntityInventory implements ITick
         return this.bookRotationPrev;
     }
 
+    public void setUser(EntityPlayer player)
+    {
+        if(this.user == null)
+        {
+            this.user = player;
+        }
+        else if(player == null)
+        {
+            this.user = null;
+        }
+    }
+
     public void setCustomName(String customName)
     {
         this.customName = customName;
-    }
-
-    @Override
-    public NBTTagCompound writeToNBT(NBTTagCompound compound)
-    {
-        super.writeToNBT(compound);
-
-        if(this.hasCustomName())
-        {
-            compound.setString("CustomName", this.customName);
-        }
-
-        return compound;
-    }
-
-    @Override
-    public void readFromNBT(NBTTagCompound compound)
-    {
-        super.readFromNBT(compound);
-
-        if(compound.hasKey("CustomName", 8))
-        {
-            this.customName = compound.getString("CustomName");
-        }
     }
 }

@@ -131,7 +131,7 @@ public class BlockReagentTable extends BlockTileEntity<TileEntityReagentTable>
         {
             TileEntity tileEntity = world.getTileEntity(pos);
 
-            if(tileEntity instanceof TileEntityReagentTable)
+            if(tileEntity instanceof TileEntityReagentTable && ((TileEntityReagentTable) tileEntity).getUser() == null)
             {
                 player.openGui(Reagenchant.instance, GuiHandler.REAGENT_TABLE_ID, world, pos.getX(), pos.getY(), pos.getZ());
             }

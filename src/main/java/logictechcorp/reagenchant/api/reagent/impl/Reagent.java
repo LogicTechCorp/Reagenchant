@@ -144,11 +144,14 @@ public class Reagent implements IReagent
                     enchantmentLevel = RandomHelper.getNumberInRange(minimumEnchantmentLevel, maximumEnchantmentLevel, random);
                 }
 
-                EnchantmentData enchantmentData = new EnchantmentData(enchantment, enchantmentLevel);
-
-                if(this.getEnchantmentProbability(world, pos, player, unenchantedStack, reagentStack, enchantmentData, random) >= random.nextDouble())
+                if(enchantmentLevel > 0)
                 {
-                    aggregateEnchantmentData.add(enchantmentData);
+                    EnchantmentData enchantmentData = new EnchantmentData(enchantment, enchantmentLevel);
+
+                    if(this.getEnchantmentProbability(world, pos, player, unenchantedStack, reagentStack, enchantmentData, random) >= random.nextDouble())
+                    {
+                        aggregateEnchantmentData.add(enchantmentData);
+                    }
                 }
             }
 

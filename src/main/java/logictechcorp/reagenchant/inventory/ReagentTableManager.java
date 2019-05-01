@@ -15,12 +15,11 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package logictechcorp.reagenchant.reagent;
+package logictechcorp.reagenchant.inventory;
 
 import logictechcorp.libraryex.utility.RandomHelper;
 import logictechcorp.reagenchant.api.ReagenchantAPI;
 import logictechcorp.reagenchant.api.reagent.iface.IReagent;
-import logictechcorp.reagenchant.inventory.ContainerReagentTable;
 import logictechcorp.reagenchant.tileentity.TileEntityReagentTable;
 import net.minecraft.advancements.CriteriaTriggers;
 import net.minecraft.enchantment.Enchantment;
@@ -38,7 +37,6 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import net.minecraftforge.common.ForgeHooks;
 import net.minecraftforge.event.ForgeEventFactory;
-import net.minecraftforge.items.IItemHandler;
 import net.minecraftforge.items.ItemStackHandler;
 
 import java.util.List;
@@ -48,7 +46,6 @@ public class ReagentTableManager
 {
     private final World world;
     private final BlockPos pos;
-    private final EntityPlayer player;
     private final TileEntityReagentTable reagentTable;
     private final ItemStackHandler inventory;
     private final Random random;
@@ -57,21 +54,20 @@ public class ReagentTableManager
     private int[] enchantmentLevels;
     private int[] enchantabilityLevels;
 
-    public ReagentTableManager(World world, BlockPos pos, EntityPlayer player, TileEntityReagentTable reagentTable)
+    public ReagentTableManager(World world, BlockPos pos, TileEntityReagentTable reagentTable)
     {
         this.world = world;
         this.pos = pos;
-        this.player = player;
         this.reagentTable = reagentTable;
         this.inventory = reagentTable.getInventory();
-        this.random = new Random();
-        this.xpSeed = player.inventory.player.getXPSeed();
+        this.random = reagentTable.getRandom();
+        this.xpSeed = reagentTable.getUser().getXPSeed();
         this.enchantments = new int[]{-1, -1, -1};
         this.enchantmentLevels = new int[]{-1, -1, -1};
         this.enchantabilityLevels = new int[3];
     }
 
-    public void onContentsChanged(ContainerReagentTable containerReagentTable)
+    void onContentsChanged(ContainerReagentTable containerReagentTable)
     {
         ItemStack unenchantedStack = this.inventory.getStackInSlot(0);
 
@@ -160,9 +156,9 @@ public class ReagentTableManager
         {
             IReagent reagent = ReagenchantAPI.getInstance().getReagentRegistry().getReagent(reagentStack.getItem());
 
-            if(reagent.hasApplicableEnchantments(this.world, this.pos, this.player, unenchantedStack, reagentStack, this.random))
+            if(reagent.hasApplicableEnchantments(this.world, this.pos, this.reagentTable.getUser(), unenchantedStack, reagentStack, this.random))
             {
-                enchantmentData = reagent.createEnchantmentList(this.world, this.pos, this.player, unenchantedStack, reagentStack, enchantmentTier, enchantabilityLevel, this.random);
+                enchantmentData = reagent.createEnchantmentList(this.world, this.pos, this.reagentTable.getUser(), unenchantedStack, reagentStack, enchantmentTier, enchantabilityLevel, this.random);
                 usedReagentEnchantments = true;
             }
         }
@@ -182,7 +178,7 @@ public class ReagentTableManager
         return enchantmentData;
     }
 
-    public boolean enchantItem(EntityPlayer player, int enchantmentTier, ContainerReagentTable containerReagentTable)
+    boolean enchantItem(EntityPlayer player, int enchantmentTier, ContainerReagentTable containerReagentTable)
     {
         ItemStack unenchantedStack = this.inventory.getStackInSlot(0);
         ItemStack lapisStack = this.inventory.getStackInSlot(1);
@@ -322,17 +318,12 @@ public class ReagentTableManager
         return this.pos;
     }
 
-    public EntityPlayer getPlayer()
-    {
-        return this.player;
-    }
-
     public TileEntityReagentTable getReagentTable()
     {
         return this.reagentTable;
     }
 
-    public IItemHandler getInventory()
+    public ItemStackHandler getInventory()
     {
         return this.inventory;
     }
@@ -374,7 +365,7 @@ public class ReagentTableManager
         return reagentStack.isEmpty() ? 0 : reagentStack.getCount();
     }
 
-    public void setXpSeed(int xpSeed)
+    void setXpSeed(int xpSeed)
     {
         this.xpSeed = xpSeed;
     }

@@ -19,7 +19,7 @@ package logictechcorp.reagenchant.handler;
 
 import logictechcorp.reagenchant.client.gui.GuiReagentTable;
 import logictechcorp.reagenchant.inventory.ContainerReagentTable;
-import logictechcorp.reagenchant.reagent.ReagentTableManager;
+import logictechcorp.reagenchant.inventory.ReagentTableManager;
 import logictechcorp.reagenchant.tileentity.TileEntityReagentTable;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.tileentity.TileEntity;
@@ -54,7 +54,10 @@ public class GuiHandler implements IGuiHandler
 
             if(tileEntity instanceof TileEntityReagentTable)
             {
-                ContainerReagentTable container = new ContainerReagentTable(new ReagentTableManager(world, pos, player, (TileEntityReagentTable) tileEntity));
+                TileEntityReagentTable tileEntityReagentTable = (TileEntityReagentTable) tileEntity;
+                tileEntityReagentTable.setUser(player);
+
+                ContainerReagentTable container = new ContainerReagentTable(new ReagentTableManager(world, pos, tileEntityReagentTable));
 
                 if(side.isClient())
                 {

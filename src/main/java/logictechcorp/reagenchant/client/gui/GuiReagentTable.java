@@ -21,7 +21,7 @@ import logictechcorp.reagenchant.api.ReagenchantAPI;
 import logictechcorp.reagenchant.api.reagent.iface.IReagent;
 import logictechcorp.reagenchant.init.ReagenchantTextures;
 import logictechcorp.reagenchant.inventory.ContainerReagentTable;
-import logictechcorp.reagenchant.reagent.ReagentTableManager;
+import logictechcorp.reagenchant.inventory.ReagentTableManager;
 import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.gui.ScaledResolution;
 import net.minecraft.client.gui.inventory.GuiContainer;
@@ -296,7 +296,7 @@ public class GuiReagentTable extends GuiContainer
                                 ItemStack unenchantedStack = this.reagentTableManager.getInventory().getStackInSlot(0);
                                 World world = this.reagentTableManager.getWorld();
                                 BlockPos pos = this.reagentTableManager.getPos();
-                                EntityPlayer player = this.reagentTableManager.getPlayer();
+                                EntityPlayer player = this.reagentTableManager.getReagentTable().getUser();
                                 Random random = this.reagentTableManager.getRandom();
 
                                 int reagentCost = reagent.getReagentCost(world, pos, player, unenchantedStack, reagentStack, new EnchantmentData(enchantment, enchantmentLevel), random);
