@@ -17,7 +17,7 @@
 
 package logictechcorp.reagenchant.compatibility.jei;
 
-import logictechcorp.reagenchant.api.reagent.iface.IReagent;
+import logictechcorp.reagenchant.api.reagent.IReagent;
 import mezz.jei.api.ingredients.IIngredients;
 import mezz.jei.api.ingredients.VanillaTypes;
 import mezz.jei.api.recipe.IRecipeWrapper;

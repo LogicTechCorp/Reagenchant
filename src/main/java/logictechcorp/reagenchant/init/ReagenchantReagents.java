@@ -12,16 +12,16 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http:www.gnu.org/licenses/>.
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
 package logictechcorp.reagenchant.init;
 
 import logictechcorp.reagenchant.Reagenchant;
 import logictechcorp.reagenchant.api.ReagenchantAPI;
-import logictechcorp.reagenchant.api.reagent.iface.IReagent;
-import logictechcorp.reagenchant.api.reagent.impl.ReagentConfigurable;
-import logictechcorp.reagenchant.api.reagent.impl.ReagentEnchantmentData;
+import logictechcorp.reagenchant.api.reagent.IReagent;
+import logictechcorp.reagenchant.reagent.ReagentConfigurable;
+import logictechcorp.reagenchant.reagent.ReagentEnchantmentData;
 import net.minecraft.init.Blocks;
 import net.minecraft.init.Enchantments;
 import net.minecraft.init.Items;

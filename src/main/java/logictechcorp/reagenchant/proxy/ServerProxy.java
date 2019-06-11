@@ -17,7 +17,7 @@
 
 package logictechcorp.reagenchant.proxy;
 
-import logictechcorp.libraryex.proxy.IProxy;
+import logictechcorp.libraryex.api.IProxy;
 
 public class ServerProxy implements IProxy
 {

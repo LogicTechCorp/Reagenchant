@@ -15,12 +15,12 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package logictechcorp.reagenchant.api.reagent.impl;
+package logictechcorp.reagenchant.reagent;
 
 import com.electronwill.nightconfig.core.Config;
 import logictechcorp.libraryex.config.ModJsonConfigFormat;
-import logictechcorp.reagenchant.api.reagent.iface.IReagentConfigurable;
-import logictechcorp.reagenchant.api.reagent.iface.IReagentEnchantmentData;
+import logictechcorp.reagenchant.api.reagent.IReagentConfigurable;
+import logictechcorp.reagenchant.api.reagent.IReagentEnchantmentData;
 import net.minecraft.enchantment.Enchantment;
 import net.minecraft.item.Item;
 import net.minecraft.util.ResourceLocation;

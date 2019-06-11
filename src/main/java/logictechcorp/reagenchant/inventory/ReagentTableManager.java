@@ -19,7 +19,7 @@ package logictechcorp.reagenchant.inventory;
 
 import logictechcorp.libraryex.utility.RandomHelper;
 import logictechcorp.reagenchant.api.ReagenchantAPI;
-import logictechcorp.reagenchant.api.reagent.iface.IReagent;
+import logictechcorp.reagenchant.api.reagent.IReagent;
 import logictechcorp.reagenchant.tileentity.TileEntityReagentTable;
 import net.minecraft.advancements.CriteriaTriggers;
 import net.minecraft.enchantment.Enchantment;

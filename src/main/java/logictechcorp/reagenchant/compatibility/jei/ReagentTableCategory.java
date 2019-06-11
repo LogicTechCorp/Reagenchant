@@ -18,7 +18,7 @@
 package logictechcorp.reagenchant.compatibility.jei;
 
 import logictechcorp.reagenchant.Reagenchant;
-import logictechcorp.reagenchant.api.reagent.iface.IReagent;
+import logictechcorp.reagenchant.api.reagent.IReagent;
 import logictechcorp.reagenchant.init.ReagenchantBlocks;
 import logictechcorp.reagenchant.init.ReagenchantTextures;
 import mezz.jei.api.IGuiHelper;

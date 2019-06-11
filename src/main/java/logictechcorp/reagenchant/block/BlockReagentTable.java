@@ -18,7 +18,7 @@
 package logictechcorp.reagenchant.block;
 
 import logictechcorp.libraryex.block.BlockTileEntity;
-import logictechcorp.libraryex.block.builder.BlockProperties;
+import logictechcorp.libraryex.block.property.BlockProperties;
 import logictechcorp.reagenchant.Reagenchant;
 import logictechcorp.reagenchant.handler.GuiHandler;
 import logictechcorp.reagenchant.tileentity.TileEntityReagentTable;

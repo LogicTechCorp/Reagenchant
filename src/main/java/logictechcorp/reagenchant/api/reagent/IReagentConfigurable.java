@@ -15,7 +15,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package logictechcorp.reagenchant.api.reagent.iface;
+package logictechcorp.reagenchant.api.reagent;
 
 import com.electronwill.nightconfig.core.Config;
 

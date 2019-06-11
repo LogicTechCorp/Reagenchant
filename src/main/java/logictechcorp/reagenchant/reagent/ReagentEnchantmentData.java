@@ -15,9 +15,9 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package logictechcorp.reagenchant.api.reagent.impl;
+package logictechcorp.reagenchant.reagent;
 
-import logictechcorp.reagenchant.api.reagent.iface.IReagentEnchantmentData;
+import logictechcorp.reagenchant.api.reagent.IReagentEnchantmentData;
 import net.minecraft.enchantment.Enchantment;
 
 public class ReagentEnchantmentData implements IReagentEnchantmentData

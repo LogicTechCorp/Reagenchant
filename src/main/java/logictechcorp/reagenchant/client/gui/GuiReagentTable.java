@@ -18,7 +18,7 @@
 package logictechcorp.reagenchant.client.gui;
 
 import logictechcorp.reagenchant.api.ReagenchantAPI;
-import logictechcorp.reagenchant.api.reagent.iface.IReagent;
+import logictechcorp.reagenchant.api.reagent.IReagent;
 import logictechcorp.reagenchant.init.ReagenchantTextures;
 import logictechcorp.reagenchant.inventory.ContainerReagentTable;
 import logictechcorp.reagenchant.inventory.ReagentTableManager;

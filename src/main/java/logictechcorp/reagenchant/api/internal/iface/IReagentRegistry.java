@@ -17,7 +17,7 @@
 
 package logictechcorp.reagenchant.api.internal.iface;
 
-import logictechcorp.reagenchant.api.reagent.iface.IReagent;
+import logictechcorp.reagenchant.api.reagent.IReagent;
 import net.minecraft.item.Item;
 import net.minecraft.util.ResourceLocation;
 

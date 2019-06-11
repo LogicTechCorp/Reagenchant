@@ -17,8 +17,8 @@
 
 package logictechcorp.reagenchant;
 
-import logictechcorp.libraryex.IModData;
-import logictechcorp.libraryex.proxy.IProxy;
+import logictechcorp.libraryex.api.IModData;
+import logictechcorp.libraryex.api.IProxy;
 import logictechcorp.reagenchant.api.ReagenchantAPI;
 import logictechcorp.reagenchant.api.internal.iface.IReagenchantAPI;
 import logictechcorp.reagenchant.api.internal.iface.IReagentManager;
@@ -86,7 +86,7 @@ public class Reagenchant implements IModData, IReagenchantAPI
     }
 
     @Override
-    public boolean writeRecipeJsons()
+    public boolean writeRecipesToJson()
     {
         return false;
     }
