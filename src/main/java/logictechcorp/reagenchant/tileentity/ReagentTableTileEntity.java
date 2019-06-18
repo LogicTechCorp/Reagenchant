@@ -18,19 +18,20 @@
 package logictechcorp.reagenchant.tileentity;
 
 import logictechcorp.libraryex.tileentity.TileEntityInventory;
-import net.minecraft.entity.player.EntityPlayer;
+import logictechcorp.reagenchant.init.ReagenchantTileEntityTypes;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.util.ITickable;
+import net.minecraft.nbt.CompoundNBT;
+import net.minecraft.tileentity.ITickableTileEntity;
+import net.minecraft.util.INameable;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.text.ITextComponent;
-import net.minecraft.util.text.TextComponentString;
-import net.minecraft.util.text.TextComponentTranslation;
+import net.minecraft.util.text.TranslationTextComponent;
 
-public class TileEntityReagentTable extends TileEntityInventory implements ITickable
+public class ReagentTableTileEntity extends TileEntityInventory implements ITickableTileEntity, INameable
 {
-    private EntityPlayer user;
-    private String customName;
+    private PlayerEntity user;
+    private ITextComponent customName;
     private int tickCounter;
     private float pageFlip;
     private float pageFlipPrev;
@@ -42,9 +43,9 @@ public class TileEntityReagentTable extends TileEntityInventory implements ITick
     private float bookRotationPrev;
     private float offsetRotation;
 
-    public TileEntityReagentTable()
+    public ReagentTableTileEntity()
     {
-        super(3);
+        super(ReagenchantTileEntityTypes.REAGENT_TABLE_TILE_ENTITY, 3);
     }
 
     @Override
@@ -54,12 +55,12 @@ public class TileEntityReagentTable extends TileEntityInventory implements ITick
     }
 
     @Override
-    public void update()
+    public void tick()
     {
         this.bookSpreadPrev = this.bookSpread;
         this.bookRotationPrev = this.bookRotation;
 
-        EntityPlayer playerToFace;
+        PlayerEntity playerToFace;
 
         if(this.user != null)
         {
@@ -67,7 +68,7 @@ public class TileEntityReagentTable extends TileEntityInventory implements ITick
         }
         else
         {
-            playerToFace = this.world.getClosestPlayer((double) ((float) this.pos.getX() + 0.5F), (double) ((float) this.pos.getY() + 0.5F), (double) ((float) this.pos.getZ() + 0.5F), 3.0D, false);
+            playerToFace = this.world.getClosestPlayer((double) ((float) this.pos.getX() + 0.5F), (double) ((float) this.pos.getY() + 0.5F), (double) ((float) this.pos.getZ() + 0.5F), 3.0D, null);
         }
 
         if(playerToFace != null)
@@ -139,49 +140,37 @@ public class TileEntityReagentTable extends TileEntityInventory implements ITick
         this.pageFlip += this.flipTurn;
     }
 
-    private boolean hasCustomName()
-    {
-        return this.customName != null && !this.customName.isEmpty();
-    }
-
     @Override
-    public NBTTagCompound writeToNBT(NBTTagCompound compound)
+    public CompoundNBT write(CompoundNBT compound)
     {
-        super.writeToNBT(compound);
-
+        super.write(compound);
         if(this.hasCustomName())
         {
-            compound.setString("CustomName", this.customName);
+            compound.putString("CustomName", ITextComponent.Serializer.toJson(this.customName));
         }
-
         return compound;
     }
 
     @Override
-    public void readFromNBT(NBTTagCompound compound)
+    public void read(CompoundNBT compound)
     {
-        super.readFromNBT(compound);
-
-        if(compound.hasKey("CustomName", 8))
+        super.read(compound);
+        if(compound.contains("CustomName", 8))
         {
-            this.customName = compound.getString("CustomName");
+            this.customName = ITextComponent.Serializer.fromJson(compound.getString("CustomName"));
         }
     }
 
     @Override
-    public ITextComponent getDisplayName()
+    public ITextComponent getCustomName()
     {
-        return (this.hasCustomName() ? new TextComponentString(this.getName()) : new TextComponentTranslation(this.getName()));
+        return this.customName;
     }
 
-    public EntityPlayer getUser()
+    @Override
+    public ITextComponent getName()
     {
-        return this.user;
-    }
-
-    private String getName()
-    {
-        return this.hasCustomName() ? this.customName : "container.enchant";
+        return (this.customName != null ? this.customName : new TranslationTextComponent("container.enchant"));
     }
 
     public int getTickCounter()
@@ -219,19 +208,7 @@ public class TileEntityReagentTable extends TileEntityInventory implements ITick
         return this.bookRotationPrev;
     }
 
-    public void setUser(EntityPlayer player)
-    {
-        if(this.user == null)
-        {
-            this.user = player;
-        }
-        else if(player == null)
-        {
-            this.user = null;
-        }
-    }
-
-    public void setCustomName(String customName)
+    public void setCustomName(ITextComponent customName)
     {
         this.customName = customName;
     }

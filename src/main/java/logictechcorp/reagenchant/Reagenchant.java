@@ -23,54 +23,40 @@ import logictechcorp.reagenchant.api.ReagenchantAPI;
 import logictechcorp.reagenchant.api.internal.iface.IReagenchantAPI;
 import logictechcorp.reagenchant.api.internal.iface.IReagentManager;
 import logictechcorp.reagenchant.api.internal.iface.IReagentRegistry;
-import logictechcorp.reagenchant.handler.GuiHandler;
 import logictechcorp.reagenchant.init.ReagenchantReagents;
-import net.minecraft.creativetab.CreativeTabs;
+import logictechcorp.reagenchant.proxy.ClientProxy;
+import logictechcorp.reagenchant.proxy.ServerProxy;
+import net.minecraft.item.ItemGroup;
 import net.minecraft.util.ResourceLocation;
+import net.minecraftforge.fml.DistExecutor;
 import net.minecraftforge.fml.common.Mod;
-import net.minecraftforge.fml.common.SidedProxy;
-import net.minecraftforge.fml.common.event.FMLInitializationEvent;
-import net.minecraftforge.fml.common.event.FMLPostInitializationEvent;
-import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
-import net.minecraftforge.fml.common.network.NetworkRegistry;
+import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
+import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-@Mod(modid = Reagenchant.MOD_ID, name = Reagenchant.NAME, version = Reagenchant.VERSION, dependencies = Reagenchant.DEPENDENCIES)
+@Mod(Reagenchant.MOD_ID)
 public class Reagenchant implements IModData, IReagenchantAPI
 {
     public static final String MOD_ID = "reagenchant";
-    public static final String NAME = "Reagenchant";
-    public static final String VERSION = "1.0.0";
-    public static final String DEPENDENCIES = "required-after:libraryex@[1.0.9,);";
 
-    @Mod.Instance(MOD_ID)
     public static Reagenchant instance;
-
-    @SidedProxy(clientSide = "logictechcorp.reagenchant.proxy.ClientProxy", serverSide = "logictechcorp.reagenchant.proxy.ServerProxy")
     public static IProxy proxy;
 
     public static final Logger LOGGER = LogManager.getLogger("Reagenchant");
 
-    @Mod.EventHandler
-    public void onFMLPreInitialization(FMLPreInitializationEvent event)
+    public Reagenchant()
+    {
+        Reagenchant.instance = this;
+        Reagenchant.proxy = DistExecutor.runForDist(() -> ClientProxy::new, () -> ServerProxy::new);
+        FMLJavaModLoadingContext.get().getModEventBus().addListener(this::commonSetup);
+        proxy.setupSidedListeners();
+    }
+
+    private void commonSetup(FMLCommonSetupEvent event)
     {
         ReagenchantAPI.setInstance(this);
-        NetworkRegistry.INSTANCE.registerGuiHandler(this, new GuiHandler());
         ReagenchantReagents.initReagents();
-        proxy.preInit();
-    }
-
-    @Mod.EventHandler
-    public void onFMLInitialization(FMLInitializationEvent event)
-    {
-        proxy.init();
-    }
-
-    @Mod.EventHandler
-    public void onFMLPostInitialization(FMLPostInitializationEvent event)
-    {
-        proxy.postInit();
     }
 
     @Override
@@ -80,9 +66,9 @@ public class Reagenchant implements IModData, IReagenchantAPI
     }
 
     @Override
-    public CreativeTabs getCreativeTab()
+    public ItemGroup getItemGroup()
     {
-        return CreativeTabs.DECORATIONS;
+        return ItemGroup.DECORATIONS;
     }
 
     @Override

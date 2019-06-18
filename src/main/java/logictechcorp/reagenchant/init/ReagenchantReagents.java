@@ -22,10 +22,10 @@ import logictechcorp.reagenchant.api.ReagenchantAPI;
 import logictechcorp.reagenchant.api.reagent.IReagent;
 import logictechcorp.reagenchant.reagent.ReagentConfigurable;
 import logictechcorp.reagenchant.reagent.ReagentEnchantmentData;
-import net.minecraft.init.Blocks;
-import net.minecraft.init.Enchantments;
-import net.minecraft.init.Items;
+import net.minecraft.block.Blocks;
+import net.minecraft.enchantment.Enchantments;
 import net.minecraft.item.Item;
+import net.minecraft.item.Items;
 
 public class ReagenchantReagents
 {

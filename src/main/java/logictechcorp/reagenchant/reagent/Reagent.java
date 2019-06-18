@@ -23,16 +23,16 @@ import logictechcorp.reagenchant.api.reagent.IReagentEnchantmentData;
 import net.minecraft.enchantment.Enchantment;
 import net.minecraft.enchantment.EnchantmentData;
 import net.minecraft.enchantment.EnchantmentHelper;
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.init.Items;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
+import net.minecraft.item.Items;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.WeightedRandom;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.world.World;
-import net.minecraftforge.fml.common.registry.ForgeRegistries;
+import net.minecraftforge.registries.ForgeRegistries;
 
 import java.util.*;
 
@@ -88,7 +88,7 @@ public class Reagent implements IReagent
     }
 
     @Override
-    public List<EnchantmentData> createEnchantmentList(World world, BlockPos pos, EntityPlayer player, ItemStack unenchantedStack, ItemStack reagentStack, int enchantmentTier, int enchantabilityLevel, Random random)
+    public List<EnchantmentData> createEnchantmentList(World world, BlockPos pos, PlayerEntity player, ItemStack unenchantedStack, ItemStack reagentStack, int enchantmentTier, int enchantabilityLevel, Random random)
     {
         int enchantability = unenchantedStack.getItem().getItemEnchantability(unenchantedStack);
 
@@ -117,7 +117,7 @@ public class Reagent implements IReagent
                 {
                     for(enchantmentLevel = maximumEnchantmentLevel; enchantmentLevel > minimumEnchantmentLevel - 1; enchantmentLevel--)
                     {
-                        if(enchantabilityLevel >= enchantment.getMinEnchantability(enchantmentLevel) && enchantabilityLevel <= enchantment.getMaxEnchantability(enchantmentLevel))
+                        if(enchantabilityLevel >= enchantment.getMinEnchantability(enchantmentLevel))
                         {
                             break;
                         }
@@ -182,7 +182,7 @@ public class Reagent implements IReagent
     }
 
     @Override
-    public boolean hasApplicableEnchantments(World world, BlockPos pos, EntityPlayer player, ItemStack unenchantedStack, ItemStack reagentStack, Random random)
+    public boolean hasApplicableEnchantments(World world, BlockPos pos, PlayerEntity player, ItemStack unenchantedStack, ItemStack reagentStack, Random random)
     {
         for(Enchantment enchantment : this.getAssociatedEnchantments())
         {
@@ -196,7 +196,7 @@ public class Reagent implements IReagent
     }
 
     @Override
-    public boolean consumeReagent(World world, BlockPos pos, EntityPlayer player, ItemStack enchantedStack, ItemStack reagentStack, List<EnchantmentData> enchantmentList, Random random)
+    public boolean consumeReagent(World world, BlockPos pos, PlayerEntity player, ItemStack enchantedStack, ItemStack reagentStack, List<EnchantmentData> enchantmentList, Random random)
     {
         List<Enchantment> applicableEnchantments = this.getApplicableEnchantments(world, pos, player, enchantedStack, reagentStack, random);
 
@@ -230,14 +230,14 @@ public class Reagent implements IReagent
 
         for(ResourceLocation registryName : this.enchantments.keySet())
         {
-            associatedEnchantments.add(Enchantment.getEnchantmentByLocation(registryName.toString()));
+            associatedEnchantments.add(ForgeRegistries.ENCHANTMENTS.getValue(registryName));
         }
 
         return associatedEnchantments;
     }
 
     @Override
-    public List<Enchantment> getApplicableEnchantments(World world, BlockPos pos, EntityPlayer player, ItemStack unenchantedStack, ItemStack reagentStack, Random random)
+    public List<Enchantment> getApplicableEnchantments(World world, BlockPos pos, PlayerEntity player, ItemStack unenchantedStack, ItemStack reagentStack, Random random)
     {
         List<Enchantment> enchantments = new ArrayList<>();
 
@@ -259,7 +259,7 @@ public class Reagent implements IReagent
     }
 
     @Override
-    public double getEnchantmentProbability(World world, BlockPos pos, EntityPlayer player, ItemStack unenchantedStack, ItemStack reagentStack, EnchantmentData enchantmentData, Random random)
+    public double getEnchantmentProbability(World world, BlockPos pos, PlayerEntity player, ItemStack unenchantedStack, ItemStack reagentStack, EnchantmentData enchantmentData, Random random)
     {
         Enchantment enchantment = enchantmentData.enchantment;
 
@@ -272,7 +272,7 @@ public class Reagent implements IReagent
     }
 
     @Override
-    public int getReagentCost(World world, BlockPos pos, EntityPlayer player, ItemStack unenchantedStack, ItemStack reagentStack, EnchantmentData enchantmentData, Random random)
+    public int getReagentCost(World world, BlockPos pos, PlayerEntity player, ItemStack unenchantedStack, ItemStack reagentStack, EnchantmentData enchantmentData, Random random)
     {
         Enchantment enchantment = enchantmentData.enchantment;
 

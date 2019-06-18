@@ -14,7 +14,30 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-@API(apiVersion = "1", owner = "reagenchant", provides = "ReagenchantAPI")
-package logictechcorp.reagenchant.api;
 
-import net.minecraftforge.fml.common.API;
+package logictechcorp.reagenchant.item;
+
+import logictechcorp.reagenchant.init.ReagenchantBlocks;
+import net.minecraft.block.Blocks;
+import net.minecraft.item.BlockItem;
+import net.minecraft.item.ItemStack;
+
+public class ReagentTableItem extends BlockItem
+{
+    public ReagentTableItem()
+    {
+        super(Blocks.ENCHANTING_TABLE, ReagenchantBlocks.getDefaultItemBlockBuilder());
+    }
+
+    @Override
+    public String getTranslationKey()
+    {
+        return "tile.enchantmentTable";
+    }
+
+    @Override
+    public String getTranslationKey(ItemStack stack)
+    {
+        return this.getTranslationKey();
+    }
+}

@@ -15,37 +15,27 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package logictechcorp.reagenchant.handler;
+package logictechcorp.reagenchant.init;
 
+import logictechcorp.libraryex.utility.InjectionHelper;
 import logictechcorp.reagenchant.Reagenchant;
-import logictechcorp.reagenchant.api.ReagenchantAPI;
-import net.minecraft.world.World;
-import net.minecraftforge.event.world.WorldEvent;
+import logictechcorp.reagenchant.tileentity.ReagentTableTileEntity;
+import net.minecraft.block.Blocks;
+import net.minecraft.tileentity.TileEntityType;
+import net.minecraftforge.event.RegistryEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 
 @Mod.EventBusSubscriber(modid = Reagenchant.MOD_ID, bus = Mod.EventBusSubscriber.Bus.MOD)
-public class WorldHandler
+public class ReagenchantTileEntityTypes
 {
-    @SubscribeEvent
-    public static void onWorldLoad(WorldEvent.Load event)
-    {
-        World world = event.getWorld().getWorld();
-
-        if(!world.isRemote)
-        {
-            ReagenchantAPI.getInstance().getReagentManager().readReagentConfigs(event);
-        }
-    }
+    public static final TileEntityType<ReagentTableTileEntity> REAGENT_TABLE_TILE_ENTITY = InjectionHelper.nullValue();
 
     @SubscribeEvent
-    public static void onWorldUnload(WorldEvent.Unload event)
+    public static void onRegisterTileEntityTypes(RegistryEvent.Register<TileEntityType<?>> event)
     {
-        World world = event.getWorld().getWorld();
-
-        if(!world.isRemote)
-        {
-            ReagenchantAPI.getInstance().getReagentManager().writeReagentConfigs(event);
-        }
+        event.getRegistry().registerAll(
+                TileEntityType.Builder.create(ReagentTableTileEntity::new, Blocks.ENCHANTING_TABLE).build(null).setRegistryName(Reagenchant.getResource("reagent_table_tile_entity"))
+        );
     }
 }

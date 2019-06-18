@@ -17,47 +17,33 @@
 
 package logictechcorp.reagenchant.init;
 
-import logictechcorp.libraryex.item.builder.ItemProperties;
-import logictechcorp.libraryex.utility.InjectionHelper;
 import logictechcorp.reagenchant.Reagenchant;
-import logictechcorp.reagenchant.block.BlockReagentTable;
-import logictechcorp.reagenchant.item.ItemBlockReagentTable;
+import logictechcorp.reagenchant.block.ReagentTableBlock;
+import logictechcorp.reagenchant.item.ReagentTableItem;
 import net.minecraft.block.Block;
 import net.minecraft.item.Item;
 import net.minecraftforge.event.RegistryEvent;
+import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
-import net.minecraftforge.fml.common.registry.GameRegistry;
 
-@GameRegistry.ObjectHolder(Reagenchant.MOD_ID)
+@Mod.EventBusSubscriber(modid = Reagenchant.MOD_ID, bus = Mod.EventBusSubscriber.Bus.MOD)
 public class ReagenchantBlocks
 {
-    @GameRegistry.ObjectHolder("minecraft:enchanting_table")
-    public static final BlockReagentTable REAGENT_TABLE = InjectionHelper.nullValue();
+    private static final Item.Properties DEFAULT_ITEM_BLOCK_BUILDER = new Item.Properties().group(Reagenchant.instance.getItemGroup());
 
-    private static final ItemProperties DEFAULT_ITEM_BLOCK_BUILDER = new ItemProperties().creativeTab(Reagenchant.instance.getCreativeTab());
-
-    @Mod.EventBusSubscriber(modid = Reagenchant.MOD_ID)
-    public static class EventHandler
+    @SubscribeEvent
+    public static void onRegisterBlocks(RegistryEvent.Register<Block> event)
     {
-        @SubscribeEvent
-        public static void onRegisterBlocks(RegistryEvent.Register<Block> event)
-        {
-            event.getRegistry().registerAll(
-                    new BlockReagentTable()
-            );
-        }
-
-        @SubscribeEvent
-        public static void onRegisterItems(RegistryEvent.Register<Item> event)
-        {
-            event.getRegistry().registerAll(
-                    new ItemBlockReagentTable()
-            );
-        }
+        event.getRegistry().register(new ReagentTableBlock().setRegistryName("minecraft:enchanting_table"));
     }
 
-    public static ItemProperties getDefaultItemBlockBuilder()
+    @SubscribeEvent
+    public static void onRegisterItems(RegistryEvent.Register<Item> event)
+    {
+        event.getRegistry().register(new ReagentTableItem().setRegistryName("minecraft:enchanting_table"));
+    }
+
+    public static Item.Properties getDefaultItemBlockBuilder()
     {
         return DEFAULT_ITEM_BLOCK_BUILDER;
     }

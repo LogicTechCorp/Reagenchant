@@ -19,34 +19,27 @@ package logictechcorp.reagenchant.proxy;
 
 import logictechcorp.libraryex.api.IProxy;
 import logictechcorp.reagenchant.client.renderer.tileentity.TileEntityReagentTableRenderer;
-import logictechcorp.reagenchant.tileentity.TileEntityReagentTable;
-import net.minecraft.client.Minecraft;
+import logictechcorp.reagenchant.tileentity.ReagentTableTileEntity;
+import net.minecraftforge.fml.DeferredWorkQueue;
 import net.minecraftforge.fml.client.registry.ClientRegistry;
+import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
+import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 
 public class ClientProxy implements IProxy
 {
-    private final Minecraft minecraft = Minecraft.getMinecraft();
-
     @Override
-    public void preInit()
+    public void setupSidedListeners()
     {
-        ClientRegistry.bindTileEntitySpecialRenderer(TileEntityReagentTable.class, new TileEntityReagentTableRenderer());
-    }
-
-    @Override
-    public void init()
-    {
-
-    }
-
-    @Override
-    public void postInit()
-    {
-
+        FMLJavaModLoadingContext.get().getModEventBus().addListener(this::clientSetup);
     }
 
     @Override
     public void spawnParticle(int particleId, double posX, double posY, double posZ, double speedX, double speedY, double speedZ)
     {
+    }
+
+    private void clientSetup(FMLClientSetupEvent event)
+    {
+        DeferredWorkQueue.runLater(() -> ClientRegistry.bindTileEntitySpecialRenderer(ReagentTableTileEntity.class, new TileEntityReagentTableRenderer()));
     }
 }

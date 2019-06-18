@@ -19,7 +19,7 @@ package logictechcorp.reagenchant.api.reagent;
 
 import net.minecraft.enchantment.Enchantment;
 import net.minecraft.enchantment.EnchantmentData;
-import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.ResourceLocation;
@@ -62,7 +62,7 @@ public interface IReagent
      * @param random              The random number generator.
      * @return A list of the enchantments that are going to be applied.
      */
-    List<EnchantmentData> createEnchantmentList(World world, BlockPos pos, EntityPlayer player, ItemStack unenchantedStack, ItemStack reagentStack, int enchantmentTier, int enchantabilityLevel, Random random);
+    List<EnchantmentData> createEnchantmentList(World world, BlockPos pos, PlayerEntity player, ItemStack unenchantedStack, ItemStack reagentStack, int enchantmentTier, int enchantabilityLevel, Random random);
 
     /**
      * Called to check if this reagent has enchantments that are applicable to the unenchantedStack.
@@ -75,7 +75,7 @@ public interface IReagent
      * @param random           The random number generator.
      * @return Whether the reagent has enchantments that are applicable to the unenchantedStack.
      */
-    boolean hasApplicableEnchantments(World world, BlockPos pos, EntityPlayer player, ItemStack unenchantedStack, ItemStack reagentStack, Random random);
+    boolean hasApplicableEnchantments(World world, BlockPos pos, PlayerEntity player, ItemStack unenchantedStack, ItemStack reagentStack, Random random);
 
     /**
      * Called after the enchantments are applied to determine if the reagent is consumed.
@@ -89,7 +89,7 @@ public interface IReagent
      * @param random          The random number generator.
      * @return Whether the reagent item is consumed.
      */
-    boolean consumeReagent(World world, BlockPos pos, EntityPlayer player, ItemStack enchantedStack, ItemStack reagentStack, List<EnchantmentData> enchantmentList, Random random);
+    boolean consumeReagent(World world, BlockPos pos, PlayerEntity player, ItemStack enchantedStack, ItemStack reagentStack, List<EnchantmentData> enchantmentList, Random random);
 
     /**
      * Returns the name of the reagent as a resource location.
@@ -124,7 +124,7 @@ public interface IReagent
      * @param random           The random number generator.
      * @return A list containing the enchantments that can be applied to the unenchantedStack.
      */
-    List<Enchantment> getApplicableEnchantments(World world, BlockPos pos, EntityPlayer player, ItemStack unenchantedStack, ItemStack reagentStack, Random random);
+    List<Enchantment> getApplicableEnchantments(World world, BlockPos pos, PlayerEntity player, ItemStack unenchantedStack, ItemStack reagentStack, Random random);
 
     /**
      * Called to get the data associated with the enchantment.
@@ -147,7 +147,7 @@ public interface IReagent
      * @param random           The random number generator.
      * @return The probability of the enchantment being applied.
      */
-    double getEnchantmentProbability(World world, BlockPos pos, EntityPlayer player, ItemStack unenchantedStack, ItemStack reagentStack, EnchantmentData enchantmentData, Random random);
+    double getEnchantmentProbability(World world, BlockPos pos, PlayerEntity player, ItemStack unenchantedStack, ItemStack reagentStack, EnchantmentData enchantmentData, Random random);
 
     /**
      * Called when applying enchantments to the unenchantedStack and allows for modification of the base reagent cost.
@@ -162,5 +162,5 @@ public interface IReagent
      * @param random           The random number generator.
      * @return The amount of reagents required to apply the enchantment.
      */
-    int getReagentCost(World world, BlockPos pos, EntityPlayer player, ItemStack unenchantedStack, ItemStack reagentStack, EnchantmentData enchantmentData, Random random);
+    int getReagentCost(World world, BlockPos pos, PlayerEntity player, ItemStack unenchantedStack, ItemStack reagentStack, EnchantmentData enchantmentData, Random random);
 }

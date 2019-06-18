@@ -18,7 +18,7 @@
 package logictechcorp.reagenchant;
 
 import com.electronwill.nightconfig.core.file.FileConfig;
-import logictechcorp.libraryex.config.ModJsonConfigFormat;
+import com.electronwill.nightconfig.json.JsonFormat;
 import logictechcorp.libraryex.utility.FileHelper;
 import logictechcorp.libraryex.utility.WorldHelper;
 import logictechcorp.reagenchant.api.ReagenchantAPI;
@@ -27,12 +27,13 @@ import logictechcorp.reagenchant.api.internal.iface.IReagentRegistry;
 import logictechcorp.reagenchant.api.reagent.IReagent;
 import logictechcorp.reagenchant.api.reagent.IReagentConfigurable;
 import logictechcorp.reagenchant.reagent.ReagentConfigurable;
-import net.minecraft.init.Items;
 import net.minecraft.item.Item;
+import net.minecraft.item.Items;
 import net.minecraft.util.ResourceLocation;
-import net.minecraft.world.DimensionType;
 import net.minecraft.world.World;
+import net.minecraft.world.dimension.DimensionType;
 import net.minecraftforge.event.world.WorldEvent;
+import net.minecraftforge.registries.ForgeRegistries;
 import org.apache.logging.log4j.Marker;
 import org.apache.logging.log4j.MarkerManager;
 
@@ -54,12 +55,12 @@ final class ReagentManager implements IReagentManager
     @Override
     public void readReagentConfigs(WorldEvent.Load event)
     {
-        World world = event.getWorld();
+        World world = event.getWorld().getWorld();
 
-        if(world.provider.getDimension() == DimensionType.OVERWORLD.getId())
+        if(world.getDimension().getType().getId() == DimensionType.OVERWORLD.getId())
         {
             Reagenchant.LOGGER.info(this.marker, "Reading Reagent configs from disk.");
-            Path path = new File(WorldHelper.getSaveDirectory(event.getWorld()), "/config/reagenchant/reagents").toPath();
+            Path path = new File(WorldHelper.getSaveDirectory(world), "/config/reagenchant/reagents").toPath();
 
             try
             {
@@ -72,10 +73,10 @@ final class ReagentManager implements IReagentManager
 
                     if(FileHelper.getFileExtension(configFile).equals("json"))
                     {
-                        FileConfig config = FileConfig.of(configFile, ModJsonConfigFormat.instance());
+                        FileConfig config = FileConfig.of(configFile, JsonFormat.fancyInstance());
                         config.load();
 
-                        Item associatedItem = Item.getByNameOrId(config.getOrElse("associatedItem", "minecraft:air"));
+                        Item associatedItem = ForgeRegistries.ITEMS.getValue(new ResourceLocation(config.getOrElse("associatedItem", "minecraft:air")));
 
                         if(associatedItem != null && associatedItem != Items.AIR)
                         {
@@ -119,9 +120,9 @@ final class ReagentManager implements IReagentManager
     @Override
     public void writeReagentConfigs(WorldEvent.Unload event)
     {
-        World world = event.getWorld();
+        World world = event.getWorld().getWorld();
 
-        if(world.provider.getDimension() == DimensionType.OVERWORLD.getId())
+        if(world.getDimension().getType().getId() == DimensionType.OVERWORLD.getId())
         {
             Reagenchant.LOGGER.info(this.marker, "Writing Reagent configs to disk.");
 
@@ -133,8 +134,8 @@ final class ReagentManager implements IReagentManager
                 }
 
                 IReagentConfigurable reagentConfigurable = (IReagentConfigurable) reagent;
-                File configFile = new File(WorldHelper.getSaveDirectory(event.getWorld()), reagentConfigurable.getRelativeSaveFile());
-                FileConfig fileConfig = FileConfig.of(configFile, ModJsonConfigFormat.instance());
+                File configFile = new File(WorldHelper.getSaveDirectory(world), reagentConfigurable.getRelativeSaveFile());
+                FileConfig fileConfig = FileConfig.of(configFile, JsonFormat.fancyInstance());
 
                 if(!configFile.getParentFile().mkdirs() && configFile.exists() || configFile.exists())
                 {

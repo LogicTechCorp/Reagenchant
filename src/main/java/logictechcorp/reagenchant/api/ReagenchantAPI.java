@@ -19,8 +19,8 @@ package logictechcorp.reagenchant.api;
 
 import logictechcorp.reagenchant.api.internal.iface.IReagenchantAPI;
 import logictechcorp.reagenchant.api.internal.impl.ReagenchantAPIStub;
-import net.minecraftforge.fml.common.Loader;
-import net.minecraftforge.fml.common.ModContainer;
+import net.minecraftforge.fml.ModContainer;
+import net.minecraftforge.fml.ModLoadingContext;
 
 public final class ReagenchantAPI
 {
@@ -37,7 +37,7 @@ public final class ReagenchantAPI
 
     public static void setInstance(IReagenchantAPI instance)
     {
-        ModContainer mod = Loader.instance().activeModContainer();
+        ModContainer mod = ModLoadingContext.get().getActiveContainer();
 
         if(mod != null && mod.getModId().equals("reagenchant"))
         {

@@ -18,10 +18,11 @@
 package logictechcorp.reagenchant.handler;
 
 import logictechcorp.libraryex.utility.NBTHelper;
+import logictechcorp.reagenchant.Reagenchant;
 import net.minecraft.enchantment.EnchantmentHelper;
+import net.minecraft.enchantment.Enchantments;
 import net.minecraft.entity.Entity;
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.init.Enchantments;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.DamageSource;
 import net.minecraftforge.event.AnvilUpdateEvent;
@@ -31,10 +32,11 @@ import net.minecraftforge.event.entity.player.PlayerEvent.HarvestCheck;
 import net.minecraftforge.event.entity.player.PlayerInteractEvent.RightClickBlock;
 import net.minecraftforge.event.world.BlockEvent.BreakEvent;
 import net.minecraftforge.event.world.BlockEvent.HarvestDropsEvent;
+import net.minecraftforge.eventbus.api.SubscribeEvent;
+import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.Mod.EventBusSubscriber;
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 
-@EventBusSubscriber(modid = "reagenchant")
+@EventBusSubscriber(modid = Reagenchant.MOD_ID, bus = Mod.EventBusSubscriber.Bus.MOD)
 public class UnbreakingHandler
 {
     @SubscribeEvent
@@ -42,7 +44,7 @@ public class UnbreakingHandler
     {
         ItemStack stack = event.getEntityPlayer().getHeldItemMainhand();
 
-        if(!stack.isEmpty() && EnchantmentHelper.getEnchantmentLevel(Enchantments.UNBREAKING, stack) > 0 && stack.getItemDamage() == stack.getMaxDamage())
+        if(!stack.isEmpty() && EnchantmentHelper.getEnchantmentLevel(Enchantments.UNBREAKING, stack) > 0 && stack.getDamage() == stack.getMaxDamage())
         {
             event.setNewSpeed(0.5F);
             setItemUnbreakable(stack);
@@ -55,7 +57,7 @@ public class UnbreakingHandler
     {
         ItemStack stack = event.getEntityPlayer().getHeldItemMainhand();
 
-        if(!stack.isEmpty() && EnchantmentHelper.getEnchantmentLevel(Enchantments.UNBREAKING, stack) > 0 && stack.getItemDamage() == stack.getMaxDamage())
+        if(!stack.isEmpty() && EnchantmentHelper.getEnchantmentLevel(Enchantments.UNBREAKING, stack) > 0 && stack.getDamage() == stack.getMaxDamage())
         {
             event.setCanHarvest(false);
             setItemUnbreakable(stack);
@@ -68,7 +70,7 @@ public class UnbreakingHandler
     {
         ItemStack stack = event.getPlayer().getHeldItemMainhand();
 
-        if(!stack.isEmpty() && EnchantmentHelper.getEnchantmentLevel(Enchantments.UNBREAKING, stack) > 0 && stack.getItemDamage() == stack.getMaxDamage())
+        if(!stack.isEmpty() && EnchantmentHelper.getEnchantmentLevel(Enchantments.UNBREAKING, stack) > 0 && stack.getDamage() == stack.getMaxDamage())
         {
             event.setExpToDrop(0);
             setItemUnbreakable(stack);
@@ -81,7 +83,7 @@ public class UnbreakingHandler
     {
         ItemStack stack = event.getHarvester().getHeldItemMainhand();
 
-        if(!stack.isEmpty() && EnchantmentHelper.getEnchantmentLevel(Enchantments.UNBREAKING, stack) > 0 && stack.getItemDamage() == stack.getMaxDamage())
+        if(!stack.isEmpty() && EnchantmentHelper.getEnchantmentLevel(Enchantments.UNBREAKING, stack) > 0 && stack.getDamage() == stack.getMaxDamage())
         {
             event.getDrops().clear();
             setItemUnbreakable(stack);
@@ -94,7 +96,7 @@ public class UnbreakingHandler
     {
         ItemStack stack = event.getItemStack();
 
-        if(!stack.isEmpty() && EnchantmentHelper.getEnchantmentLevel(Enchantments.UNBREAKING, stack) > 0 && stack.getItemDamage() == stack.getMaxDamage())
+        if(!stack.isEmpty() && EnchantmentHelper.getEnchantmentLevel(Enchantments.UNBREAKING, stack) > 0 && stack.getDamage() == stack.getMaxDamage())
         {
             event.setCanceled(true);
             setItemUnbreakable(stack);
@@ -108,12 +110,12 @@ public class UnbreakingHandler
         DamageSource source = event.getSource();
         Entity attacker = source.getTrueSource();
 
-        if(attacker instanceof EntityPlayer)
+        if(attacker instanceof PlayerEntity)
         {
-            EntityPlayer player = (EntityPlayer) attacker;
+            PlayerEntity player = (PlayerEntity) attacker;
             ItemStack stack = player.getHeldItemMainhand();
 
-            if(EnchantmentHelper.getEnchantmentLevel(Enchantments.UNBREAKING, stack) > 0 && stack.getItemDamage() == stack.getMaxDamage())
+            if(EnchantmentHelper.getEnchantmentLevel(Enchantments.UNBREAKING, stack) > 0 && stack.getDamage() == stack.getMaxDamage())
             {
                 event.setAmount(1.0F);
                 setItemUnbreakable(stack);
@@ -131,9 +133,9 @@ public class UnbreakingHandler
         {
             NBTHelper.ensureTagExists(inputStack);
 
-            if(inputStack.getTagCompound().hasKey("Unbreakable"))
+            if(inputStack.getTag().contains("Unbreakable"))
             {
-                inputStack.getTagCompound().removeTag("Unbreakable");
+                inputStack.getTag().remove("Unbreakable");
             }
         }
 
@@ -141,9 +143,9 @@ public class UnbreakingHandler
         {
             NBTHelper.ensureTagExists(ingredientStack);
 
-            if(ingredientStack.getTagCompound().hasKey("Unbreakable"))
+            if(ingredientStack.getTag().contains("Unbreakable"))
             {
-                ingredientStack.getTagCompound().removeTag("Unbreakable");
+                ingredientStack.getTag().remove("Unbreakable");
             }
         }
 
@@ -153,9 +155,9 @@ public class UnbreakingHandler
     {
         NBTHelper.ensureTagExists(stack);
 
-        if(!stack.getTagCompound().getBoolean("Unbreakable"))
+        if(!stack.getTag().getBoolean("Unbreakable"))
         {
-            stack.getTagCompound().setBoolean("Unbreakable", true);
+            stack.getTag().putBoolean("Unbreakable", true);
         }
 
     }

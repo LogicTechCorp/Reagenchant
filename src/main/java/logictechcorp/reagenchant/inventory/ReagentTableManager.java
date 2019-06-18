@@ -17,25 +17,25 @@
 
 package logictechcorp.reagenchant.inventory;
 
+import logictechcorp.libraryex.utility.BlockHelper;
 import logictechcorp.libraryex.utility.RandomHelper;
 import logictechcorp.reagenchant.api.ReagenchantAPI;
 import logictechcorp.reagenchant.api.reagent.IReagent;
-import logictechcorp.reagenchant.tileentity.TileEntityReagentTable;
+import logictechcorp.reagenchant.tileentity.ReagentTableTileEntity;
 import net.minecraft.advancements.CriteriaTriggers;
-import net.minecraft.enchantment.Enchantment;
 import net.minecraft.enchantment.EnchantmentData;
 import net.minecraft.enchantment.EnchantmentHelper;
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.entity.player.EntityPlayerMP;
-import net.minecraft.init.Items;
-import net.minecraft.init.SoundEvents;
-import net.minecraft.item.ItemEnchantedBook;
+import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.entity.player.ServerPlayerEntity;
+import net.minecraft.item.EnchantedBookItem;
 import net.minecraft.item.ItemStack;
-import net.minecraft.stats.StatList;
+import net.minecraft.item.Items;
+import net.minecraft.stats.Stats;
 import net.minecraft.util.SoundCategory;
+import net.minecraft.util.SoundEvents;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.registry.Registry;
 import net.minecraft.world.World;
-import net.minecraftforge.common.ForgeHooks;
 import net.minecraftforge.event.ForgeEventFactory;
 import net.minecraftforge.items.ItemStackHandler;
 
@@ -46,7 +46,8 @@ public class ReagentTableManager
 {
     private final World world;
     private final BlockPos pos;
-    private final TileEntityReagentTable reagentTable;
+    private final PlayerEntity user;
+    private final ReagentTableTileEntity reagentTable;
     private final ItemStackHandler inventory;
     private final Random random;
     private int xpSeed;
@@ -54,24 +55,25 @@ public class ReagentTableManager
     private int[] enchantmentLevels;
     private int[] enchantabilityLevels;
 
-    public ReagentTableManager(World world, BlockPos pos, TileEntityReagentTable reagentTable)
+    public ReagentTableManager(World world, BlockPos pos, PlayerEntity user, ReagentTableTileEntity reagentTable)
     {
         this.world = world;
         this.pos = pos;
+        this.user = user;
         this.reagentTable = reagentTable;
         this.inventory = reagentTable.getInventory();
-        this.random = reagentTable.getRandom();
-        this.xpSeed = reagentTable.getUser().getXPSeed();
+        this.random = new Random();
+        this.xpSeed = user.getXPSeed();
         this.enchantments = new int[]{-1, -1, -1};
         this.enchantmentLevels = new int[]{-1, -1, -1};
         this.enchantabilityLevels = new int[3];
     }
 
-    void onContentsChanged(ContainerReagentTable containerReagentTable)
+    void onContentsChanged(ReagentTableContainer reagentTableContainer)
     {
         ItemStack unenchantedStack = this.inventory.getStackInSlot(0);
 
-        if(unenchantedStack.isItemEnchantable() && !this.inventory.getStackInSlot(1).isEmpty())
+        if(unenchantedStack.isEnchanted() && !this.inventory.getStackInSlot(1).isEmpty())
         {
             if(!this.world.isRemote)
             {
@@ -81,17 +83,20 @@ public class ReagentTableManager
                 {
                     for(int x = -1; x <= 1; x++)
                     {
-                        if((z != 0 || x != 0) && !this.world.getBlockState(this.pos.add(x, 0, z)).isOpaqueCube() && !this.world.getBlockState(this.pos.add(x, 1, z)).isOpaqueCube())
+                        BlockPos adjustedPos = this.pos.add(x, 0, z);
+                        BlockPos adjustedPosUp = adjustedPos.up();
+
+                        if((z != 0 || x != 0) && !this.world.getBlockState(adjustedPos).isOpaqueCube(this.world, adjustedPos) && !this.world.getBlockState(adjustedPosUp).isOpaqueCube(this.world, adjustedPosUp))
                         {
-                            power += ForgeHooks.getEnchantPower(this.world, this.pos.add(x * 2, 0, z * 2));
-                            power += ForgeHooks.getEnchantPower(this.world, this.pos.add(x * 2, 1, z * 2));
+                            power += BlockHelper.getEnchantPower(this.world, this.pos.add(x * 2, 0, z * 2));
+                            power += BlockHelper.getEnchantPower(this.world, this.pos.add(x * 2, 1, z * 2));
 
                             if(x != 0 && z != 0)
                             {
-                                power += ForgeHooks.getEnchantPower(this.world, this.pos.add(x * 2, 0, z));
-                                power += ForgeHooks.getEnchantPower(this.world, this.pos.add(x * 2, 1, z));
-                                power += ForgeHooks.getEnchantPower(this.world, this.pos.add(x, 0, z * 2));
-                                power += ForgeHooks.getEnchantPower(this.world, this.pos.add(x, 1, z * 2));
+                                power += BlockHelper.getEnchantPower(this.world, this.pos.add(x * 2, 0, z));
+                                power += BlockHelper.getEnchantPower(this.world, this.pos.add(x * 2, 1, z));
+                                power += BlockHelper.getEnchantPower(this.world, this.pos.add(x, 0, z * 2));
+                                power += BlockHelper.getEnchantPower(this.world, this.pos.add(x, 1, z * 2));
                             }
                         }
                     }
@@ -122,13 +127,13 @@ public class ReagentTableManager
                         if(enchantmentList != null && !enchantmentList.isEmpty())
                         {
                             EnchantmentData enchantmentData = enchantmentList.get(this.random.nextInt(enchantmentList.size()));
-                            this.enchantments[i] = Enchantment.getEnchantmentID(enchantmentData.enchantment);
+                            this.enchantments[i] = Registry.ENCHANTMENT.getId(enchantmentData.enchantment);
                             this.enchantmentLevels[i] = enchantmentData.enchantmentLevel;
                         }
                     }
                 }
 
-                containerReagentTable.detectAndSendChanges();
+                reagentTableContainer.detectAndSendChanges();
             }
         }
         else
@@ -156,9 +161,9 @@ public class ReagentTableManager
         {
             IReagent reagent = ReagenchantAPI.getInstance().getReagentRegistry().getReagent(reagentStack.getItem());
 
-            if(reagent.hasApplicableEnchantments(this.world, this.pos, this.reagentTable.getUser(), unenchantedStack, reagentStack, this.random))
+            if(reagent.hasApplicableEnchantments(this.world, this.pos, this.user, unenchantedStack, reagentStack, this.random))
             {
-                enchantmentData = reagent.createEnchantmentList(this.world, this.pos, this.reagentTable.getUser(), unenchantedStack, reagentStack, enchantmentTier, enchantabilityLevel, this.random);
+                enchantmentData = reagent.createEnchantmentList(this.world, this.pos, this.user, unenchantedStack, reagentStack, enchantmentTier, enchantabilityLevel, this.random);
                 usedReagentEnchantments = true;
             }
         }
@@ -178,18 +183,18 @@ public class ReagentTableManager
         return enchantmentData;
     }
 
-    boolean enchantItem(EntityPlayer player, int enchantmentTier, ContainerReagentTable containerReagentTable)
+    boolean enchantItem(PlayerEntity player, int enchantmentTier, ReagentTableContainer reagentTableContainer)
     {
         ItemStack unenchantedStack = this.inventory.getStackInSlot(0);
         ItemStack lapisStack = this.inventory.getStackInSlot(1);
         ItemStack reagentStack = this.inventory.getStackInSlot(2);
         int i = enchantmentTier + 1;
 
-        if((lapisStack.isEmpty() || lapisStack.getCount() < i) && !player.capabilities.isCreativeMode)
+        if((lapisStack.isEmpty() || lapisStack.getCount() < i) && !player.abilities.isCreativeMode)
         {
             return false;
         }
-        else if(this.enchantabilityLevels[enchantmentTier] > 0 && !unenchantedStack.isEmpty() && (player.experienceLevel >= i && player.experienceLevel >= this.enchantabilityLevels[enchantmentTier] || player.capabilities.isCreativeMode))
+        else if(this.enchantabilityLevels[enchantmentTier] > 0 && !unenchantedStack.isEmpty() && (player.experienceLevel >= i && player.experienceLevel >= this.enchantabilityLevels[enchantmentTier] || player.abilities.isCreativeMode))
         {
             if(!this.world.isRemote)
             {
@@ -233,7 +238,7 @@ public class ReagentTableManager
                                             maxReagentCost = reagentCost;
                                         }
 
-                                        ItemEnchantedBook.addEnchantment(unenchantedStack, enchantmentData);
+                                        EnchantedBookItem.addEnchantment(unenchantedStack, enchantmentData);
                                     }
                                 }
                                 else
@@ -253,7 +258,7 @@ public class ReagentTableManager
                             {
                                 if(flag)
                                 {
-                                    ItemEnchantedBook.addEnchantment(unenchantedStack, enchantmentData);
+                                    EnchantedBookItem.addEnchantment(unenchantedStack, enchantmentData);
                                 }
                                 else
                                 {
@@ -263,7 +268,7 @@ public class ReagentTableManager
                         }
                     }
 
-                    if(!player.capabilities.isCreativeMode)
+                    if(!player.abilities.isCreativeMode)
                     {
                         lapisStack.shrink(i);
 
@@ -286,16 +291,16 @@ public class ReagentTableManager
                         }
                     }
 
-                    player.addStat(StatList.ITEM_ENCHANTED);
+                    player.addStat(Stats.ENCHANT_ITEM);
 
-                    if(player instanceof EntityPlayerMP)
+                    if(player instanceof ServerPlayerEntity)
                     {
-                        CriteriaTriggers.ENCHANTED_ITEM.trigger((EntityPlayerMP) player, unenchantedStack, i);
+                        CriteriaTriggers.ENCHANTED_ITEM.trigger((ServerPlayerEntity) player, unenchantedStack, i);
                     }
 
                     this.reagentTable.markDirty();
                     this.xpSeed = player.getXPSeed();
-                    this.onContentsChanged(containerReagentTable);
+                    this.onContentsChanged(reagentTableContainer);
                     this.world.playSound(null, this.pos, SoundEvents.BLOCK_ENCHANTMENT_TABLE_USE, SoundCategory.BLOCKS, 1.0F, this.world.rand.nextFloat() * 0.1F + 0.9F);
                 }
             }
@@ -318,9 +323,14 @@ public class ReagentTableManager
         return this.pos;
     }
 
-    public TileEntityReagentTable getReagentTable()
+    public ReagentTableTileEntity getReagentTable()
     {
         return this.reagentTable;
+    }
+
+    public PlayerEntity getUser()
+    {
+        return this.user;
     }
 
     public ItemStackHandler getInventory()

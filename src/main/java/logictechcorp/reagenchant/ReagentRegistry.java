@@ -19,8 +19,8 @@ package logictechcorp.reagenchant;
 
 import logictechcorp.reagenchant.api.internal.iface.IReagentRegistry;
 import logictechcorp.reagenchant.api.reagent.IReagent;
-import net.minecraft.init.Items;
 import net.minecraft.item.Item;
+import net.minecraft.item.Items;
 import net.minecraft.util.ResourceLocation;
 import org.apache.logging.log4j.Marker;
 import org.apache.logging.log4j.MarkerManager;

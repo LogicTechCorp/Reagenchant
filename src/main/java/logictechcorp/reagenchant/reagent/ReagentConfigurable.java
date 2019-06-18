@@ -18,14 +18,16 @@
 package logictechcorp.reagenchant.reagent;
 
 import com.electronwill.nightconfig.core.Config;
-import logictechcorp.libraryex.config.ModJsonConfigFormat;
+import com.electronwill.nightconfig.json.JsonFormat;
 import logictechcorp.reagenchant.api.reagent.IReagentConfigurable;
 import logictechcorp.reagenchant.api.reagent.IReagentEnchantmentData;
 import net.minecraft.enchantment.Enchantment;
 import net.minecraft.item.Item;
 import net.minecraft.util.ResourceLocation;
+import net.minecraftforge.registries.ForgeRegistries;
 
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -52,7 +54,7 @@ public class ReagentConfigurable extends Reagent implements IReagentConfigurable
 
         for(Config enchantmentConfig : enchantmentConfigs)
         {
-            Enchantment enchantment = Enchantment.getEnchantmentByLocation(enchantmentConfig.getOrElse("enchantment", ""));
+            Enchantment enchantment = ForgeRegistries.ENCHANTMENTS.getValue(new ResourceLocation(enchantmentConfig.getOrElse("enchantment", "")));
 
             if(enchantment != null)
             {
@@ -96,7 +98,7 @@ public class ReagentConfigurable extends Reagent implements IReagentConfigurable
         {
             IReagentEnchantmentData reagentEnchantmentData = entry.getValue();
 
-            Config enchantmentConfig = ModJsonConfigFormat.newConfig();
+            Config enchantmentConfig = JsonFormat.newConfig(LinkedHashMap::new);
             enchantmentConfig.add("enchantment", entry.getKey().toString());
             enchantmentConfig.add("probability", reagentEnchantmentData.getEnchantmentProbability());
             enchantmentConfig.add("reagentCost", reagentEnchantmentData.getReagentCost());

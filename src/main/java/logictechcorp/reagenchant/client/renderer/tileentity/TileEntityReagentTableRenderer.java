@@ -17,27 +17,27 @@
 
 package logictechcorp.reagenchant.client.renderer.tileentity;
 
+import com.mojang.blaze3d.platform.GlStateManager;
 import logictechcorp.reagenchant.init.ReagenchantTextures;
-import logictechcorp.reagenchant.tileentity.TileEntityReagentTable;
-import net.minecraft.client.model.ModelBook;
-import net.minecraft.client.renderer.GlStateManager;
-import net.minecraft.client.renderer.tileentity.TileEntitySpecialRenderer;
+import logictechcorp.reagenchant.tileentity.ReagentTableTileEntity;
+import net.minecraft.client.renderer.entity.model.BookModel;
+import net.minecraft.client.renderer.tileentity.TileEntityRenderer;
 import net.minecraft.util.math.MathHelper;
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.api.distmarker.OnlyIn;
 
-@SideOnly(Side.CLIENT)
-public class TileEntityReagentTableRenderer extends TileEntitySpecialRenderer<TileEntityReagentTable>
+@OnlyIn(value = Dist.CLIENT)
+public class TileEntityReagentTableRenderer extends TileEntityRenderer<ReagentTableTileEntity>
 {
-    private final ModelBook modelBook = new ModelBook();
+    private final BookModel modelBook = new BookModel();
 
     @Override
-    public void render(TileEntityReagentTable reagentTable, double x, double y, double z, float partialTicks, int destroyStage, float alpha)
+    public void render(ReagentTableTileEntity reagentTable, double x, double y, double z, float partialTicks, int destroyStage)
     {
         GlStateManager.pushMatrix();
-        GlStateManager.translate((float) x + 0.5F, (float) y + 0.75F, (float) z + 0.5F);
+        GlStateManager.translatef((float) x + 0.5F, (float) y + 0.75F, (float) z + 0.5F);
         float ticks = (float) reagentTable.getTickCounter() + partialTicks;
-        GlStateManager.translate(0.0F, 0.1F + MathHelper.sin(ticks * 0.1F) * 0.01F, 0.0F);
+        GlStateManager.translatef(0.0F, 0.1F + MathHelper.sin(ticks * 0.1F) * 0.01F, 0.0F);
         float bookRotation;
 
         for(bookRotation = reagentTable.getBookRotation() - reagentTable.getBookRotationPrev(); bookRotation >= (float) Math.PI; bookRotation -= ((float) Math.PI * 2F))
@@ -50,8 +50,8 @@ public class TileEntityReagentTableRenderer extends TileEntitySpecialRenderer<Ti
         }
 
         float previousBookRotation = reagentTable.getBookRotationPrev() + bookRotation * partialTicks;
-        GlStateManager.rotate(-previousBookRotation * (180F / (float) Math.PI), 0.0F, 1.0F, 0.0F);
-        GlStateManager.rotate(80.0F, 0.0F, 0.0F, 1.0F);
+        GlStateManager.rotatef(-previousBookRotation * (180F / (float) Math.PI), 0.0F, 1.0F, 0.0F);
+        GlStateManager.rotatef(80.0F, 0.0F, 0.0F, 1.0F);
         this.bindTexture(ReagenchantTextures.REAGENT_TABLE_BOOK);
         float pageOneFlip = reagentTable.getPageFlipPrev() + (reagentTable.getPageFlip() - reagentTable.getPageFlipPrev()) * partialTicks + 0.25F;
         float pageTwoFlip = reagentTable.getPageFlipPrev() + (reagentTable.getPageFlip() - reagentTable.getPageFlipPrev()) * partialTicks + 0.75F;
@@ -80,7 +80,7 @@ public class TileEntityReagentTableRenderer extends TileEntitySpecialRenderer<Ti
 
         float bookSpread = reagentTable.getBookSpreadPrev() + (reagentTable.getBookSpread() - reagentTable.getBookSpreadPrev()) * partialTicks;
         GlStateManager.enableCull();
-        this.modelBook.render(null, ticks, pageOneFlip, pageTwoFlip, bookSpread, 0.0F, 0.0625F);
+        this.modelBook.func_217103_a(ticks, pageOneFlip, pageTwoFlip, bookSpread, 0.0F, 0.0625F);
         GlStateManager.popMatrix();
     }
 }

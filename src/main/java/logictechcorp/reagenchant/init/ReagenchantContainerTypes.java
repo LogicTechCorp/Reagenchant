@@ -15,37 +15,27 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package logictechcorp.reagenchant.handler;
+package logictechcorp.reagenchant.init;
 
+import logictechcorp.libraryex.utility.InjectionHelper;
 import logictechcorp.reagenchant.Reagenchant;
-import logictechcorp.reagenchant.api.ReagenchantAPI;
-import net.minecraft.world.World;
-import net.minecraftforge.event.world.WorldEvent;
+import logictechcorp.reagenchant.inventory.ReagentTableContainer;
+import net.minecraft.inventory.container.Container;
+import net.minecraft.inventory.container.ContainerType;
+import net.minecraftforge.event.RegistryEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 
 @Mod.EventBusSubscriber(modid = Reagenchant.MOD_ID, bus = Mod.EventBusSubscriber.Bus.MOD)
-public class WorldHandler
+public class ReagenchantContainerTypes
 {
-    @SubscribeEvent
-    public static void onWorldLoad(WorldEvent.Load event)
-    {
-        World world = event.getWorld().getWorld();
-
-        if(!world.isRemote)
-        {
-            ReagenchantAPI.getInstance().getReagentManager().readReagentConfigs(event);
-        }
-    }
+    public static final ContainerType<ReagentTableContainer> REAGENT_TABLE_CONTAINER = InjectionHelper.nullValue();
 
     @SubscribeEvent
-    public static void onWorldUnload(WorldEvent.Unload event)
+    public static void onRegisterContainerTypes(RegistryEvent.Register<ContainerType<?>> event)
     {
-        World world = event.getWorld().getWorld();
-
-        if(!world.isRemote)
-        {
-            ReagenchantAPI.getInstance().getReagentManager().writeReagentConfigs(event);
-        }
+        event.getRegistry().registerAll(
+                new ContainerType<>((ContainerType.IFactory<Container>) (id, inventory) -> new ReagentTableContainer(id)).setRegistryName(Reagenchant.getResource("reagent_table_container"))
+        );
     }
 }
