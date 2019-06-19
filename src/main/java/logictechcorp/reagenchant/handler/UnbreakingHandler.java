@@ -79,14 +79,18 @@ public class UnbreakingHandler
     @SubscribeEvent
     public static void onHarvestDrops(HarvestDropsEvent event)
     {
-        ItemStack stack = event.getHarvester().getHeldItemMainhand();
+        EntityPlayer player = event.getHarvester();
 
-        if(!stack.isEmpty() && EnchantmentHelper.getEnchantmentLevel(Enchantments.UNBREAKING, stack) > 0 && stack.getItemDamage() == stack.getMaxDamage())
+        if(player != null)
         {
-            event.getDrops().clear();
-            setItemUnbreakable(stack);
-        }
+            ItemStack stack = event.getHarvester().getHeldItemMainhand();
 
+            if(!stack.isEmpty() && EnchantmentHelper.getEnchantmentLevel(Enchantments.UNBREAKING, stack) > 0 && stack.getItemDamage() == stack.getMaxDamage())
+            {
+                event.getDrops().clear();
+                setItemUnbreakable(stack);
+            }
+        }
     }
 
     @SubscribeEvent
