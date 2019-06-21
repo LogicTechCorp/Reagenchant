@@ -24,6 +24,7 @@ import logictechcorp.reagenchant.api.internal.iface.IReagenchantAPI;
 import logictechcorp.reagenchant.api.internal.iface.IReagentManager;
 import logictechcorp.reagenchant.api.internal.iface.IReagentRegistry;
 import logictechcorp.reagenchant.handler.GuiHandler;
+import logictechcorp.reagenchant.handler.UnbreakingHandler;
 import logictechcorp.reagenchant.init.ReagenchantReagents;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.util.ResourceLocation;
@@ -64,6 +65,7 @@ public class Reagenchant implements IModData, IReagenchantAPI
     @Mod.EventHandler
     public void onFMLInitialization(FMLInitializationEvent event)
     {
+        UnbreakingHandler.addBrokenPropertyToItems();
         proxy.init();
     }
 
