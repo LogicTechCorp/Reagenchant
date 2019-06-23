@@ -1,0 +1,6 @@
+{
+    "parent": "item/handheld",
+    "textures": {
+        "layer0": "reagenchant:items/broken_stone_sword"
+    }
+}

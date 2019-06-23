@@ -1,0 +1,14 @@
+{
+    "parent": "item/handheld",
+    "textures": {
+        "layer0": "items/iron_shovel"
+    },
+    "overrides": [
+        {
+            "predicate": {
+                "reagenchant:broken": 1.0
+            },
+            "model": "reagenchant:item/broken_iron_shovel"
+        }
+    ]
+}

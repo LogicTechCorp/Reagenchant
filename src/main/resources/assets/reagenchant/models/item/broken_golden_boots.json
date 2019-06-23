@@ -1,0 +1,6 @@
+{
+    "parent": "item/generated",
+    "textures": {
+        "layer0": "reagenchant:items/broken_gold_boots"
+    }
+}

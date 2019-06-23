@@ -18,21 +18,28 @@
 package logictechcorp.reagenchant.handler;
 
 import logictechcorp.reagenchant.Reagenchant;
+import net.minecraft.block.Block;
 import net.minecraft.enchantment.EnchantmentHelper;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.init.Blocks;
 import net.minecraft.init.Enchantments;
 import net.minecraft.item.IItemPropertyGetter;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.DamageSource;
 import net.minecraft.util.ResourceLocation;
+import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
+import net.minecraftforge.common.IShearable;
 import net.minecraftforge.event.entity.living.LivingHurtEvent;
 import net.minecraftforge.event.entity.player.PlayerEvent.BreakSpeed;
 import net.minecraftforge.event.entity.player.PlayerEvent.HarvestCheck;
+import net.minecraftforge.event.entity.player.PlayerInteractEvent.EntityInteract;
+import net.minecraftforge.event.entity.player.PlayerInteractEvent.EntityInteractSpecific;
 import net.minecraftforge.event.entity.player.PlayerInteractEvent.RightClickBlock;
+import net.minecraftforge.event.entity.player.PlayerInteractEvent.RightClickItem;
 import net.minecraftforge.event.world.BlockEvent.BreakEvent;
 import net.minecraftforge.event.world.BlockEvent.HarvestDropsEvent;
 import net.minecraftforge.fml.common.Mod.EventBusSubscriber;
@@ -80,10 +87,23 @@ public class UnbreakingHandler
     @SubscribeEvent
     public static void onBlockBreak(BreakEvent event)
     {
+        World world = event.getWorld();
+        BlockPos pos = event.getPos();
+        Block block = event.getState().getBlock();
         ItemStack stack = event.getPlayer().getHeldItemMainhand();
 
         if(UnbreakingHandler.isItemBroken(stack))
         {
+            if(block instanceof IShearable)
+            {
+                IShearable shearable = (IShearable) block;
+
+                if(shearable.isShearable(stack, world, pos))
+                {
+                    world.setBlockState(pos, Blocks.AIR.getDefaultState());
+                }
+            }
+
             event.setExpToDrop(0);
         }
     }
@@ -105,7 +125,40 @@ public class UnbreakingHandler
     }
 
     @SubscribeEvent
-    public static void onPlayerRightClick(RightClickBlock event)
+    public static void onRightClickBlock(RightClickBlock event)
+    {
+        ItemStack stack = event.getItemStack();
+
+        if(UnbreakingHandler.isItemBroken(stack))
+        {
+            event.setCanceled(true);
+        }
+    }
+
+    @SubscribeEvent
+    public static void onRightClickItem(RightClickItem event)
+    {
+        ItemStack stack = event.getItemStack();
+
+        if(UnbreakingHandler.isItemBroken(stack))
+        {
+            event.setCanceled(true);
+        }
+    }
+
+    @SubscribeEvent
+    public static void onEntityInteractSpecific(EntityInteractSpecific event)
+    {
+        ItemStack stack = event.getItemStack();
+
+        if(UnbreakingHandler.isItemBroken(stack))
+        {
+            event.setCanceled(true);
+        }
+    }
+
+    @SubscribeEvent
+    public static void onEntityInteract(EntityInteract event)
     {
         ItemStack stack = event.getItemStack();
 
@@ -142,7 +195,7 @@ public class UnbreakingHandler
             stack.setItemDamage(stack.getMaxDamage() - 1);
         }
 
-        return !stack.isEmpty() && EnchantmentHelper.getEnchantmentLevel(Enchantments.UNBREAKING, stack) > 0 && usesRemaining <= 1;
+        return !stack.isEmpty() && !EnchantmentHelper.hasBindingCurse(stack) && EnchantmentHelper.getEnchantmentLevel(Enchantments.UNBREAKING, stack) > 0 && usesRemaining <= 1;
     }
 
     public static void addBrokenPropertyToItems()

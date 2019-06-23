@@ -1,0 +1,15 @@
+{
+    "parent": "item/generated",
+    "textures": {
+        "layer0": "items/leather_helmet",
+        "layer1": "items/leather_helmet_overlay"
+    },
+    "overrides": [
+        {
+            "predicate": {
+                "reagenchant:broken": 1.0
+            },
+            "model": "reagenchant:item/broken_leather_helmet"
+        }
+    ]
+}

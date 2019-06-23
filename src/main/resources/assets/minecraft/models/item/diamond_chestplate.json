@@ -1,0 +1,14 @@
+{
+	"parent": "item/generated",
+	"textures": {
+		"layer0": "items/diamond_chestplate"
+	},
+   "overrides": [
+       {
+           "predicate": {
+               "reagenchant:broken": 1.0
+           },
+           "model": "reagenchant:item/broken_diamond_chestplate"
+       }
+   ]
+}

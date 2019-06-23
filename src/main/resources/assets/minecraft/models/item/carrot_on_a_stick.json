@@ -1,0 +1,14 @@
+{
+    "parent": "item/handheld_rod",
+    "textures": {
+        "layer0": "items/carrot_on_a_stick"
+    },
+    "overrides": [
+        {
+            "predicate": {
+                "reagenchant:broken": 1.0
+            },
+            "model": "reagenchant:item/broken_carrot_on_a_stick"
+        }
+    ]
+}
