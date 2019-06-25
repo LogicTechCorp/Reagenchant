@@ -17,18 +17,22 @@
 
 package logictechcorp.reagenchant.handler;
 
+import logictechcorp.libraryex.utility.NBTHelper;
 import logictechcorp.reagenchant.Reagenchant;
 import net.minecraft.block.Block;
+import net.minecraft.block.BlockDispenser;
+import net.minecraft.block.BlockTNT;
+import net.minecraft.block.state.IBlockState;
+import net.minecraft.dispenser.IBlockSource;
 import net.minecraft.enchantment.Enchantment;
 import net.minecraft.enchantment.EnchantmentHelper;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.init.Blocks;
-import net.minecraft.init.Enchantments;
-import net.minecraft.init.MobEffects;
+import net.minecraft.init.*;
 import net.minecraft.item.IItemPropertyGetter;
 import net.minecraft.item.Item;
+import net.minecraft.item.ItemArmor;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
@@ -43,15 +47,17 @@ import net.minecraftforge.common.ForgeHooks;
 import net.minecraftforge.common.IShearable;
 import net.minecraftforge.common.ISpecialArmor;
 import net.minecraftforge.event.entity.living.LivingHurtEvent;
+import net.minecraftforge.event.entity.player.AnvilRepairEvent;
 import net.minecraftforge.event.entity.player.PlayerEvent.BreakSpeed;
 import net.minecraftforge.event.entity.player.PlayerEvent.HarvestCheck;
 import net.minecraftforge.event.entity.player.PlayerInteractEvent.EntityInteract;
-import net.minecraftforge.event.entity.player.PlayerInteractEvent.EntityInteractSpecific;
 import net.minecraftforge.event.entity.player.PlayerInteractEvent.RightClickBlock;
 import net.minecraftforge.event.entity.player.PlayerInteractEvent.RightClickItem;
+import net.minecraftforge.event.entity.player.PlayerPickupXpEvent;
 import net.minecraftforge.event.world.BlockEvent.BreakEvent;
 import net.minecraftforge.event.world.BlockEvent.HarvestDropsEvent;
 import net.minecraftforge.fml.common.Mod.EventBusSubscriber;
+import net.minecraftforge.fml.common.eventhandler.Event;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.registry.ForgeRegistries;
 import net.minecraftforge.fml.relauncher.Side;
@@ -67,16 +73,19 @@ public class UnbreakingHandler
         @SideOnly(Side.CLIENT)
         public float apply(ItemStack stack, World world, EntityLivingBase entity)
         {
-            return UnbreakingHandler.isItemBroken(stack) ? 1.0F : 0.0F;
+            return UnbreakingHandler.isItemConsideredBroken(stack) ? 1.0F : 0.0F;
         }
     };
+    private static final String PLAYED_BROKEN_SOUND_KEY = Reagenchant.MOD_ID + ":PlayedBrokenSound";
+    private static final String DISABLED_ENCHANTMENTS_KEY = Reagenchant.MOD_ID + ":DisabledEnchantments";
 
     @SubscribeEvent
     public static void onPlayerBreakSpeed(BreakSpeed event)
     {
-        ItemStack stack = event.getEntityPlayer().getHeldItemMainhand();
+        EntityPlayer player = event.getEntityPlayer();
+        ItemStack stack = player.getHeldItemMainhand();
 
-        if(UnbreakingHandler.isItemBroken(stack))
+        if(UnbreakingHandler.isItemConsideredBroken(stack))
         {
             event.setNewSpeed(0.5F);
         }
@@ -85,9 +94,11 @@ public class UnbreakingHandler
     @SubscribeEvent
     public static void onPlayerHarvestCheck(HarvestCheck event)
     {
-        ItemStack stack = event.getEntityPlayer().getHeldItemMainhand();
+        EntityPlayer player = event.getEntityPlayer();
+        IBlockState state = event.getTargetBlock();
+        ItemStack stack = player.getHeldItemMainhand();
 
-        if(UnbreakingHandler.isItemBroken(stack))
+        if(UnbreakingHandler.isItemConsideredBroken(stack) && !state.getMaterial().isToolNotRequired())
         {
             event.setCanHarvest(false);
         }
@@ -98,37 +109,46 @@ public class UnbreakingHandler
     {
         World world = event.getWorld();
         BlockPos pos = event.getPos();
-        Block block = event.getState().getBlock();
-        ItemStack stack = event.getPlayer().getHeldItemMainhand();
+        IBlockState state = event.getState();
+        EntityPlayer player = event.getPlayer();
+        Block block = state.getBlock();
+        ItemStack stack = player.getHeldItemMainhand();
 
-        if(UnbreakingHandler.isItemBroken(stack))
+        if(UnbreakingHandler.isItemConsideredBroken(stack))
         {
             if(block instanceof IShearable)
             {
-                IShearable shearable = (IShearable) block;
-
-                if(shearable.isShearable(stack, world, pos))
+                if(((IShearable) block).isShearable(stack, world, pos))
                 {
                     world.setBlockState(pos, Blocks.AIR.getDefaultState());
                 }
             }
 
-            event.setExpToDrop(0);
+            if(!state.getMaterial().isToolNotRequired())
+            {
+                event.setExpToDrop(0);
+            }
         }
     }
 
     @SubscribeEvent
     public static void onHarvestDrops(HarvestDropsEvent event)
     {
+        IBlockState state = event.getState();
         EntityPlayer player = event.getHarvester();
 
         if(player != null)
         {
             ItemStack stack = event.getHarvester().getHeldItemMainhand();
 
-            if(UnbreakingHandler.isItemBroken(stack))
+            if(UnbreakingHandler.isItemConsideredBroken(stack))
             {
-                event.getDrops().clear();
+                UnbreakingHandler.breakItem(player, stack);
+
+                if(!state.getMaterial().isToolNotRequired())
+                {
+                    event.getDrops().clear();
+                }
             }
         }
     }
@@ -136,44 +156,49 @@ public class UnbreakingHandler
     @SubscribeEvent
     public static void onRightClickBlock(RightClickBlock event)
     {
+        EntityPlayer player = event.getEntityPlayer();
         ItemStack stack = event.getItemStack();
 
-        if(UnbreakingHandler.isItemBroken(stack))
+        if(UnbreakingHandler.isItemConsideredBroken(stack))
         {
-            event.setCanceled(true);
+            UnbreakingHandler.breakItem(player, stack);
+            event.setUseItem(Event.Result.DENY);
         }
     }
 
     @SubscribeEvent
     public static void onRightClickItem(RightClickItem event)
     {
+        EntityPlayer player = event.getEntityPlayer();
         ItemStack stack = event.getItemStack();
+        Item item = stack.getItem();
 
-        if(UnbreakingHandler.isItemBroken(stack))
+        if(UnbreakingHandler.isItemConsideredBroken(stack))
         {
-            event.setCanceled(true);
-        }
-    }
-
-    @SubscribeEvent
-    public static void onEntityInteractSpecific(EntityInteractSpecific event)
-    {
-        ItemStack stack = event.getItemStack();
-
-        if(UnbreakingHandler.isItemBroken(stack))
-        {
-            event.setCanceled(true);
+            if(!(item instanceof ItemArmor) && !(item instanceof ISpecialArmor))
+            {
+                UnbreakingHandler.breakItem(player, stack);
+                event.setCanceled(true);
+            }
         }
     }
 
     @SubscribeEvent
     public static void onEntityInteract(EntityInteract event)
     {
+        EntityPlayer player = event.getEntityPlayer();
+        Entity entity = event.getTarget();
         ItemStack stack = event.getItemStack();
+        Item item = stack.getItem();
 
-        if(UnbreakingHandler.isItemBroken(stack))
+        if(UnbreakingHandler.isItemConsideredBroken(stack))
         {
-            event.setCanceled(true);
+            UnbreakingHandler.breakItem(player, stack);
+
+            if(entity instanceof EntityLivingBase && item.itemInteractionForEntity(ItemStack.EMPTY, event.getEntityPlayer(), (EntityLivingBase) entity, event.getHand()))
+            {
+                event.setCanceled(true);
+            }
         }
     }
 
@@ -189,8 +214,9 @@ public class UnbreakingHandler
             EntityPlayer player = (EntityPlayer) attacker;
             ItemStack stack = player.getHeldItemMainhand();
 
-            if(UnbreakingHandler.isItemBroken(stack))
+            if(UnbreakingHandler.isItemConsideredBroken(stack))
             {
+                UnbreakingHandler.breakItem(player, stack);
                 event.setAmount(1.0F);
             }
         }
@@ -201,12 +227,122 @@ public class UnbreakingHandler
         }
     }
 
-    public static void addBrokenPropertyToItems()
+    @SubscribeEvent
+    public static void onAnvilRepair(AnvilRepairEvent event)
+    {
+        if(UnbreakingHandler.isItemConsideredBroken(event.getItemInput()))
+        {
+            UnbreakingHandler.fixItem(event.getItemResult());
+        }
+    }
+
+    @SubscribeEvent
+    public static void onMending(PlayerPickupXpEvent event)
+    {
+        EntityPlayer player = event.getEntityPlayer();
+
+        for(ItemStack stack : Enchantments.MENDING.getEntityEquipment(player))
+        {
+            if(UnbreakingHandler.isItemConsideredBroken(stack))
+            {
+                UnbreakingHandler.fixItem(stack);
+            }
+        }
+    }
+
+    public static void overrideBehavior()
     {
         for(Item item : ForgeRegistries.ITEMS)
         {
             item.addPropertyOverride(BROKEN_PROPERTY_KEY, BROKEN_PROPERTY);
         }
+
+        BlockDispenser.DISPENSE_BEHAVIOR_REGISTRY.putObject(Items.FLINT_AND_STEEL, new Bootstrap.BehaviorDispenseOptional()
+        {
+            @Override
+            protected ItemStack dispenseStack(IBlockSource source, ItemStack stack)
+            {
+                this.successful = false;
+
+                if(!UnbreakingHandler.isItemConsideredBroken(stack))
+                {
+                    World world = source.getWorld();
+                    BlockPos pos = source.getBlockPos().offset(source.getBlockState().getValue(BlockDispenser.FACING));
+                    this.successful = true;
+
+                    if(world.isAirBlock(pos))
+                    {
+                        world.setBlockState(pos, Blocks.FIRE.getDefaultState());
+
+                        if(stack.attemptDamageItem(1, world.rand, null))
+                        {
+                            stack.setCount(0);
+                        }
+                    }
+                    else if(world.getBlockState(pos).getBlock() == Blocks.TNT)
+                    {
+                        Blocks.TNT.onPlayerDestroy(world, pos, Blocks.TNT.getDefaultState().withProperty(BlockTNT.EXPLODE, true));
+                        world.setBlockToAir(pos);
+                    }
+                }
+
+                return stack;
+            }
+        });
+    }
+
+    private static void breakItem(EntityLivingBase livingEntity, ItemStack stack)
+    {
+        NBTTagCompound stackCompound = NBTHelper.ensureTagExists(stack);
+
+        if(!stackCompound.getBoolean(PLAYED_BROKEN_SOUND_KEY))
+        {
+            livingEntity.renderBrokenItemStack(stack);
+            stackCompound.setBoolean(PLAYED_BROKEN_SOUND_KEY, true);
+        }
+
+        NBTTagList enchantments = stack.getEnchantmentTagList();
+        NBTTagList disabledEnchantments = new NBTTagList();
+
+        for(int i = 0; i < enchantments.tagCount(); i++)
+        {
+            int enchantmentId = enchantments.getCompoundTagAt(i).getShort("id");
+
+            if(enchantmentId == Enchantment.getEnchantmentID(Enchantments.BINDING_CURSE))
+            {
+                enchantments.removeTag(i);
+            }
+            else if(enchantmentId != Enchantment.getEnchantmentID(Enchantments.UNBREAKING) && enchantmentId != Enchantment.getEnchantmentID(Enchantments.MENDING))
+            {
+                disabledEnchantments.appendTag(enchantments.removeTag(i));
+            }
+        }
+
+        NBTHelper.ensureTagExists(stack).setTag(DISABLED_ENCHANTMENTS_KEY, disabledEnchantments);
+    }
+
+    private static void fixItem(ItemStack stack)
+    {
+        NBTTagCompound stackCompound = NBTHelper.ensureTagExists(stack);
+
+        if(stackCompound.getBoolean(PLAYED_BROKEN_SOUND_KEY))
+        {
+            stackCompound.setBoolean(PLAYED_BROKEN_SOUND_KEY, false);
+        }
+
+        NBTTagList enchantments = stack.getEnchantmentTagList();
+
+        if(stackCompound.hasKey(DISABLED_ENCHANTMENTS_KEY))
+        {
+            NBTTagList disabledEnchantments = stackCompound.getTagList(DISABLED_ENCHANTMENTS_KEY, 10);
+
+            for(int i = 0; i < disabledEnchantments.tagCount(); i++)
+            {
+                enchantments.appendTag(disabledEnchantments.removeTag(i));
+            }
+        }
+
+        stackCompound.setTag("ench", enchantments);
     }
 
     private static void damagePlayer(EntityPlayer player, DamageSource source, float amount)
@@ -216,7 +352,7 @@ public class UnbreakingHandler
 
         for(int i = 0; i < armorStacks.size(); i++)
         {
-            if(UnbreakingHandler.isItemBroken(armorStacks.get(i)))
+            if(UnbreakingHandler.isItemConsideredBroken(armorStacks.get(i)))
             {
                 brokenArmorStacks.set(i, armorStacks.set(i, ItemStack.EMPTY));
             }
@@ -269,8 +405,9 @@ public class UnbreakingHandler
         {
             ItemStack armorStack = armorStacks.get(i);
 
-            if(!armorStack.isEmpty() && !UnbreakingHandler.isItemBroken(armorStack) && armorStack.getMaxDamage() == armorStack.getItemDamage())
+            if(!armorStack.isEmpty() && !UnbreakingHandler.isItemConsideredBroken(armorStack) && armorStack.getMaxDamage() == armorStack.getItemDamage())
             {
+                UnbreakingHandler.breakItem(player, armorStack);
                 armorStacks.set(i, ItemStack.EMPTY);
             }
         }
@@ -281,38 +418,23 @@ public class UnbreakingHandler
 
             if(!armorStack.isEmpty())
             {
+                UnbreakingHandler.breakItem(player, armorStack);
                 armorStacks.set(i, armorStack);
             }
         }
     }
 
-    private static boolean isItemBroken(ItemStack stack)
+    private static boolean isItemConsideredBroken(ItemStack stack)
     {
         int usesRemaining = (stack.getMaxDamage() - stack.getItemDamage());
         boolean canBeBroken = !stack.isEmpty() && EnchantmentHelper.getEnchantmentLevel(Enchantments.UNBREAKING, stack) > 0;
-        boolean isBroken = canBeBroken && usesRemaining <= 1;
+        boolean isConsideredBroken = canBeBroken && usesRemaining <= 1;
 
         if(usesRemaining == 0 && canBeBroken)
         {
             stack.setItemDamage(stack.getMaxDamage() - 1);
         }
 
-        if(isBroken && EnchantmentHelper.hasBindingCurse(stack))
-        {
-            NBTTagList enchantmentList = stack.getTagCompound().getTagList("ench", 10);
-
-            for(int i = 0; i < enchantmentList.tagCount(); i++)
-            {
-                NBTTagCompound compound = enchantmentList.getCompoundTagAt(i);
-
-                if(compound.getShort("id") == Enchantment.getEnchantmentID(Enchantments.BINDING_CURSE))
-                {
-                    enchantmentList.removeTag(i);
-                    break;
-                }
-            }
-        }
-
-        return isBroken;
+        return isConsideredBroken;
     }
 }

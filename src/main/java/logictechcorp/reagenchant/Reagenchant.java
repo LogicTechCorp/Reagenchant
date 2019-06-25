@@ -65,7 +65,7 @@ public class Reagenchant implements IModData, IReagenchantAPI
     @Mod.EventHandler
     public void onFMLInitialization(FMLInitializationEvent event)
     {
-        UnbreakingHandler.addBrokenPropertyToItems();
+        UnbreakingHandler.overrideBehavior();
         proxy.init();
     }
 
