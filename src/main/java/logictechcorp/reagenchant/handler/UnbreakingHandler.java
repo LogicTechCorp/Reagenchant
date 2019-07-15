@@ -76,7 +76,7 @@ public class UnbreakingHandler
             return UnbreakingHandler.isItemConsideredBroken(stack) ? 1.0F : 0.0F;
         }
     };
-    private static final String PLAYED_BROKEN_SOUND_KEY = Reagenchant.MOD_ID + ":PlayedBrokenSound";
+    private static final String PLAYED_BREAKING_SOUND_KEY = Reagenchant.MOD_ID + ":PlayedBreakingSound";
     private static final String DISABLED_ENCHANTMENTS_KEY = Reagenchant.MOD_ID + ":DisabledEnchantments";
 
     @SubscribeEvent
@@ -295,10 +295,10 @@ public class UnbreakingHandler
     {
         NBTTagCompound stackCompound = NBTHelper.ensureTagExists(stack);
 
-        if(!stackCompound.getBoolean(PLAYED_BROKEN_SOUND_KEY))
+        if(!stackCompound.getBoolean(PLAYED_BREAKING_SOUND_KEY))
         {
             livingEntity.renderBrokenItemStack(stack);
-            stackCompound.setBoolean(PLAYED_BROKEN_SOUND_KEY, true);
+            stackCompound.setBoolean(PLAYED_BREAKING_SOUND_KEY, true);
         }
 
         NBTTagList enchantments = stack.getEnchantmentTagList();
@@ -325,9 +325,9 @@ public class UnbreakingHandler
     {
         NBTTagCompound stackCompound = NBTHelper.ensureTagExists(stack);
 
-        if(stackCompound.getBoolean(PLAYED_BROKEN_SOUND_KEY))
+        if(stackCompound.getBoolean(PLAYED_BREAKING_SOUND_KEY))
         {
-            stackCompound.setBoolean(PLAYED_BROKEN_SOUND_KEY, false);
+            stackCompound.setBoolean(PLAYED_BREAKING_SOUND_KEY, false);
         }
 
         NBTTagList enchantments = stack.getEnchantmentTagList();

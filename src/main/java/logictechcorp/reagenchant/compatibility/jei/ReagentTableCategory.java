@@ -32,7 +32,6 @@ import net.minecraft.enchantment.Enchantment;
 import net.minecraft.enchantment.EnchantmentHelper;
 import net.minecraft.item.ItemStack;
 
-import java.util.List;
 import java.util.Map;
 
 class ReagentTableCategory implements IRecipeCategory<ReagentWrapper>
@@ -88,7 +87,7 @@ class ReagentTableCategory implements IRecipeCategory<ReagentWrapper>
     {
         IReagent reagent = reagentWrapper.getReagent();
 
-        recipeLayout.getIngredientsGroup(VanillaTypes.ITEM).addTooltipCallback((int slotIndex, boolean input, ItemStack ingredient, List<String> tooltip) ->
+        recipeLayout.getIngredientsGroup(VanillaTypes.ITEM).addTooltipCallback((slotIndex, input, ingredient, tooltip) ->
         {
             Map<Enchantment, Integer> enchantments = EnchantmentHelper.getEnchantments(ingredient);
 
