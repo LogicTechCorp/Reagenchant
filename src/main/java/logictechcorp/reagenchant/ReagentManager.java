@@ -18,7 +18,7 @@
 package logictechcorp.reagenchant;
 
 import com.electronwill.nightconfig.core.file.FileConfig;
-import logictechcorp.libraryex.config.ModJsonConfigFormat;
+import com.electronwill.nightconfig.json.JsonFormat;
 import logictechcorp.libraryex.utility.FileHelper;
 import logictechcorp.libraryex.utility.WorldHelper;
 import logictechcorp.reagenchant.api.ReagenchantAPI;
@@ -72,7 +72,7 @@ final class ReagentManager implements IReagentManager
 
                     if(FileHelper.getFileExtension(configFile).equals("json"))
                     {
-                        FileConfig config = FileConfig.of(configFile, ModJsonConfigFormat.instance());
+                        FileConfig config = FileConfig.of(configFile, JsonFormat.fancyInstance());
                         config.load();
 
                         Item associatedItem = Item.getByNameOrId(config.getOrElse("associatedItem", "minecraft:air"));
@@ -134,7 +134,7 @@ final class ReagentManager implements IReagentManager
 
                 IReagentConfigurable reagentConfigurable = (IReagentConfigurable) reagent;
                 File configFile = new File(WorldHelper.getSaveDirectory(event.getWorld()), reagentConfigurable.getRelativeSaveFile());
-                FileConfig fileConfig = FileConfig.of(configFile, ModJsonConfigFormat.instance());
+                FileConfig fileConfig = FileConfig.of(configFile, JsonFormat.fancyInstance());
 
                 if(!configFile.getParentFile().mkdirs() && configFile.exists() || configFile.exists())
                 {

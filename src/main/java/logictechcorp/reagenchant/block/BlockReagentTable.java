@@ -31,6 +31,7 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Blocks;
 import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
+import net.minecraft.tileentity.TileEntityEnchantmentTable;
 import net.minecraft.util.EnumBlockRenderType;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.EnumHand;
@@ -39,6 +40,7 @@ import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
+import net.minecraftforge.common.ForgeHooks;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
@@ -75,7 +77,7 @@ public class BlockReagentTable extends BlockTileEntity<TileEntityReagentTable>
                     {
                         BlockPos blockpos = pos.add(x, y, z);
 
-                        if(net.minecraftforge.common.ForgeHooks.getEnchantPower(world, blockpos) > 0)
+                        if(ForgeHooks.getEnchantPower(world, blockpos) > 0)
                         {
                             if(!world.isAirBlock(pos.add(x / 2, 0, z / 2)))
                             {
@@ -87,56 +89,6 @@ public class BlockReagentTable extends BlockTileEntity<TileEntityReagentTable>
                     }
                 }
             }
-        }
-    }
-
-    @Override
-    public EnumBlockRenderType getRenderType(IBlockState state)
-    {
-        return EnumBlockRenderType.MODEL;
-    }
-
-    @Override
-    public boolean isOpaqueCube(IBlockState state)
-    {
-        return false;
-    }
-
-    @Override
-    public boolean isFullCube(IBlockState state)
-    {
-        return false;
-    }
-
-    @Override
-    public AxisAlignedBB getBoundingBox(IBlockState state, IBlockAccess source, BlockPos pos)
-    {
-        return AABB;
-    }
-
-    @Override
-    public BlockFaceShape getBlockFaceShape(IBlockAccess world, IBlockState state, BlockPos pos, EnumFacing face)
-    {
-        return face == EnumFacing.DOWN ? BlockFaceShape.SOLID : BlockFaceShape.UNDEFINED;
-    }
-
-    @Override
-    public boolean onBlockActivated(World world, BlockPos pos, IBlockState state, EntityPlayer player, EnumHand hand, EnumFacing facing, float hitX, float hitY, float hitZ)
-    {
-        if(world.isRemote)
-        {
-            return true;
-        }
-        else
-        {
-            TileEntity tileEntity = world.getTileEntity(pos);
-
-            if(tileEntity instanceof TileEntityReagentTable && ((TileEntityReagentTable) tileEntity).getUser() == null)
-            {
-                player.openGui(Reagenchant.instance, GuiHandler.REAGENT_TABLE_ID, world, pos.getX(), pos.getY(), pos.getZ());
-            }
-
-            return true;
         }
     }
 
@@ -154,5 +106,60 @@ public class BlockReagentTable extends BlockTileEntity<TileEntityReagentTable>
                 ((TileEntityReagentTable) tileentity).setCustomName(stack.getDisplayName());
             }
         }
+    }
+
+    @Override
+    public boolean onBlockActivated(World world, BlockPos pos, IBlockState state, EntityPlayer player, EnumHand hand, EnumFacing facing, float hitX, float hitY, float hitZ)
+    {
+        if(world.isRemote)
+        {
+            return true;
+        }
+        else
+        {
+            if(world.getTileEntity(pos) instanceof TileEntityEnchantmentTable)
+            {
+                world.setTileEntity(pos, this.createTileEntity(world, state));
+            }
+
+            TileEntity tileEntity = world.getTileEntity(pos);
+
+            if(tileEntity instanceof TileEntityReagentTable && ((TileEntityReagentTable) tileEntity).getUser() == null)
+            {
+                player.openGui(Reagenchant.instance, GuiHandler.REAGENT_TABLE_ID, world, pos.getX(), pos.getY(), pos.getZ());
+            }
+
+            return true;
+        }
+    }
+
+    @Override
+    public boolean isOpaqueCube(IBlockState state)
+    {
+        return false;
+    }
+
+    @Override
+    public boolean isFullCube(IBlockState state)
+    {
+        return false;
+    }
+
+    @Override
+    public EnumBlockRenderType getRenderType(IBlockState state)
+    {
+        return EnumBlockRenderType.MODEL;
+    }
+
+    @Override
+    public AxisAlignedBB getBoundingBox(IBlockState state, IBlockAccess source, BlockPos pos)
+    {
+        return AABB;
+    }
+
+    @Override
+    public BlockFaceShape getBlockFaceShape(IBlockAccess world, IBlockState state, BlockPos pos, EnumFacing face)
+    {
+        return face == EnumFacing.DOWN ? BlockFaceShape.SOLID : BlockFaceShape.UNDEFINED;
     }
 }
