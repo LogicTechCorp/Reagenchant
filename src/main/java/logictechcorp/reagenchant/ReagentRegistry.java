@@ -43,11 +43,12 @@ final class ReagentRegistry implements IReagentRegistry
     {
         if(reagent != null)
         {
-            Item associatedItem = reagent.getItem();
+            Item item = reagent.getItem();
+            ResourceLocation itemRegistryName = item.getRegistryName();
 
-            if(associatedItem != Items.AIR)
+            if(!this.reagents.containsKey(itemRegistryName) && item != Items.AIR)
             {
-                this.reagents.put(associatedItem.getRegistryName(), reagent);
+                this.reagents.put(item.getRegistryName(), reagent);
             }
         }
     }
