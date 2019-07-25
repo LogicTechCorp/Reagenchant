@@ -25,14 +25,14 @@ import logictechcorp.reagenchant.api.ReagenchantAPI;
 import logictechcorp.reagenchant.api.internal.iface.IReagentManager;
 import logictechcorp.reagenchant.api.internal.iface.IReagentRegistry;
 import logictechcorp.reagenchant.api.reagent.IReagent;
-import logictechcorp.reagenchant.api.reagent.IReagentConfigurable;
-import logictechcorp.reagenchant.reagent.ReagentConfigurable;
+import logictechcorp.reagenchant.reagent.Reagent;
 import net.minecraft.init.Items;
 import net.minecraft.item.Item;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.world.DimensionType;
 import net.minecraft.world.World;
 import net.minecraftforge.event.world.WorldEvent;
+import net.minecraftforge.fml.common.registry.ForgeRegistries;
 import org.apache.logging.log4j.Marker;
 import org.apache.logging.log4j.MarkerManager;
 
@@ -59,7 +59,7 @@ final class ReagentManager implements IReagentManager
         if(world.provider.getDimension() == DimensionType.OVERWORLD.getId())
         {
             Reagenchant.LOGGER.info(this.marker, "Reading Reagent configs from disk.");
-            Path path = new File(WorldHelper.getSaveDirectory(event.getWorld()), "/config/reagenchant/reagents").toPath();
+            Path path = new File(WorldHelper.getSaveDirectory(event.getWorld()), "config/" + Reagenchant.MOD_ID + "/reagents").toPath();
 
             try
             {
@@ -72,35 +72,30 @@ final class ReagentManager implements IReagentManager
 
                     if(FileHelper.getFileExtension(configFile).equals("json"))
                     {
-                        FileConfig config = FileConfig.of(configFile, JsonFormat.fancyInstance());
+                        FileConfig config = FileConfig.builder(configFile, JsonFormat.fancyInstance()).preserveInsertionOrder().build();
                         config.load();
 
-                        Item associatedItem = Item.getByNameOrId(config.getOrElse("associatedItem", "minecraft:air"));
+                        Item item = ForgeRegistries.ITEMS.getValue(new ResourceLocation(config.getOrElse("item", "missing:no")));
 
-                        if(associatedItem != null && associatedItem != Items.AIR)
+                        if(item != null && item != Items.AIR)
                         {
                             IReagentRegistry reagentRegistry = ReagenchantAPI.getInstance().getReagentRegistry();
                             IReagent reagent;
 
-                            if(reagentRegistry.isReagentItem(associatedItem))
+                            if(reagentRegistry.hasReagent(item))
                             {
-                                reagent = reagentRegistry.getReagent(associatedItem);
-
-                                if(!(reagent instanceof IReagentConfigurable))
-                                {
-                                    continue;
-                                }
-
-                                ((IReagentConfigurable) reagent).readFromConfig(config);
+                                reagent = reagentRegistry.getReagent(item);
                             }
                             else
                             {
-                                reagent = new ReagentConfigurable(new ResourceLocation(config.getOrElse("name", "missing:no")), associatedItem);
-                                ((IReagentConfigurable) reagent).readFromConfig(config);
-                                reagentRegistry.registerReagent(reagent);
+                                reagent = new Reagent(item);
                             }
+
+                            reagent.readFromConfig(config);
+                            reagentRegistry.registerReagent(reagent);
                         }
 
+                        config.save();
                         config.close();
                     }
                     else if(!configFile.isDirectory())
@@ -127,24 +122,29 @@ final class ReagentManager implements IReagentManager
 
             for(IReagent reagent : ReagenchantAPI.getInstance().getReagentRegistry().getReagents().values())
             {
-                if(!(reagent instanceof IReagentConfigurable))
+                File configFile = new File(WorldHelper.getSaveDirectory(event.getWorld()), "config/" + Reagenchant.MOD_ID + "/" + reagent.getRelativeConfigPath());
+                FileConfig config = FileConfig.builder(configFile, JsonFormat.fancyInstance()).preserveInsertionOrder().build();
+
+                if(!configFile.exists())
                 {
-                    continue;
+                    try
+                    {
+                        Files.createDirectories(configFile.getParentFile().toPath());
+                    }
+                    catch(IOException e)
+                    {
+                        e.printStackTrace();
+                    }
+                }
+                else
+                {
+                    config.load();
                 }
 
-                IReagentConfigurable reagentConfigurable = (IReagentConfigurable) reagent;
-                File configFile = new File(WorldHelper.getSaveDirectory(event.getWorld()), reagentConfigurable.getRelativeSaveFile());
-                FileConfig fileConfig = FileConfig.of(configFile, JsonFormat.fancyInstance());
-
-                if(!configFile.getParentFile().mkdirs() && configFile.exists() || configFile.exists())
-                {
-                    fileConfig.load();
-                    reagentConfigurable.readFromConfig(fileConfig);
-                }
-
-                reagentConfigurable.writeToConfig(fileConfig);
-                fileConfig.save();
-                fileConfig.close();
+                reagent.writeToConfig(config);
+                config.save();
+                config.close();
+                reagent.readFromDefaultConfig();
             }
         }
     }

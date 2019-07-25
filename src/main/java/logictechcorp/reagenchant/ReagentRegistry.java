@@ -22,8 +22,6 @@ import logictechcorp.reagenchant.api.reagent.IReagent;
 import net.minecraft.init.Items;
 import net.minecraft.item.Item;
 import net.minecraft.util.ResourceLocation;
-import org.apache.logging.log4j.Marker;
-import org.apache.logging.log4j.MarkerManager;
 
 import java.util.Collections;
 import java.util.HashMap;
@@ -33,48 +31,43 @@ final class ReagentRegistry implements IReagentRegistry
 {
     static final IReagentRegistry INSTANCE = new ReagentRegistry();
 
-    private final Map<ResourceLocation, IReagent> reagents = new HashMap<>();
-    private final Marker marker = MarkerManager.getMarker("ReagentRegistry");
+    private final Map<ResourceLocation, IReagent> reagents;
 
     private ReagentRegistry()
     {
+        this.reagents = new HashMap<>();
     }
 
     @Override
     public void registerReagent(IReagent reagent)
     {
-        if(reagent == null)
+        if(reagent != null)
         {
-            return;
+            Item associatedItem = reagent.getItem();
+
+            if(associatedItem != Items.AIR)
+            {
+                this.reagents.put(associatedItem.getRegistryName(), reagent);
+            }
         }
-
-        Item associatedItem = reagent.getAssociatedItem();
-
-        if(associatedItem == Items.AIR)
-        {
-            Reagenchant.LOGGER.warn(this.marker, "The {} Reagent was not able to registered because it has an invalid associated item.", reagent.getName().toString());
-            return;
-        }
-
-        this.reagents.put(associatedItem.getRegistryName(), reagent);
     }
 
     @Override
-    public void unregisterReagent(Item associatedItem)
+    public void unregisterReagent(Item item)
     {
-        this.reagents.remove(associatedItem.getRegistryName());
+        this.reagents.remove(item.getRegistryName());
     }
 
     @Override
-    public boolean isReagentItem(Item item)
+    public boolean hasReagent(Item item)
     {
-        return item instanceof IReagent || this.reagents.containsKey(item.getRegistryName());
+        return this.reagents.containsKey(item.getRegistryName());
     }
 
     @Override
-    public IReagent getReagent(Item associatedItem)
+    public IReagent getReagent(Item item)
     {
-        return this.reagents.get(associatedItem.getRegistryName());
+        return this.reagents.get(item.getRegistryName());
     }
 
     @Override

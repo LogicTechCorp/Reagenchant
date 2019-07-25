@@ -40,12 +40,12 @@ public interface IReagentRegistry
     void unregisterReagent(Item associatedItem);
 
     /**
-     * Called to check if an item is associated with a reagent.
+     * Called to check if there is a reagent for the passed in item.
      *
      * @param item The item to check against.
-     * @return Whether the item is associated with a reagent.
+     * @return Whether there is a reagent for the passed in item.
      */
-    boolean isReagentItem(Item item);
+    boolean hasReagent(Item item);
 
     /**
      * Called to get a reagent associated with an item.

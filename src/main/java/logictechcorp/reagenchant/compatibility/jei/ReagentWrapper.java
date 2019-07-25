@@ -56,7 +56,7 @@ class ReagentWrapper implements IRecipeWrapper
         }
 
         slots.add(enchantments);
-        ingredients.setInput(VanillaTypes.ITEM, new ItemStack(this.reagent.getAssociatedItem()));
+        ingredients.setInput(VanillaTypes.ITEM, new ItemStack(this.reagent.getItem()));
         ingredients.setOutputLists(VanillaTypes.ITEM, slots);
     }
 

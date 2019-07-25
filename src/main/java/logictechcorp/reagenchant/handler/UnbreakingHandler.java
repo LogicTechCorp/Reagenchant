@@ -37,10 +37,7 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
 import net.minecraft.stats.StatList;
-import net.minecraft.util.CombatRules;
-import net.minecraft.util.DamageSource;
-import net.minecraft.util.NonNullList;
-import net.minecraft.util.ResourceLocation;
+import net.minecraft.util.*;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import net.minecraftforge.common.ForgeHooks;
@@ -241,9 +238,11 @@ public class UnbreakingHandler
     {
         EntityPlayer player = event.getEntityPlayer();
 
-        for(ItemStack stack : Enchantments.MENDING.getEntityEquipment(player))
+        for(EnumHand hand : EnumHand.values())
         {
-            if(UnbreakingHandler.isItemConsideredBroken(stack))
+            ItemStack stack = player.getHeldItem(hand);
+
+            if(UnbreakingHandler.isItemConsideredBroken(stack) && EnchantmentHelper.getEnchantmentLevel(Enchantments.MENDING, stack) > 0)
             {
                 UnbreakingHandler.fixItem(stack);
             }
@@ -304,21 +303,24 @@ public class UnbreakingHandler
         NBTTagList enchantments = stack.getEnchantmentTagList();
         NBTTagList disabledEnchantments = new NBTTagList();
 
-        for(int i = 0; i < enchantments.tagCount(); i++)
+        if(!stackCompound.hasKey(DISABLED_ENCHANTMENTS_KEY))
         {
-            int enchantmentId = enchantments.getCompoundTagAt(i).getShort("id");
+            for(int i = 0; i < enchantments.tagCount(); i++)
+            {
+                int enchantmentId = enchantments.getCompoundTagAt(i).getShort("id");
 
-            if(enchantmentId == Enchantment.getEnchantmentID(Enchantments.BINDING_CURSE))
-            {
-                enchantments.removeTag(i);
+                if(enchantmentId == Enchantment.getEnchantmentID(Enchantments.BINDING_CURSE))
+                {
+                    enchantments.removeTag(i);
+                }
+                else if(enchantmentId != Enchantment.getEnchantmentID(Enchantments.UNBREAKING) && enchantmentId != Enchantment.getEnchantmentID(Enchantments.MENDING))
+                {
+                    disabledEnchantments.appendTag(enchantments.removeTag(i));
+                }
             }
-            else if(enchantmentId != Enchantment.getEnchantmentID(Enchantments.UNBREAKING) && enchantmentId != Enchantment.getEnchantmentID(Enchantments.MENDING))
-            {
-                disabledEnchantments.appendTag(enchantments.removeTag(i));
-            }
+
+            stackCompound.setTag(DISABLED_ENCHANTMENTS_KEY, disabledEnchantments);
         }
-
-        NBTHelper.ensureTagExists(stack).setTag(DISABLED_ENCHANTMENTS_KEY, disabledEnchantments);
     }
 
     private static void fixItem(ItemStack stack)
@@ -342,6 +344,7 @@ public class UnbreakingHandler
             }
         }
 
+        stackCompound.removeTag(DISABLED_ENCHANTMENTS_KEY);
         stackCompound.setTag("ench", enchantments);
     }
 

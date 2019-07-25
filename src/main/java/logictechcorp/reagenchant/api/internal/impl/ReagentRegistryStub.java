@@ -46,7 +46,7 @@ final class ReagentRegistryStub implements IReagentRegistry
     }
 
     @Override
-    public boolean isReagentItem(Item item)
+    public boolean hasReagent(Item item)
     {
         return false;
     }

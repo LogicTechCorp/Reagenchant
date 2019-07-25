@@ -17,12 +17,12 @@
 
 package logictechcorp.reagenchant.api.reagent;
 
+import com.electronwill.nightconfig.core.Config;
 import net.minecraft.enchantment.Enchantment;
 import net.minecraft.enchantment.EnchantmentData;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
-import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 
@@ -34,6 +34,37 @@ import java.util.Random;
  */
 public interface IReagent
 {
+    /**
+     * Called to write the current state of the reagent to its default config.
+     * <p>
+     * This should be called after the default values have been changed by a modder.
+     * <p>
+     * This should not be called after the reagent has been configured from an
+     * external config because it may contain player edits.
+     */
+    void writeToDefaultConfig();
+
+    /**
+     * Called when the server is starting to configure this reagent.
+     *
+     * @param config The config that belongs to the reagent.
+     */
+    void readFromConfig(Config config);
+
+    /**
+     * Called when the server is stopping to save this reagent's data.
+     *
+     * @param config The config that belongs to the reagent.
+     */
+    void writeToConfig(Config config);
+
+    /**
+     * Called after {@link #writeToConfig}.
+     * <p>
+     * This is called to read the reagent from its default config.*
+     */
+    void readFromDefaultConfig();
+
     /**
      * Called to associate an enchantment with this reagent.
      *
@@ -92,18 +123,11 @@ public interface IReagent
     boolean consumeReagent(World world, BlockPos pos, EntityPlayer player, ItemStack enchantedStack, ItemStack reagentStack, List<EnchantmentData> enchantmentList, Random random);
 
     /**
-     * Returns the name of the reagent as a resource location.
-     *
-     * @return The name of the reagent as a resource location.
-     */
-    ResourceLocation getName();
-
-    /**
      * Returns the item that is associated with this reagent.
      *
      * @return The item that is associated with this reagent.
      */
-    Item getAssociatedItem();
+    Item getItem();
 
     /**
      * Returns a list containing the associated enchantments.
@@ -163,4 +187,11 @@ public interface IReagent
      * @return The amount of reagents required to apply the enchantment.
      */
     int getReagentCost(World world, BlockPos pos, EntityPlayer player, ItemStack unenchantedStack, ItemStack reagentStack, EnchantmentData enchantmentData, Random random);
+
+    /**
+     * Called to get this reagent's relative config path.
+     *
+     * @return This reagent's relative config path.
+     */
+    String getRelativeConfigPath();
 }

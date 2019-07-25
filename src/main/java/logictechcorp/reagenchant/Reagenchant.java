@@ -88,12 +88,6 @@ public class Reagenchant implements IModData, IReagenchantAPI
     }
 
     @Override
-    public boolean writeRecipesToJson()
-    {
-        return false;
-    }
-
-    @Override
     public boolean isStub()
     {
         return false;

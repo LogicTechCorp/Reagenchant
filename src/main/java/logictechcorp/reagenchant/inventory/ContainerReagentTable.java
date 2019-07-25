@@ -103,7 +103,7 @@ public class ContainerReagentTable extends Container
             @Override
             public boolean isItemValid(ItemStack stack)
             {
-                return ReagenchantAPI.getInstance().getReagentRegistry().isReagentItem(stack.getItem());
+                return ReagenchantAPI.getInstance().getReagentRegistry().hasReagent(stack.getItem());
             }
 
             @Override
@@ -208,21 +208,21 @@ public class ContainerReagentTable extends Container
 
             if(index == 0)
             {
-                if(!this.mergeItemStack(slotStack, 3, 38, true))
+                if(!this.mergeItemStack(slotStack, 3, 39, true))
                 {
                     return ItemStack.EMPTY;
                 }
             }
             else if(index == 1)
             {
-                if(!this.mergeItemStack(slotStack, 3, 38, true))
+                if(!this.mergeItemStack(slotStack, 3, 39, true))
                 {
                     return ItemStack.EMPTY;
                 }
             }
             else if(index == 2)
             {
-                if(!this.mergeItemStack(slotStack, 3, 38, true))
+                if(!this.mergeItemStack(slotStack, 3, 39, true))
                 {
                     return ItemStack.EMPTY;
                 }
@@ -234,7 +234,7 @@ public class ContainerReagentTable extends Container
                     return ItemStack.EMPTY;
                 }
             }
-            else if(ReagenchantAPI.getInstance().getReagentRegistry().isReagentItem(slotStack.getItem()))
+            else if(ReagenchantAPI.getInstance().getReagentRegistry().hasReagent(slotStack.getItem()))
             {
                 if(!this.mergeItemStack(slotStack, 2, 3, true))
                 {
