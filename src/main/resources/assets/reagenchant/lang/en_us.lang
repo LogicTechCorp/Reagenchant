@@ -3,17 +3,6 @@ language.name=English
 language.region=United States
 language.code=en_us
 
-# Guis
-gui.reagenchant:reagent_table.title=Enchant
-gui.reagenchant:reagent_table.lapis.cost=Lapis Lazuli cost: %s
-gui.reagenchant:reagent_table.reagent.cost=Reagent cost: %s
-gui.reagenchant:reagent_table.experience.requirement=Experience required to unlock: %s
-gui.reagenchant:reagent_table.experience.cost=Experience Level cost: %s
-gui.reagenchant:reagent_table.enchantment.clue=%s . . . ?
-gui.reagenchant:reagent_table.enchantment.limited=Limited Enchantability
-gui.reagenchant:reagent_table.probability.base=Base Probability: %s%%
-gui.reagenchant:reagent_table.reagent.base_cost=Base Reagent cost: %s
-
 # Levels
 enchantment.level.11=XI
 enchantment.level.12=XII
@@ -105,3 +94,17 @@ enchantment.level.97=XCVII
 enchantment.level.98=XCVIII
 enchantment.level.99=XCIX
 enchantment.level.100=C
+
+# Guis
+gui.reagenchant:reagent_table.title=Enchant
+gui.reagenchant:reagent_table.lapis.cost=Lapis Lazuli cost: %s
+gui.reagenchant:reagent_table.reagent.cost=Reagent cost: %s
+gui.reagenchant:reagent_table.experience.requirement=Experience required to unlock: %s
+gui.reagenchant:reagent_table.experience.cost=Experience Level cost: %s
+gui.reagenchant:reagent_table.enchantment.clue=%s . . . ?
+gui.reagenchant:reagent_table.enchantment.limited=Limited Enchantability
+gui.reagenchant:reagent_table.probability.base=Base Probability: %s%%
+gui.reagenchant:reagent_table.reagent.base_cost=Base Reagent cost: %s
+
+# Tooltips
+tooltip.reagenchant:item.broken=Broken

@@ -39,12 +39,15 @@ import net.minecraft.nbt.NBTTagList;
 import net.minecraft.stats.StatList;
 import net.minecraft.util.*;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.text.TextFormatting;
+import net.minecraft.util.text.translation.I18n;
 import net.minecraft.world.World;
 import net.minecraftforge.common.ForgeHooks;
 import net.minecraftforge.common.IShearable;
 import net.minecraftforge.common.ISpecialArmor;
 import net.minecraftforge.event.entity.living.LivingHurtEvent;
 import net.minecraftforge.event.entity.player.AnvilRepairEvent;
+import net.minecraftforge.event.entity.player.ItemTooltipEvent;
 import net.minecraftforge.event.entity.player.PlayerEvent.BreakSpeed;
 import net.minecraftforge.event.entity.player.PlayerEvent.HarvestCheck;
 import net.minecraftforge.event.entity.player.PlayerInteractEvent.EntityInteract;
@@ -60,6 +63,8 @@ import net.minecraftforge.fml.common.registry.ForgeRegistries;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
+import java.util.List;
+
 @EventBusSubscriber(modid = Reagenchant.MOD_ID)
 public class UnbreakingHandler
 {
@@ -73,8 +78,50 @@ public class UnbreakingHandler
             return UnbreakingHandler.isItemConsideredBroken(stack) ? 1.0F : 0.0F;
         }
     };
-    private static final String PLAYED_BREAKING_SOUND_KEY = Reagenchant.MOD_ID + ":PlayedBreakingSound";
+    private static final String BROKEN_KEY = Reagenchant.MOD_ID + ":Broken";
     private static final String DISABLED_ENCHANTMENTS_KEY = Reagenchant.MOD_ID + ":DisabledEnchantments";
+
+    @SubscribeEvent
+    public static void onItemTooltip(ItemTooltipEvent event)
+    {
+        ItemStack stack = event.getItemStack();
+        List<String> tooltips = event.getToolTip();
+        NBTTagCompound compound = stack.getTagCompound();
+
+        if(compound != null && compound.hasKey(DISABLED_ENCHANTMENTS_KEY))
+        {
+            for(int tooltipIndex = 0; tooltipIndex < tooltips.size(); tooltipIndex++)
+            {
+                String tooltip = tooltips.get(tooltipIndex);
+
+                if(tooltip.equals(I18n.translateToLocal("item.modifiers.mainhand")))
+                {
+                    NBTTagList disabledEnchantments = compound.getTagList(DISABLED_ENCHANTMENTS_KEY, 10);
+
+                    int enchantmentCount = disabledEnchantments.tagCount();
+
+                    for(int tagIndex = 0; tagIndex < enchantmentCount; tagIndex++)
+                    {
+                        NBTTagCompound enchantmentCompound = disabledEnchantments.getCompoundTagAt(tagIndex);
+                        Enchantment enchantment = Enchantment.getEnchantmentByID(enchantmentCompound.getShort("id"));
+                        int index = ((tooltipIndex + tagIndex) - 1);
+
+                        if(enchantment != null)
+                        {
+                            tooltips.add(index, TextFormatting.GOLD + enchantment.getTranslatedName(enchantmentCompound.getShort("lvl")));
+                        }
+
+                        if((tagIndex + 1) == enchantmentCount)
+                        {
+                            tooltips.add((index + 1), TextFormatting.GOLD + I18n.translateToLocal("tooltip." + Reagenchant.MOD_ID + ":item.broken"));
+                        }
+                    }
+
+                    break;
+                }
+            }
+        }
+    }
 
     @SubscribeEvent
     public static void onPlayerBreakSpeed(BreakSpeed event)
@@ -227,9 +274,12 @@ public class UnbreakingHandler
     @SubscribeEvent
     public static void onAnvilRepair(AnvilRepairEvent event)
     {
-        if(UnbreakingHandler.isItemConsideredBroken(event.getItemInput()))
+        ItemStack inputStack = event.getItemInput();
+        ItemStack outputStack = event.getItemResult();
+
+        if(UnbreakingHandler.isItemConsideredBroken(inputStack) && (outputStack.getItemDamage() < inputStack.getItemDamage()))
         {
-            UnbreakingHandler.fixItem(event.getItemResult());
+            UnbreakingHandler.fixItem(outputStack);
         }
     }
 
@@ -294,32 +344,32 @@ public class UnbreakingHandler
     {
         NBTTagCompound stackCompound = NBTHelper.ensureTagExists(stack);
 
-        if(!stackCompound.getBoolean(PLAYED_BREAKING_SOUND_KEY))
+        if(!stackCompound.getBoolean(BROKEN_KEY))
         {
-            livingEntity.renderBrokenItemStack(stack);
-            stackCompound.setBoolean(PLAYED_BREAKING_SOUND_KEY, true);
-        }
+            NBTTagList enchantments = stack.getEnchantmentTagList();
+            NBTTagList disabledEnchantments = new NBTTagList();
 
-        NBTTagList enchantments = stack.getEnchantmentTagList();
-        NBTTagList disabledEnchantments = new NBTTagList();
-
-        if(!stackCompound.hasKey(DISABLED_ENCHANTMENTS_KEY))
-        {
-            for(int i = 0; i < enchantments.tagCount(); i++)
+            if(!stackCompound.hasKey(DISABLED_ENCHANTMENTS_KEY))
             {
-                int enchantmentId = enchantments.getCompoundTagAt(i).getShort("id");
+                for(int tagIndex = 0; tagIndex < enchantments.tagCount(); tagIndex++)
+                {
+                    int enchantmentId = enchantments.getCompoundTagAt(tagIndex).getShort("id");
 
-                if(enchantmentId == Enchantment.getEnchantmentID(Enchantments.BINDING_CURSE))
-                {
-                    enchantments.removeTag(i);
+                    if(enchantmentId == Enchantment.getEnchantmentID(Enchantments.BINDING_CURSE))
+                    {
+                        enchantments.removeTag(tagIndex);
+                    }
+                    else if(enchantmentId != Enchantment.getEnchantmentID(Enchantments.UNBREAKING) && enchantmentId != Enchantment.getEnchantmentID(Enchantments.MENDING))
+                    {
+                        disabledEnchantments.appendTag(enchantments.removeTag(tagIndex));
+                    }
                 }
-                else if(enchantmentId != Enchantment.getEnchantmentID(Enchantments.UNBREAKING) && enchantmentId != Enchantment.getEnchantmentID(Enchantments.MENDING))
-                {
-                    disabledEnchantments.appendTag(enchantments.removeTag(i));
-                }
+
+                stackCompound.setTag(DISABLED_ENCHANTMENTS_KEY, disabledEnchantments);
             }
 
-            stackCompound.setTag(DISABLED_ENCHANTMENTS_KEY, disabledEnchantments);
+            livingEntity.renderBrokenItemStack(stack);
+            stackCompound.setBoolean(BROKEN_KEY, true);
         }
     }
 
@@ -327,25 +377,24 @@ public class UnbreakingHandler
     {
         NBTTagCompound stackCompound = NBTHelper.ensureTagExists(stack);
 
-        if(stackCompound.getBoolean(PLAYED_BREAKING_SOUND_KEY))
+        if(stackCompound.getBoolean(BROKEN_KEY))
         {
-            stackCompound.setBoolean(PLAYED_BREAKING_SOUND_KEY, false);
-        }
+            NBTTagList enchantments = stack.getEnchantmentTagList();
 
-        NBTTagList enchantments = stack.getEnchantmentTagList();
-
-        if(stackCompound.hasKey(DISABLED_ENCHANTMENTS_KEY))
-        {
-            NBTTagList disabledEnchantments = stackCompound.getTagList(DISABLED_ENCHANTMENTS_KEY, 10);
-
-            for(int i = 0; i < disabledEnchantments.tagCount(); i++)
+            if(stackCompound.hasKey(DISABLED_ENCHANTMENTS_KEY))
             {
-                enchantments.appendTag(disabledEnchantments.removeTag(i));
-            }
-        }
+                NBTTagList disabledEnchantments = stackCompound.getTagList(DISABLED_ENCHANTMENTS_KEY, 10);
 
-        stackCompound.removeTag(DISABLED_ENCHANTMENTS_KEY);
-        stackCompound.setTag("ench", enchantments);
+                for(int tagIndex = 0; tagIndex < disabledEnchantments.tagCount(); tagIndex++)
+                {
+                    enchantments.appendTag(disabledEnchantments.removeTag(tagIndex));
+                }
+            }
+
+            stackCompound.removeTag(DISABLED_ENCHANTMENTS_KEY);
+            stackCompound.setTag("ench", enchantments);
+            stackCompound.setBoolean(BROKEN_KEY, false);
+        }
     }
 
     private static void damagePlayer(EntityPlayer player, DamageSource source, float amount)
