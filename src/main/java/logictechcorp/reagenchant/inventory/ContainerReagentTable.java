@@ -143,11 +143,15 @@ public class ContainerReagentTable extends Container
         }
         else if(id >= 4 && id <= 6)
         {
-            this.reagentTableManager.getEnchantments()[id - 4] = data;
+            this.reagentTableManager.getEnchantmentHints()[id - 4] = data;
         }
         else if(id >= 7 && id <= 9)
         {
             this.reagentTableManager.getEnchantmentLevels()[id - 7] = data;
+        }
+        else if(id >= 10 && id <= 12)
+        {
+            this.reagentTableManager.getReagentCosts()[id - 10] = data;
         }
         else
         {
@@ -306,12 +310,15 @@ public class ContainerReagentTable extends Container
         listener.sendWindowProperty(this, 1, this.reagentTableManager.getEnchantabilityLevels()[1]);
         listener.sendWindowProperty(this, 2, this.reagentTableManager.getEnchantabilityLevels()[2]);
         listener.sendWindowProperty(this, 3, this.reagentTableManager.getXpSeed() & -16);
-        listener.sendWindowProperty(this, 4, this.reagentTableManager.getEnchantments()[0]);
-        listener.sendWindowProperty(this, 5, this.reagentTableManager.getEnchantments()[1]);
-        listener.sendWindowProperty(this, 6, this.reagentTableManager.getEnchantments()[2]);
+        listener.sendWindowProperty(this, 4, this.reagentTableManager.getEnchantmentHints()[0]);
+        listener.sendWindowProperty(this, 5, this.reagentTableManager.getEnchantmentHints()[1]);
+        listener.sendWindowProperty(this, 6, this.reagentTableManager.getEnchantmentHints()[2]);
         listener.sendWindowProperty(this, 7, this.reagentTableManager.getEnchantmentLevels()[0]);
         listener.sendWindowProperty(this, 8, this.reagentTableManager.getEnchantmentLevels()[1]);
         listener.sendWindowProperty(this, 9, this.reagentTableManager.getEnchantmentLevels()[2]);
+        listener.sendWindowProperty(this, 10, this.reagentTableManager.getReagentCosts()[0]);
+        listener.sendWindowProperty(this, 11, this.reagentTableManager.getReagentCosts()[1]);
+        listener.sendWindowProperty(this, 12, this.reagentTableManager.getReagentCosts()[2]);
     }
 
     public ReagentTableManager getReagentTableManager()

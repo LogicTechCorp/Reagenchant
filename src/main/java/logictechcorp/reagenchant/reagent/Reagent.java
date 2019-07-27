@@ -70,6 +70,18 @@ public class Reagent implements IReagent
     }
 
     @Override
+    public void addEnchantment(Enchantment enchantment, IReagentEnchantmentData reagentEnchantmentData)
+    {
+        this.enchantments.put(enchantment.getRegistryName(), reagentEnchantmentData);
+    }
+
+    @Override
+    public void removeEnchantment(Enchantment enchantment)
+    {
+        this.enchantments.remove(enchantment.getRegistryName());
+    }
+
+    @Override
     public void writeToDefaultConfig()
     {
         this.defaultConfig.clear();
@@ -146,29 +158,17 @@ public class Reagent implements IReagent
     }
 
     @Override
-    public void addEnchantment(Enchantment enchantment, IReagentEnchantmentData reagentEnchantmentData)
-    {
-        this.enchantments.put(enchantment.getRegistryName(), reagentEnchantmentData);
-    }
-
-    @Override
-    public void removeEnchantment(Enchantment enchantment)
-    {
-        this.enchantments.remove(enchantment.getRegistryName());
-    }
-
-    @Override
     public List<EnchantmentData> createEnchantmentList(World world, BlockPos pos, EntityPlayer player, ItemStack unenchantedStack, ItemStack reagentStack, int enchantmentTier, int enchantabilityLevel, Random random)
     {
-        int enchantability = unenchantedStack.getItem().getItemEnchantability(unenchantedStack);
+        int itemEnchantability = unenchantedStack.getItem().getItemEnchantability(unenchantedStack);
 
-        if(enchantability <= 0)
+        if(itemEnchantability <= 0)
         {
             return new ArrayList<>();
         }
         else
         {
-            enchantabilityLevel = enchantabilityLevel + 1 + random.nextInt(enchantability / 4 + 1) + random.nextInt(enchantability / 4 + 1);
+            enchantabilityLevel = enchantabilityLevel + 1 + random.nextInt(itemEnchantability / 4 + 1) + random.nextInt(itemEnchantability / 4 + 1);
             float enchantmentMultiplier = (random.nextFloat() + random.nextFloat() - 1.0F) * 0.15F;
             enchantabilityLevel = MathHelper.clamp(Math.round((float) enchantabilityLevel + (float) enchantabilityLevel * enchantmentMultiplier), 1, Integer.MAX_VALUE);
 
@@ -178,41 +178,7 @@ public class Reagent implements IReagent
 
             for(Enchantment enchantment : applicableEnchantments)
             {
-                IReagentEnchantmentData reagentEnchantmentData = this.getReagentEnchantmentData(enchantment);
-                int minimumEnchantmentLevel = reagentEnchantmentData.getMinimumEnchantmentLevel();
-                int maximumEnchantmentLevel = reagentEnchantmentData.getMaximumEnchantmentLevel();
-                int enchantmentLevel;
-
-                if(minimumEnchantmentLevel == enchantment.getMinLevel() && maximumEnchantmentLevel == enchantment.getMaxLevel())
-                {
-                    for(enchantmentLevel = maximumEnchantmentLevel; enchantmentLevel > minimumEnchantmentLevel - 1; enchantmentLevel--)
-                    {
-                        if(enchantabilityLevel >= enchantment.getMinEnchantability(enchantmentLevel) && enchantabilityLevel <= enchantment.getMaxEnchantability(enchantmentLevel))
-                        {
-                            break;
-                        }
-                    }
-                }
-                else
-                {
-                    int oneThird = (maximumEnchantmentLevel - minimumEnchantmentLevel) / 3;
-
-                    if(enchantmentTier == 0)
-                    {
-                        maximumEnchantmentLevel = (minimumEnchantmentLevel + oneThird);
-                    }
-                    else if(enchantmentTier == 1)
-                    {
-                        minimumEnchantmentLevel += oneThird;
-                        maximumEnchantmentLevel -= oneThird;
-                    }
-                    else
-                    {
-                        minimumEnchantmentLevel = (maximumEnchantmentLevel - oneThird);
-                    }
-
-                    enchantmentLevel = RandomHelper.getNumberInRange(minimumEnchantmentLevel, maximumEnchantmentLevel, random);
-                }
+                int enchantmentLevel = this.getEnchantmentLevel(enchantment, enchantmentTier, enchantabilityLevel, random);
 
                 if(enchantmentLevel > 0)
                 {
@@ -227,12 +193,11 @@ public class Reagent implements IReagent
 
             if(aggregateEnchantmentData.isEmpty())
             {
-                return EnchantmentHelper.buildEnchantmentList(random, unenchantedStack, enchantabilityLevel, false);
+                aggregateEnchantmentData.addAll(EnchantmentHelper.getEnchantmentDatas(enchantabilityLevel, unenchantedStack, false));
             }
 
             List<EnchantmentData> refinedEnchantmentData = new ArrayList<>();
             refinedEnchantmentData.add(WeightedRandom.getRandomItem(random, aggregateEnchantmentData));
-            aggregateEnchantmentData.addAll(EnchantmentHelper.getEnchantmentDatas(enchantabilityLevel, unenchantedStack, false));
 
             while(random.nextInt(50) <= enchantabilityLevel)
             {
@@ -254,7 +219,7 @@ public class Reagent implements IReagent
     @Override
     public boolean hasApplicableEnchantments(World world, BlockPos pos, EntityPlayer player, ItemStack unenchantedStack, ItemStack reagentStack, Random random)
     {
-        for(Enchantment enchantment : this.getAssociatedEnchantments())
+        for(Enchantment enchantment : this.getEnchantments())
         {
             if(enchantment.canApplyAtEnchantingTable(unenchantedStack) || (unenchantedStack.getItem() == Items.BOOK && enchantment.isAllowedOnBooks()))
             {
@@ -266,19 +231,9 @@ public class Reagent implements IReagent
     }
 
     @Override
-    public boolean consumeReagent(World world, BlockPos pos, EntityPlayer player, ItemStack enchantedStack, ItemStack reagentStack, List<EnchantmentData> enchantmentList, Random random)
+    public boolean consumeReagent(World world, BlockPos pos, EntityPlayer player, ItemStack unenchantedStack, ItemStack reagentStack, List<EnchantmentData> enchantmentList, Random random)
     {
-        List<Enchantment> applicableEnchantments = this.getApplicableEnchantments(world, pos, player, enchantedStack, reagentStack, random);
-
-        for(EnchantmentData enchantmentData : enchantmentList)
-        {
-            if(applicableEnchantments.contains(enchantmentData.enchantment))
-            {
-                return true;
-            }
-        }
-
-        return false;
+        return true;
     }
 
     @Override
@@ -288,7 +243,7 @@ public class Reagent implements IReagent
     }
 
     @Override
-    public List<Enchantment> getAssociatedEnchantments()
+    public List<Enchantment> getEnchantments()
     {
         List<Enchantment> associatedEnchantments = new ArrayList<>();
 
@@ -305,7 +260,7 @@ public class Reagent implements IReagent
     {
         List<Enchantment> enchantments = new ArrayList<>();
 
-        for(Enchantment enchantment : this.getAssociatedEnchantments())
+        for(Enchantment enchantment : this.getEnchantments())
         {
             if(enchantment.canApplyAtEnchantingTable(unenchantedStack) || (unenchantedStack.getItem() == Items.BOOK && enchantment.isAllowedOnBooks()))
             {
@@ -323,13 +278,55 @@ public class Reagent implements IReagent
     }
 
     @Override
+    public int getEnchantmentLevel(Enchantment enchantment, int enchantmentTier, int enchantabilityLevel, Random random)
+    {
+        IReagentEnchantmentData reagentEnchantmentData = this.getReagentEnchantmentData(enchantment);
+        int minimumEnchantmentLevel = reagentEnchantmentData.getMinimumEnchantmentLevel();
+        int maximumEnchantmentLevel = reagentEnchantmentData.getMaximumEnchantmentLevel();
+        int enchantmentLevel;
+
+        if(minimumEnchantmentLevel == enchantment.getMinLevel() && maximumEnchantmentLevel == enchantment.getMaxLevel())
+        {
+            for(enchantmentLevel = maximumEnchantmentLevel; enchantmentLevel > minimumEnchantmentLevel - 1; enchantmentLevel--)
+            {
+                if(enchantabilityLevel >= enchantment.getMinEnchantability(enchantmentLevel) && enchantabilityLevel <= enchantment.getMaxEnchantability(enchantmentLevel))
+                {
+                    break;
+                }
+            }
+        }
+        else
+        {
+            int oneThird = (maximumEnchantmentLevel - minimumEnchantmentLevel) / 3;
+
+            if(enchantmentTier == 0)
+            {
+                maximumEnchantmentLevel = (minimumEnchantmentLevel + oneThird);
+            }
+            else if(enchantmentTier == 1)
+            {
+                minimumEnchantmentLevel += oneThird;
+                maximumEnchantmentLevel -= oneThird;
+            }
+            else
+            {
+                minimumEnchantmentLevel = (maximumEnchantmentLevel - oneThird);
+            }
+
+            enchantmentLevel = RandomHelper.getNumberInRange(minimumEnchantmentLevel, maximumEnchantmentLevel, random);
+        }
+
+        return enchantmentLevel;
+    }
+
+    @Override
     public double getEnchantmentProbability(World world, BlockPos pos, EntityPlayer player, ItemStack unenchantedStack, ItemStack reagentStack, EnchantmentData enchantmentData, Random random)
     {
-        Enchantment enchantment = enchantmentData.enchantment;
+        ResourceLocation enchantmentRegistryName = enchantmentData.enchantment.getRegistryName();
 
-        if(this.enchantments.containsKey(enchantment.getRegistryName()))
+        if(this.enchantments.containsKey(enchantmentRegistryName))
         {
-            return this.getReagentEnchantmentData(enchantment).getEnchantmentProbability();
+            return this.enchantments.get(enchantmentRegistryName).getEnchantmentProbability();
         }
 
         return 0.5D;
@@ -338,11 +335,11 @@ public class Reagent implements IReagent
     @Override
     public int getReagentCost(World world, BlockPos pos, EntityPlayer player, ItemStack unenchantedStack, ItemStack reagentStack, EnchantmentData enchantmentData, Random random)
     {
-        Enchantment enchantment = enchantmentData.enchantment;
+        ResourceLocation enchantmentRegistryName = enchantmentData.enchantment.getRegistryName();
 
-        if(this.enchantments.containsKey(enchantment.getRegistryName()))
+        if(this.enchantments.containsKey(enchantmentRegistryName))
         {
-            return this.getReagentEnchantmentData(enchantment).getReagentCost();
+            return this.enchantments.get(enchantmentRegistryName).getReagentCost();
         }
 
         return 1;

@@ -17,8 +17,6 @@
 
 package logictechcorp.reagenchant.client.gui;
 
-import logictechcorp.reagenchant.api.ReagenchantAPI;
-import logictechcorp.reagenchant.api.reagent.IReagent;
 import logictechcorp.reagenchant.init.ReagenchantTextures;
 import logictechcorp.reagenchant.inventory.ContainerReagentTable;
 import logictechcorp.reagenchant.inventory.ReagentTableManager;
@@ -30,16 +28,12 @@ import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.RenderHelper;
 import net.minecraft.client.resources.I18n;
 import net.minecraft.enchantment.Enchantment;
-import net.minecraft.enchantment.EnchantmentData;
-import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.EnchantmentNameParts;
 import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.TextFormatting;
-import net.minecraft.world.World;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 import org.lwjgl.util.glu.Project;
@@ -196,11 +190,11 @@ public class GuiReagentTable extends GuiContainer
 
         for(int i = 0; i < 3; i++)
         {
+            int enchantabilityLevel = this.reagentTableManager.getEnchantabilityLevels()[i];
             int rectanglePosX = width + 62;
             int textPosX = rectanglePosX + 20;
             this.zLevel = 0.0F;
             this.mc.getTextureManager().bindTexture(guiTexture);
-            int enchantabilityLevel = this.reagentTableManager.getEnchantabilityLevels()[i];
             GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
 
             if(enchantabilityLevel == 0)
@@ -215,7 +209,7 @@ public class GuiReagentTable extends GuiContainer
                 FontRenderer fontrenderer = this.mc.standardGalacticFontRenderer;
                 int color = 6839882;
 
-                if(((this.reagentTableManager.getLapisAmount() < i + 1 || this.mc.player.experienceLevel < enchantabilityLevel) && !this.mc.player.capabilities.isCreativeMode) || this.reagentTableManager.getEnchantments()[i] == -1)
+                if(((this.mc.player.experienceLevel < enchantabilityLevel || this.reagentTableManager.getLapisAmount() < (i + 1) || this.reagentTableManager.getReagentAmount() < this.reagentTableManager.getReagentCosts()[i]) && !this.mc.player.capabilities.isCreativeMode) || this.reagentTableManager.getEnchantmentHints()[i] == -1)
                 {
                     this.drawTexturedModalRect(rectanglePosX, height + 14 + 19 * i, 0, 185, 108, 19);
                     this.drawTexturedModalRect(rectanglePosX + 1, height + 15 + 19 * i, 16 * i, 239, 16, 16);
@@ -258,7 +252,7 @@ public class GuiReagentTable extends GuiContainer
 
         for(int i = 0; i < 3; i++)
         {
-            Enchantment enchantment = Enchantment.getEnchantmentByID(this.reagentTableManager.getEnchantments()[i]);
+            Enchantment enchantmentHint = Enchantment.getEnchantmentByID(this.reagentTableManager.getEnchantmentHints()[i]);
             int enchantmentLevel = this.reagentTableManager.getEnchantmentLevels()[i];
             int enchantabilityLevel = this.reagentTableManager.getEnchantabilityLevels()[i];
             int enchantmentTier = i + 1;
@@ -266,9 +260,9 @@ public class GuiReagentTable extends GuiContainer
             if(this.isPointInRegion(62, 14 + 19 * i, 108, 17, mouseX, mouseY) && enchantabilityLevel > 0)
             {
                 List<String> list = new ArrayList<>();
-                list.add("" + TextFormatting.WHITE + TextFormatting.ITALIC + I18n.format("gui.reagenchant:reagent_table.enchantment.clue", enchantment == null ? "" : enchantment.getTranslatedName(enchantmentLevel)));
+                list.add("" + TextFormatting.WHITE + TextFormatting.ITALIC + I18n.format("gui.reagenchant:reagent_table.enchantment.clue", enchantmentHint == null ? "" : enchantmentHint.getTranslatedName(enchantmentLevel)));
 
-                if(enchantment == null)
+                if(enchantmentHint == null)
                 {
                     Collections.addAll(list, "", TextFormatting.RED + I18n.format("gui.reagenchant:reagent_table.enchantment.limited"));
                 }
@@ -289,20 +283,9 @@ public class GuiReagentTable extends GuiContainer
 
                         if(!reagentStack.isEmpty())
                         {
-                            IReagent reagent = ReagenchantAPI.getInstance().getReagentRegistry().getReagent(reagentStack.getItem());
-
-                            if(reagent.getAssociatedEnchantments().contains(enchantment))
-                            {
-                                ItemStack unenchantedStack = this.reagentTableManager.getInventory().getStackInSlot(0);
-                                World world = this.reagentTableManager.getWorld();
-                                BlockPos pos = this.reagentTableManager.getPos();
-                                EntityPlayer player = this.reagentTableManager.getReagentTable().getUser();
-                                Random random = this.reagentTableManager.getRandom();
-
-                                int reagentCost = reagent.getReagentCost(world, pos, player, unenchantedStack, reagentStack, new EnchantmentData(enchantment, enchantmentLevel), random);
-                                TextFormatting reagentTextFormatting = this.reagentTableManager.getReagentAmount() >= reagentCost ? TextFormatting.GRAY : TextFormatting.RED;
-                                list.add(reagentTextFormatting + "" + I18n.format("gui.reagenchant:reagent_table.reagent.cost", reagentCost));
-                            }
+                            int reagentCost = this.reagentTableManager.getReagentCosts()[i];
+                            TextFormatting reagentTextFormatting = this.reagentTableManager.getReagentAmount() >= reagentCost ? TextFormatting.GRAY : TextFormatting.RED;
+                            list.add(reagentTextFormatting + "" + I18n.format("gui.reagenchant:reagent_table.reagent.cost", reagentCost));
                         }
 
                         list.add(TextFormatting.GRAY + "" + I18n.format("gui.reagenchant:reagent_table.experience.cost", enchantmentTier));
