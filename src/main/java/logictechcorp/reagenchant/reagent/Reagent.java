@@ -191,13 +191,21 @@ public class Reagent implements IReagent
                 }
             }
 
+            boolean addedOtherEnchantments = false;
+
             if(aggregateEnchantmentData.isEmpty())
             {
                 aggregateEnchantmentData.addAll(EnchantmentHelper.getEnchantmentDatas(enchantabilityLevel, unenchantedStack, false));
+                addedOtherEnchantments = true;
             }
 
             List<EnchantmentData> refinedEnchantmentData = new ArrayList<>();
             refinedEnchantmentData.add(WeightedRandom.getRandomItem(random, aggregateEnchantmentData));
+
+            if(!addedOtherEnchantments)
+            {
+                aggregateEnchantmentData.addAll(EnchantmentHelper.getEnchantmentDatas(enchantabilityLevel, unenchantedStack, false));
+            }
 
             while(random.nextInt(50) <= enchantabilityLevel)
             {
