@@ -33,8 +33,6 @@ import net.minecraft.world.DimensionType;
 import net.minecraft.world.World;
 import net.minecraftforge.event.world.WorldEvent;
 import net.minecraftforge.fml.common.registry.ForgeRegistries;
-import org.apache.logging.log4j.Marker;
-import org.apache.logging.log4j.MarkerManager;
 
 import java.io.File;
 import java.io.IOException;
@@ -45,7 +43,6 @@ import java.util.Iterator;
 final class ReagentManager implements IReagentManager
 {
     static final IReagentManager INSTANCE = new ReagentManager();
-    private final Marker marker = MarkerManager.getMarker("ReagentManager");
 
     private ReagentManager()
     {
@@ -58,7 +55,7 @@ final class ReagentManager implements IReagentManager
 
         if(world.provider.getDimension() == DimensionType.OVERWORLD.getId())
         {
-            Reagenchant.LOGGER.info(this.marker, "Reading Reagent configs from disk.");
+            Reagenchant.LOGGER.info("Reading Reagent configs from disk.");
             Path path = new File(WorldHelper.getSaveDirectory(event.getWorld()), "config/" + Reagenchant.MOD_ID + "/reagents").toPath();
 
             try
@@ -88,7 +85,7 @@ final class ReagentManager implements IReagentManager
                             }
                             else
                             {
-                                reagent = new Reagent(item);
+                                reagent = new Reagent(item, true);
                             }
 
                             reagent.readFromConfig(config);
@@ -100,7 +97,7 @@ final class ReagentManager implements IReagentManager
                     }
                     else if(!configFile.isDirectory())
                     {
-                        Reagenchant.LOGGER.info(this.marker, "Skipping file located at, {}, as it is not a json file.", configFile.getPath());
+                        Reagenchant.LOGGER.info("Skipping file located at, {}, as it is not a json file.", configFile.getPath());
                     }
                 }
             }
@@ -118,9 +115,10 @@ final class ReagentManager implements IReagentManager
 
         if(world.provider.getDimension() == DimensionType.OVERWORLD.getId())
         {
-            Reagenchant.LOGGER.info(this.marker, "Writing Reagent configs to disk.");
+            Reagenchant.LOGGER.info("Writing Reagent configs to disk.");
+            IReagentRegistry reagentRegistry = ReagenchantAPI.getInstance().getReagentRegistry();
 
-            for(IReagent reagent : ReagenchantAPI.getInstance().getReagentRegistry().getReagents().values())
+            for(IReagent reagent : reagentRegistry.getReagents().values())
             {
                 File configFile = new File(WorldHelper.getSaveDirectory(event.getWorld()), "config/" + Reagenchant.MOD_ID + "/" + reagent.getRelativeConfigPath());
                 FileConfig config = FileConfig.builder(configFile, JsonFormat.fancyInstance()).preserveInsertionOrder().build();
@@ -145,6 +143,11 @@ final class ReagentManager implements IReagentManager
                 config.save();
                 config.close();
                 reagent.readFromDefaultConfig();
+
+                if(reagent.isPlayerCreated())
+                {
+                    reagentRegistry.unregisterReagent(reagent.getItem());
+                }
             }
         }
     }

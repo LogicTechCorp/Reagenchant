@@ -123,6 +123,13 @@ public interface IReagent
     boolean consumeReagent(World world, BlockPos pos, EntityPlayer player, ItemStack unenchantedStack, ItemStack reagentStack, List<EnchantmentData> enchantmentList, Random random);
 
     /**
+     * Called to check if the reagent was created by a player.
+     *
+     * @return Whether the reagent was created by a player.
+     */
+    boolean isPlayerCreated();
+
+    /**
      * Returns the item that is associated with this reagent.
      *
      * @return The item that is associated with this reagent.

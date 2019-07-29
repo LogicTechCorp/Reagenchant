@@ -46,9 +46,10 @@ public class Reagent implements IReagent
 {
     protected final Item item;
     protected final Map<ResourceLocation, IReagentEnchantmentData> enchantments;
-    protected Config defaultConfig;
+    protected final boolean isPlayerCreated;
+    protected final Config defaultConfig;
 
-    public Reagent(Item item)
+    public Reagent(Item item, boolean isPlayerCreated)
     {
         if(item != null)
         {
@@ -60,13 +61,24 @@ public class Reagent implements IReagent
         }
 
         this.enchantments = new HashMap<>();
+        this.isPlayerCreated = isPlayerCreated;
         this.defaultConfig = InMemoryFormat.withUniversalSupport().createConfig();
         this.writeToDefaultConfig();
     }
 
-    public Reagent(ResourceLocation associatedItemRegistryName)
+    public Reagent(Item item)
     {
-        this(ForgeRegistries.ITEMS.getValue(associatedItemRegistryName));
+        this(item, false);
+    }
+
+    public Reagent(ResourceLocation itemRegistryName, boolean isPlayerCreated)
+    {
+        this(ForgeRegistries.ITEMS.getValue(itemRegistryName), isPlayerCreated);
+    }
+
+    public Reagent(ResourceLocation itemRegistryName)
+    {
+        this(itemRegistryName, false);
     }
 
     @Override
@@ -84,8 +96,11 @@ public class Reagent implements IReagent
     @Override
     public void writeToDefaultConfig()
     {
-        this.defaultConfig.clear();
-        this.writeToConfig(this.defaultConfig);
+        if(!this.isPlayerCreated)
+        {
+            this.defaultConfig.clear();
+            this.writeToConfig(this.defaultConfig);
+        }
     }
 
     @Override
@@ -154,7 +169,10 @@ public class Reagent implements IReagent
     @Override
     public void readFromDefaultConfig()
     {
-        this.readFromConfig(this.defaultConfig);
+        if(!this.isPlayerCreated)
+        {
+            this.readFromConfig(this.defaultConfig);
+        }
     }
 
     @Override
@@ -242,6 +260,12 @@ public class Reagent implements IReagent
     public boolean consumeReagent(World world, BlockPos pos, EntityPlayer player, ItemStack unenchantedStack, ItemStack reagentStack, List<EnchantmentData> enchantmentList, Random random)
     {
         return true;
+    }
+
+    @Override
+    public boolean isPlayerCreated()
+    {
+        return this.isPlayerCreated;
     }
 
     @Override
