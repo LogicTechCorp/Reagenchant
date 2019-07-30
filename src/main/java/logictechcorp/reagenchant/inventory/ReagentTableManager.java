@@ -136,7 +136,7 @@ public class ReagentTableManager
                                 EntityPlayer player = this.reagentTable.getUser();
                                 IReagent reagent = ReagenchantAPI.getInstance().getReagentRegistry().getReagent(reagentStack.getItem());
 
-                                for(Enchantment enchantment : reagent.getEnchantments())
+                                for(Enchantment enchantment : reagent.getReagentEnchantmentData())
                                 {
                                     if(enchantment.canApply(unenchantedStack))
                                     {
@@ -171,7 +171,7 @@ public class ReagentTableManager
         ItemStack reagentStack = this.inventory.getStackInSlot(2);
         int enchantabilityLevel = this.enchantabilityLevels[enchantmentTier];
 
-        this.random.setSeed((long) (this.xpSeed + enchantmentTier));
+        this.random.setSeed(this.xpSeed + enchantmentTier);
         List<EnchantmentData> enchantments = EnchantmentHelper.buildEnchantmentList(this.random, unenchantedStack, enchantabilityLevel, false);
         boolean usedReagentEnchantments = false;
 

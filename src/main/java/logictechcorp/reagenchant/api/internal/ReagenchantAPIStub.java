@@ -15,28 +15,25 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package logictechcorp.reagenchant.api.internal.iface;
+package logictechcorp.reagenchant.api.internal;
 
-public interface IReagenchantAPI
+public final class ReagenchantAPIStub implements IReagenchantAPI
 {
-    /**
-     * Returns false if the actual mod is loaded.
-     *
-     * @return Whether this API instance is created by the mod.
-     */
-    boolean isStub();
+    public static final IReagenchantAPI INSTANCE = new ReagenchantAPIStub();
 
-    /**
-     * Returns the reagent registry.
-     *
-     * @return The reagent registry.
-     */
-    IReagentRegistry getReagentRegistry();
+    private ReagenchantAPIStub()
+    {
+    }
 
-    /**
-     * Returns the reagent manager.
-     *
-     * @return The reagent manager
-     */
-    IReagentManager getReagentManager();
+    @Override
+    public boolean isStub()
+    {
+        return true;
+    }
+
+    @Override
+    public IReagentRegistry getReagentRegistry()
+    {
+        return ReagentRegistryStub.INSTANCE;
+    }
 }

@@ -45,7 +45,7 @@ class ReagentWrapper implements IRecipeWrapper
         List<List<ItemStack>> slots = new ArrayList<>();
         List<ItemStack> enchantments = new ArrayList<>();
 
-        for(Enchantment enchantment : this.reagent.getEnchantments())
+        for(Enchantment enchantment : this.reagent.getReagentEnchantmentData())
         {
             for(int level = enchantment.getMinLevel(); level <= enchantment.getMaxLevel(); level++)
             {

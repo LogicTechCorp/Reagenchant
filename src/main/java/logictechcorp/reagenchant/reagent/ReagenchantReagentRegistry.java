@@ -15,9 +15,9 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package logictechcorp.reagenchant;
+package logictechcorp.reagenchant.reagent;
 
-import logictechcorp.reagenchant.api.internal.iface.IReagentRegistry;
+import logictechcorp.reagenchant.api.internal.IReagentRegistry;
 import logictechcorp.reagenchant.api.reagent.IReagent;
 import net.minecraft.init.Items;
 import net.minecraft.item.Item;
@@ -27,13 +27,14 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
-final class ReagentRegistry implements IReagentRegistry
+public final class ReagenchantReagentRegistry implements IReagentRegistry
 {
-    static final IReagentRegistry INSTANCE = new ReagentRegistry();
+    //NOT for use by modders. Please access using the api.
+    public static final IReagentRegistry INSTANCE = new ReagenchantReagentRegistry();
 
     private final Map<ResourceLocation, IReagent> reagents;
 
-    private ReagentRegistry()
+    private ReagenchantReagentRegistry()
     {
         this.reagents = new HashMap<>();
     }

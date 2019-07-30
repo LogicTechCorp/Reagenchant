@@ -15,28 +15,21 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package logictechcorp.reagenchant.api.internal.impl;
+package logictechcorp.reagenchant.api.internal;
 
-import logictechcorp.reagenchant.api.internal.iface.IReagentManager;
-import net.minecraftforge.event.world.WorldEvent;
-
-final class ReagentManagerStub implements IReagentManager
+public interface IReagenchantAPI
 {
-    static final IReagentManager INSTANCE = new ReagentManagerStub();
+    /**
+     * Returns false if the actual mod is loaded.
+     *
+     * @return Whether this API instance is created by the mod.
+     */
+    boolean isStub();
 
-    private ReagentManagerStub()
-    {
-    }
-
-    @Override
-    public void readReagentConfigs(WorldEvent.Load event)
-    {
-
-    }
-
-    @Override
-    public void writeReagentConfigs(WorldEvent.Unload event)
-    {
-
-    }
+    /**
+     * Returns the reagent registry.
+     *
+     * @return The reagent registry.
+     */
+    IReagentRegistry getReagentRegistry();
 }

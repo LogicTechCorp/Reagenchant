@@ -18,7 +18,6 @@
 package logictechcorp.reagenchant.reagent;
 
 import com.electronwill.nightconfig.core.Config;
-import com.electronwill.nightconfig.core.InMemoryFormat;
 import com.electronwill.nightconfig.json.JsonFormat;
 import logictechcorp.libraryex.utility.RandomHelper;
 import logictechcorp.reagenchant.api.reagent.IReagent;
@@ -45,11 +44,9 @@ import java.util.*;
 public class Reagent implements IReagent
 {
     protected final Item item;
-    protected final Map<ResourceLocation, IReagentEnchantmentData> enchantments;
-    protected final boolean isPlayerCreated;
-    protected final Config defaultConfig;
+    protected final Map<ResourceLocation, IReagentEnchantmentData> reagentEnchantmentData;
 
-    public Reagent(Item item, boolean isPlayerCreated)
+    public Reagent(Item item)
     {
         if(item != null)
         {
@@ -60,53 +57,30 @@ public class Reagent implements IReagent
             this.item = Items.AIR;
         }
 
-        this.enchantments = new HashMap<>();
-        this.isPlayerCreated = isPlayerCreated;
-        this.defaultConfig = InMemoryFormat.withUniversalSupport().createConfig();
-        this.writeToDefaultConfig();
-    }
-
-    public Reagent(Item item)
-    {
-        this(item, false);
-    }
-
-    public Reagent(ResourceLocation itemRegistryName, boolean isPlayerCreated)
-    {
-        this(ForgeRegistries.ITEMS.getValue(itemRegistryName), isPlayerCreated);
+        this.reagentEnchantmentData = new HashMap<>();
     }
 
     public Reagent(ResourceLocation itemRegistryName)
     {
-        this(itemRegistryName, false);
+        this(ForgeRegistries.ITEMS.getValue(itemRegistryName));
     }
 
     @Override
-    public void addEnchantment(Enchantment enchantment, IReagentEnchantmentData reagentEnchantmentData)
+    public void addReagentEnchantmentData(IReagentEnchantmentData reagentEnchantmentData)
     {
-        this.enchantments.put(enchantment.getRegistryName(), reagentEnchantmentData);
+        this.reagentEnchantmentData.put(reagentEnchantmentData.getEnchantment().getRegistryName(), reagentEnchantmentData);
     }
 
     @Override
-    public void removeEnchantment(Enchantment enchantment)
+    public void removeReagentEnchantmentData(Enchantment enchantment)
     {
-        this.enchantments.remove(enchantment.getRegistryName());
-    }
-
-    @Override
-    public void writeToDefaultConfig()
-    {
-        if(!this.isPlayerCreated)
-        {
-            this.defaultConfig.clear();
-            this.writeToConfig(this.defaultConfig);
-        }
+        this.reagentEnchantmentData.remove(enchantment.getRegistryName());
     }
 
     @Override
     public void readFromConfig(Config config)
     {
-        this.enchantments.clear();
+        this.reagentEnchantmentData.clear();
         List<Config> enchantmentConfigs = config.getOrElse("enchantments", new ArrayList<>());
 
         for(Config enchantmentConfig : enchantmentConfigs)
@@ -139,7 +113,7 @@ public class Reagent implements IReagent
                     maximumEnchantmentLevel = 100;
                 }
 
-                this.enchantments.put(enchantment.getRegistryName(), new ReagentEnchantmentData(enchantment, minimumEnchantmentLevel, maximumEnchantmentLevel, probability, reagentCost));
+                this.reagentEnchantmentData.put(enchantment.getRegistryName(), new ReagentEnchantmentData(enchantment, minimumEnchantmentLevel, maximumEnchantmentLevel, probability, reagentCost));
             }
         }
     }
@@ -150,29 +124,20 @@ public class Reagent implements IReagent
         List<Config> enchantmentConfigs = new ArrayList<>();
         config.set("item", this.item.getRegistryName().toString());
 
-        for(Map.Entry<ResourceLocation, IReagentEnchantmentData> entry : this.enchantments.entrySet())
+        for(Map.Entry<ResourceLocation, IReagentEnchantmentData> entry : this.reagentEnchantmentData.entrySet())
         {
-            IReagentEnchantmentData reagentEnchantmentData = entry.getValue();
+            IReagentEnchantmentData reagenchantmentData = entry.getValue();
 
             Config enchantmentConfig = JsonFormat.newConfig(LinkedHashMap::new);
             enchantmentConfig.add("enchantment", entry.getKey().toString());
-            enchantmentConfig.add("probability", reagentEnchantmentData.getEnchantmentProbability());
-            enchantmentConfig.add("reagentCost", reagentEnchantmentData.getReagentCost());
-            enchantmentConfig.add("minimumEnchantmentLevel", reagentEnchantmentData.getMinimumEnchantmentLevel());
-            enchantmentConfig.add("maximumEnchantmentLevel", reagentEnchantmentData.getMaximumEnchantmentLevel());
+            enchantmentConfig.add("probability", reagenchantmentData.getEnchantmentProbability());
+            enchantmentConfig.add("reagentCost", reagenchantmentData.getReagentCost());
+            enchantmentConfig.add("minimumEnchantmentLevel", reagenchantmentData.getMinimumEnchantmentLevel());
+            enchantmentConfig.add("maximumEnchantmentLevel", reagenchantmentData.getMaximumEnchantmentLevel());
             enchantmentConfigs.add(enchantmentConfig);
         }
 
         config.set("enchantments", enchantmentConfigs);
-    }
-
-    @Override
-    public void readFromDefaultConfig()
-    {
-        if(!this.isPlayerCreated)
-        {
-            this.readFromConfig(this.defaultConfig);
-        }
     }
 
     @Override
@@ -245,7 +210,7 @@ public class Reagent implements IReagent
     @Override
     public boolean hasApplicableEnchantments(World world, BlockPos pos, EntityPlayer player, ItemStack unenchantedStack, ItemStack reagentStack, Random random)
     {
-        for(Enchantment enchantment : this.getEnchantments())
+        for(Enchantment enchantment : this.getReagentEnchantmentData())
         {
             if(enchantment.canApplyAtEnchantingTable(unenchantedStack) || (unenchantedStack.getItem() == Items.BOOK && enchantment.isAllowedOnBooks()))
             {
@@ -263,23 +228,17 @@ public class Reagent implements IReagent
     }
 
     @Override
-    public boolean isPlayerCreated()
-    {
-        return this.isPlayerCreated;
-    }
-
-    @Override
     public Item getItem()
     {
         return this.item;
     }
 
     @Override
-    public List<Enchantment> getEnchantments()
+    public List<Enchantment> getReagentEnchantmentData()
     {
         List<Enchantment> associatedEnchantments = new ArrayList<>();
 
-        for(ResourceLocation registryName : this.enchantments.keySet())
+        for(ResourceLocation registryName : this.reagentEnchantmentData.keySet())
         {
             associatedEnchantments.add(Enchantment.getEnchantmentByLocation(registryName.toString()));
         }
@@ -292,7 +251,7 @@ public class Reagent implements IReagent
     {
         List<Enchantment> enchantments = new ArrayList<>();
 
-        for(Enchantment enchantment : this.getEnchantments())
+        for(Enchantment enchantment : this.getReagentEnchantmentData())
         {
             if(enchantment.canApplyAtEnchantingTable(unenchantedStack) || (unenchantedStack.getItem() == Items.BOOK && enchantment.isAllowedOnBooks()))
             {
@@ -306,13 +265,13 @@ public class Reagent implements IReagent
     @Override
     public IReagentEnchantmentData getReagentEnchantmentData(Enchantment enchantment)
     {
-        return this.enchantments.get(enchantment.getRegistryName());
+        return this.reagentEnchantmentData.get(enchantment.getRegistryName());
     }
 
     @Override
     public int getEnchantmentLevel(Enchantment enchantment, int enchantmentTier, int enchantabilityLevel, Random random)
     {
-        IReagentEnchantmentData reagentEnchantmentData = this.getReagentEnchantmentData(enchantment);
+        IReagentEnchantmentData reagentEnchantmentData = this.reagentEnchantmentData.get(enchantment.getRegistryName());
         int minimumEnchantmentLevel = reagentEnchantmentData.getMinimumEnchantmentLevel();
         int maximumEnchantmentLevel = reagentEnchantmentData.getMaximumEnchantmentLevel();
         int enchantmentLevel;
@@ -356,9 +315,9 @@ public class Reagent implements IReagent
     {
         ResourceLocation enchantmentRegistryName = enchantmentData.enchantment.getRegistryName();
 
-        if(this.enchantments.containsKey(enchantmentRegistryName))
+        if(this.reagentEnchantmentData.containsKey(enchantmentRegistryName))
         {
-            return this.enchantments.get(enchantmentRegistryName).getEnchantmentProbability();
+            return this.reagentEnchantmentData.get(enchantmentRegistryName).getEnchantmentProbability();
         }
 
         return 0.5D;
@@ -369,17 +328,11 @@ public class Reagent implements IReagent
     {
         ResourceLocation enchantmentRegistryName = enchantmentData.enchantment.getRegistryName();
 
-        if(this.enchantments.containsKey(enchantmentRegistryName))
+        if(this.reagentEnchantmentData.containsKey(enchantmentRegistryName))
         {
-            return this.enchantments.get(enchantmentRegistryName).getReagentCost();
+            return this.reagentEnchantmentData.get(enchantmentRegistryName).getReagentCost();
         }
 
         return 1;
-    }
-
-    @Override
-    public String getRelativeConfigPath()
-    {
-        return "reagents/" + this.item.getRegistryName().toString().replace(":", "/") + ".json";
     }
 }

@@ -15,17 +15,16 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package logictechcorp.reagenchant;
+package logictechcorp.reagenchant.reagent;
 
 import com.electronwill.nightconfig.core.file.FileConfig;
 import com.electronwill.nightconfig.json.JsonFormat;
+import logictechcorp.libraryex.LibraryEx;
 import logictechcorp.libraryex.utility.FileHelper;
-import logictechcorp.libraryex.utility.WorldHelper;
+import logictechcorp.reagenchant.Reagenchant;
 import logictechcorp.reagenchant.api.ReagenchantAPI;
-import logictechcorp.reagenchant.api.internal.iface.IReagentManager;
-import logictechcorp.reagenchant.api.internal.iface.IReagentRegistry;
+import logictechcorp.reagenchant.api.internal.IReagentRegistry;
 import logictechcorp.reagenchant.api.reagent.IReagent;
-import logictechcorp.reagenchant.reagent.Reagent;
 import net.minecraft.init.Items;
 import net.minecraft.item.Item;
 import net.minecraft.util.ResourceLocation;
@@ -40,15 +39,14 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Iterator;
 
-final class ReagentManager implements IReagentManager
+public final class ReagenchantReagentManager
 {
-    static final IReagentManager INSTANCE = new ReagentManager();
+    public static final ReagenchantReagentManager INSTANCE = new ReagenchantReagentManager();
 
-    private ReagentManager()
+    private ReagenchantReagentManager()
     {
     }
 
-    @Override
     public void readReagentConfigs(WorldEvent.Load event)
     {
         World world = event.getWorld();
@@ -56,7 +54,7 @@ final class ReagentManager implements IReagentManager
         if(world.provider.getDimension() == DimensionType.OVERWORLD.getId())
         {
             Reagenchant.LOGGER.info("Reading Reagent configs from disk.");
-            Path path = new File(WorldHelper.getSaveDirectory(event.getWorld()), "config/" + Reagenchant.MOD_ID + "/reagents").toPath();
+            Path path = new File(LibraryEx.CONFIG_DIRECTORY, Reagenchant.MOD_ID + "/reagents").toPath();
 
             try
             {
@@ -85,7 +83,7 @@ final class ReagentManager implements IReagentManager
                             }
                             else
                             {
-                                reagent = new Reagent(item, true);
+                                reagent = new Reagent(item);
                             }
 
                             reagent.readFromConfig(config);
@@ -108,7 +106,6 @@ final class ReagentManager implements IReagentManager
         }
     }
 
-    @Override
     public void writeReagentConfigs(WorldEvent.Unload event)
     {
         World world = event.getWorld();
@@ -120,7 +117,7 @@ final class ReagentManager implements IReagentManager
 
             for(IReagent reagent : reagentRegistry.getReagents().values())
             {
-                File configFile = new File(WorldHelper.getSaveDirectory(event.getWorld()), "config/" + Reagenchant.MOD_ID + "/" + reagent.getRelativeConfigPath());
+                File configFile = new File(LibraryEx.CONFIG_DIRECTORY, Reagenchant.MOD_ID + "/reagents/" + reagent.getItem().getRegistryName().toString().replace(":", "/") + ".json");
                 FileConfig config = FileConfig.builder(configFile, JsonFormat.fancyInstance()).preserveInsertionOrder().build();
 
                 if(!configFile.exists())
@@ -142,12 +139,6 @@ final class ReagentManager implements IReagentManager
                 reagent.writeToConfig(config);
                 config.save();
                 config.close();
-                reagent.readFromDefaultConfig();
-
-                if(reagent.isPlayerCreated())
-                {
-                    reagentRegistry.unregisterReagent(reagent.getItem());
-                }
             }
         }
     }

@@ -20,12 +20,12 @@ package logictechcorp.reagenchant;
 import logictechcorp.libraryex.api.IModData;
 import logictechcorp.libraryex.api.IProxy;
 import logictechcorp.reagenchant.api.ReagenchantAPI;
-import logictechcorp.reagenchant.api.internal.iface.IReagenchantAPI;
-import logictechcorp.reagenchant.api.internal.iface.IReagentManager;
-import logictechcorp.reagenchant.api.internal.iface.IReagentRegistry;
+import logictechcorp.reagenchant.api.internal.IReagenchantAPI;
+import logictechcorp.reagenchant.api.internal.IReagentRegistry;
 import logictechcorp.reagenchant.handler.GuiHandler;
 import logictechcorp.reagenchant.handler.UnbreakingHandler;
 import logictechcorp.reagenchant.init.ReagenchantReagents;
+import logictechcorp.reagenchant.reagent.ReagenchantReagentRegistry;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.fml.common.Mod;
@@ -96,13 +96,7 @@ public class Reagenchant implements IModData, IReagenchantAPI
     @Override
     public IReagentRegistry getReagentRegistry()
     {
-        return ReagentRegistry.INSTANCE;
-    }
-
-    @Override
-    public IReagentManager getReagentManager()
-    {
-        return ReagentManager.INSTANCE;
+        return ReagenchantReagentRegistry.INSTANCE;
     }
 
     public static ResourceLocation getResource(String name)

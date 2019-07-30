@@ -18,7 +18,7 @@
 package logictechcorp.reagenchant.handler;
 
 import logictechcorp.reagenchant.Reagenchant;
-import logictechcorp.reagenchant.api.ReagenchantAPI;
+import logictechcorp.reagenchant.reagent.ReagenchantReagentManager;
 import net.minecraft.world.World;
 import net.minecraftforge.event.world.WorldEvent;
 import net.minecraftforge.fml.common.Mod;
@@ -34,7 +34,7 @@ public class WorldHandler
 
         if(!world.isRemote)
         {
-            ReagenchantAPI.getInstance().getReagentManager().readReagentConfigs(event);
+            ReagenchantReagentManager.INSTANCE.readReagentConfigs(event);
         }
     }
 
@@ -45,7 +45,7 @@ public class WorldHandler
 
         if(!world.isRemote)
         {
-            ReagenchantAPI.getInstance().getReagentManager().writeReagentConfigs(event);
+            ReagenchantReagentManager.INSTANCE.writeReagentConfigs(event);
         }
     }
 }

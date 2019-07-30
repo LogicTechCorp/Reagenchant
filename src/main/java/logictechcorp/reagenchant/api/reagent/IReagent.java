@@ -37,27 +37,16 @@ public interface IReagent
     /**
      * Called to associate an enchantment with this reagent.
      *
-     * @param enchantment            The enchantment to be associated with this reagent.
      * @param reagentEnchantmentData The data that represents the enchantment.
      */
-    void addEnchantment(Enchantment enchantment, IReagentEnchantmentData reagentEnchantmentData);
+    void addReagentEnchantmentData(IReagentEnchantmentData reagentEnchantmentData);
 
     /**
-     * Called to unassociated an enchantment with this reagent.
+     * Called to unassociate an enchantment with this reagent.
      *
      * @param enchantment The enchantment to be unassociated with this reagent.
      */
-    void removeEnchantment(Enchantment enchantment);
-
-    /**
-     * Called to write the current state of the reagent to its default config.
-     * <p>
-     * This should be called after the default values have been changed by a modder.
-     * <p>
-     * This should not be called after the reagent has been configured from an
-     * external config because it may contain player edits.
-     */
-    void writeToDefaultConfig();
+    void removeReagentEnchantmentData(Enchantment enchantment);
 
     /**
      * Called when the server is starting to configure this reagent.
@@ -72,13 +61,6 @@ public interface IReagent
      * @param config The config that belongs to the reagent.
      */
     void writeToConfig(Config config);
-
-    /**
-     * Called after {@link #writeToConfig}.
-     * <p>
-     * This is called to read the reagent from its default config.*
-     */
-    void readFromDefaultConfig();
 
     /**
      * Returns a list of the enchantments that are to be applied to the unenchantedStack.
@@ -123,13 +105,6 @@ public interface IReagent
     boolean consumeReagent(World world, BlockPos pos, EntityPlayer player, ItemStack unenchantedStack, ItemStack reagentStack, List<EnchantmentData> enchantmentList, Random random);
 
     /**
-     * Called to check if the reagent was created by a player.
-     *
-     * @return Whether the reagent was created by a player.
-     */
-    boolean isPlayerCreated();
-
-    /**
      * Returns the item that is associated with this reagent.
      *
      * @return The item that is associated with this reagent.
@@ -141,7 +116,7 @@ public interface IReagent
      *
      * @return A list containing the associated enchantments.
      */
-    List<Enchantment> getEnchantments();
+    List<Enchantment> getReagentEnchantmentData();
 
     /**
      * Called when creating the list of enchantments that can be applied to the unenchantedStack and allows for modification of said list.
@@ -205,11 +180,4 @@ public interface IReagent
      * @return The amount of reagents required to apply the enchantment.
      */
     int getReagentCost(World world, BlockPos pos, EntityPlayer player, ItemStack unenchantedStack, ItemStack reagentStack, EnchantmentData enchantmentData, Random random);
-
-    /**
-     * Called to get this reagent's relative config path.
-     *
-     * @return This reagent's relative config path.
-     */
-    String getRelativeConfigPath();
 }
