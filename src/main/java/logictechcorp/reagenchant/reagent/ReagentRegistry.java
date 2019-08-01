@@ -27,14 +27,14 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
-public final class ReagenchantReagentRegistry implements IReagentRegistry
+public final class ReagentRegistry implements IReagentRegistry
 {
     //NOT for use by modders. Please access using the api.
-    public static final IReagentRegistry INSTANCE = new ReagenchantReagentRegistry();
+    public static final IReagentRegistry INSTANCE = new ReagentRegistry();
 
     private final Map<ResourceLocation, IReagent> reagents;
 
-    private ReagenchantReagentRegistry()
+    private ReagentRegistry()
     {
         this.reagents = new HashMap<>();
     }

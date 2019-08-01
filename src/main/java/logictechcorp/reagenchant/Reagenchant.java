@@ -25,7 +25,8 @@ import logictechcorp.reagenchant.api.internal.IReagentRegistry;
 import logictechcorp.reagenchant.handler.GuiHandler;
 import logictechcorp.reagenchant.handler.UnbreakingHandler;
 import logictechcorp.reagenchant.init.ReagenchantReagents;
-import logictechcorp.reagenchant.reagent.ReagenchantReagentRegistry;
+import logictechcorp.reagenchant.reagent.ReagentConfigManager;
+import logictechcorp.reagenchant.reagent.ReagentRegistry;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.fml.common.Mod;
@@ -72,6 +73,7 @@ public class Reagenchant implements IModData, IReagenchantAPI
     @Mod.EventHandler
     public void onFMLPostInitialization(FMLPostInitializationEvent event)
     {
+        ReagentConfigManager.writeReagentConfigs();
         proxy.postInit();
     }
 
@@ -96,7 +98,7 @@ public class Reagenchant implements IModData, IReagenchantAPI
     @Override
     public IReagentRegistry getReagentRegistry()
     {
-        return ReagenchantReagentRegistry.INSTANCE;
+        return ReagentRegistry.INSTANCE;
     }
 
     public static ResourceLocation getResource(String name)
