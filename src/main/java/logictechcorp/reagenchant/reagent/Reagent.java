@@ -113,7 +113,7 @@ public class Reagent implements IReagent
                     maximumEnchantmentLevel = 100;
                 }
 
-                this.reagentEnchantmentData.put(enchantment.getRegistryName(), new ReagentEnchantmentData(enchantment, minimumEnchantmentLevel, maximumEnchantmentLevel, probability, reagentCost));
+                this.addReagentEnchantmentData(new ReagentEnchantmentData(enchantment, minimumEnchantmentLevel, maximumEnchantmentLevel, probability, reagentCost));
             }
         }
     }

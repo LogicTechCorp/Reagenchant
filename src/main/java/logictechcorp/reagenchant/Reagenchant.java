@@ -58,8 +58,8 @@ public class Reagenchant implements IModData, IReagenchantAPI
     public void onFMLPreInitialization(FMLPreInitializationEvent event)
     {
         ReagenchantAPI.setInstance(this);
-        NetworkRegistry.INSTANCE.registerGuiHandler(this, new GuiHandler());
         ReagenchantReagents.initReagents();
+        NetworkRegistry.INSTANCE.registerGuiHandler(this, new GuiHandler());
         proxy.preInit();
     }
 
@@ -67,6 +67,7 @@ public class Reagenchant implements IModData, IReagenchantAPI
     public void onFMLInitialization(FMLInitializationEvent event)
     {
         UnbreakingHandler.overrideBehavior();
+        ReagentConfigManager.readReagentConfigs();
         proxy.init();
     }
 
