@@ -6,9 +6,9 @@
         "version": "${version}",
         "mcversion": "${mcversion}",
         "url": "https://minecraft.curseforge.com/projects/reagenchant",
-        "authorList": [ "LogicTechCorp", "AnarchCassius", "LapisWhovian", "misterslime", "MCvinnyq", "Cameron" ],
+        "authorList": [ "LogicTechCorp", "Cameron", "Five" ],
         "credits": "",
-        "logoFile": "",
+        "logoFile": "assets/reagenchant/logo.png",
         "screenshots": [ ],
         "dependencies": [ ]
     }
