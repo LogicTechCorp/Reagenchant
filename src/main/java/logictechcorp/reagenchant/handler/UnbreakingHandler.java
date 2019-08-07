@@ -82,6 +82,7 @@ public class UnbreakingHandler
     private static final String DISABLED_ENCHANTMENTS_KEY = Reagenchant.MOD_ID + ":DisabledEnchantments";
 
     @SubscribeEvent
+    @SideOnly(Side.CLIENT)
     public static void onItemTooltip(ItemTooltipEvent event)
     {
         ItemStack stack = event.getItemStack();
