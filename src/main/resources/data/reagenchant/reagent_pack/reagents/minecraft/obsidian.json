@@ -1,0 +1,12 @@
+{
+	"item": "minecraft:obsidian",
+	"enchantments": [
+		{
+			"enchantment": "minecraft:unbreaking",
+			"probability": 0.5,
+			"reagentCost": 1,
+			"minimumEnchantmentLevel": 1,
+			"maximumEnchantmentLevel": 3
+		}
+	]
+}

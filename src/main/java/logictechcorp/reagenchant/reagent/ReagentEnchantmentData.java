@@ -17,11 +17,12 @@
 
 package logictechcorp.reagenchant.reagent;
 
-import logictechcorp.reagenchant.api.reagent.IReagentEnchantmentData;
 import net.minecraft.enchantment.Enchantment;
 
-public class ReagentEnchantmentData implements IReagentEnchantmentData
+public class ReagentEnchantmentData
 {
+    public static final ReagentEnchantmentData EMPTY = new ReagentEnchantmentData(null, 0, 0, 0.0D, 0);
+
     private Enchantment enchantment;
     private int minimumEnchantmentLevel;
     private int maximumEnchantmentLevel;
@@ -42,31 +43,31 @@ public class ReagentEnchantmentData implements IReagentEnchantmentData
         this(enchantment, enchantment.getMinLevel(), enchantment.getMaxLevel(), enchantmentProbability, reagentCost);
     }
 
-    @Override
+    public boolean isEmpty()
+    {
+        return this == EMPTY;
+    }
+
     public Enchantment getEnchantment()
     {
         return this.enchantment;
     }
 
-    @Override
     public int getMinimumEnchantmentLevel()
     {
         return this.minimumEnchantmentLevel;
     }
 
-    @Override
     public int getMaximumEnchantmentLevel()
     {
         return this.maximumEnchantmentLevel;
     }
 
-    @Override
     public double getEnchantmentProbability()
     {
         return this.enchantmentProbability;
     }
 
-    @Override
     public int getReagentCost()
     {
         return this.reagentCost;

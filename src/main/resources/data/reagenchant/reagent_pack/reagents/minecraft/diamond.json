@@ -1,0 +1,33 @@
+{
+	"item": "minecraft:diamond",
+	"enchantments": [
+		{
+			"enchantment": "minecraft:looting",
+			"probability": 0.5,
+			"reagentCost": 1,
+			"minimumEnchantmentLevel": 1,
+			"maximumEnchantmentLevel": 3
+		}, 
+		{
+			"enchantment": "minecraft:fortune",
+			"probability": 0.5,
+			"reagentCost": 1,
+			"minimumEnchantmentLevel": 1,
+			"maximumEnchantmentLevel": 3
+		}, 
+		{
+			"enchantment": "minecraft:infinity",
+			"probability": 0.5,
+			"reagentCost": 1,
+			"minimumEnchantmentLevel": 1,
+			"maximumEnchantmentLevel": 1
+		}, 
+		{
+			"enchantment": "minecraft:blast_protection",
+			"probability": 0.5,
+			"reagentCost": 1,
+			"minimumEnchantmentLevel": 1,
+			"maximumEnchantmentLevel": 4
+		}
+	]
+}

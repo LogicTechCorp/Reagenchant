@@ -18,9 +18,7 @@
 package logictechcorp.reagenchant.tileentity;
 
 import logictechcorp.libraryex.tileentity.TileEntityInventory;
-import logictechcorp.reagenchant.init.ReagenchantTileEntityTypes;
 import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.tileentity.ITickableTileEntity;
 import net.minecraft.util.INameable;
@@ -30,7 +28,6 @@ import net.minecraft.util.text.TranslationTextComponent;
 
 public class ReagentTableTileEntity extends TileEntityInventory implements ITickableTileEntity, INameable
 {
-    private PlayerEntity user;
     private ITextComponent customName;
     private int tickCounter;
     private float pageFlip;
@@ -45,13 +42,7 @@ public class ReagentTableTileEntity extends TileEntityInventory implements ITick
 
     public ReagentTableTileEntity()
     {
-        super(ReagenchantTileEntityTypes.REAGENT_TABLE_TILE_ENTITY, 3);
-    }
-
-    @Override
-    public boolean acceptsItemStack(ItemStack stack)
-    {
-        return true;
+        super(ReagenchantTileEntities.REAGENT_TABLE_TILE_ENTITY.get(), 3);
     }
 
     @Override
@@ -60,16 +51,7 @@ public class ReagentTableTileEntity extends TileEntityInventory implements ITick
         this.bookSpreadPrev = this.bookSpread;
         this.bookRotationPrev = this.bookRotation;
 
-        PlayerEntity playerToFace;
-
-        if(this.user != null)
-        {
-            playerToFace = this.user;
-        }
-        else
-        {
-            playerToFace = this.world.getClosestPlayer((double) ((float) this.pos.getX() + 0.5F), (double) ((float) this.pos.getY() + 0.5F), (double) ((float) this.pos.getZ() + 0.5F), 3.0D, null);
-        }
+        PlayerEntity playerToFace = this.world.getClosestPlayer(((float) this.pos.getX() + 0.5F), ((float) this.pos.getY() + 0.5F), ((float) this.pos.getZ() + 0.5F), 3.0D, null);
 
         if(playerToFace != null)
         {

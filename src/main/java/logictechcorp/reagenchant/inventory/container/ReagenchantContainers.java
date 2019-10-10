@@ -15,15 +15,17 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package logictechcorp.reagenchant.init;
+package logictechcorp.reagenchant.inventory.container;
 
 import logictechcorp.reagenchant.Reagenchant;
-import net.minecraft.util.ResourceLocation;
+import net.minecraft.inventory.container.ContainerType;
+import net.minecraftforge.fml.RegistryObject;
+import net.minecraftforge.registries.DeferredRegister;
+import net.minecraftforge.registries.ForgeRegistries;
 
-public class ReagenchantTextures
+public class ReagenchantContainers
 {
-    public static final ResourceLocation REAGENT_TABLE_WITH_REAGENT_GUI = Reagenchant.getResource("textures/gui/container/reagent_table_with_reagent.png");
-    public static final ResourceLocation REAGENT_TABLE_WITHOUT_REAGENT_GUI = Reagenchant.getResource("textures/gui/container/reagent_table_without_reagent.png");
-    public static final ResourceLocation REAGENT_TABLE_BOOK = Reagenchant.getResource("textures/entity/reagent_table_book.png");
-    public static final ResourceLocation REAGENT_TABLE_RECIPE_GUI = Reagenchant.getResource("textures/gui/container/reagent_table_recipe.png");
+    public static final DeferredRegister<ContainerType<?>> CONTAINERS = new DeferredRegister<>(ForgeRegistries.CONTAINERS, Reagenchant.MOD_ID);
+
+    public static final RegistryObject<ContainerType<ReagentTableContainer>> REAGENT_TABLE_CONTAINER = CONTAINERS.register("reagent_table_container", () -> new ContainerType<>(ReagentTableContainer::new));
 }

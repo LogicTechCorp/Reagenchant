@@ -17,24 +17,9 @@
 
 package logictechcorp.reagenchant.proxy;
 
-import logictechcorp.libraryex.api.IProxy;
-import net.minecraftforge.fml.event.lifecycle.FMLDedicatedServerSetupEvent;
-import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
-
-public class ServerProxy implements IProxy
+public class ServerProxy
 {
-    @Override
-    public void setupSidedListeners()
-    {
-        FMLJavaModLoadingContext.get().getModEventBus().addListener(this::serverSetup);
-    }
-
-    @Override
-    public void spawnParticle(int particleId, double posX, double posY, double posZ, double speedX, double speedY, double speedZ)
-    {
-    }
-
-    private void serverSetup(FMLDedicatedServerSetupEvent event)
+    public ServerProxy()
     {
     }
 }

@@ -15,28 +15,19 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package logictechcorp.reagenchant.api.internal.impl;
+package logictechcorp.reagenchant.block;
 
-import logictechcorp.reagenchant.api.internal.iface.IReagentManager;
-import net.minecraftforge.event.world.WorldEvent;
+import net.minecraft.block.Block;
+import net.minecraft.block.Blocks;
+import net.minecraftforge.registries.DeferredRegister;
+import net.minecraftforge.registries.ForgeRegistries;
 
-final class ReagentManagerStub implements IReagentManager
+public class ReagenchantBlocks
 {
-    static final IReagentManager INSTANCE = new ReagentManagerStub();
+    public static final DeferredRegister<Block> BLOCK_OVERRIDES = new DeferredRegister<>(ForgeRegistries.BLOCKS, "minecraft");
 
-    private ReagentManagerStub()
+    static
     {
-    }
-
-    @Override
-    public void readReagentConfigs(WorldEvent.Load event)
-    {
-
-    }
-
-    @Override
-    public void writeReagentConfigs(WorldEvent.Unload event)
-    {
-
+        BLOCK_OVERRIDES.register("enchanting_table", () -> new ReagentTableBlock(Block.Properties.from(Blocks.ENCHANTING_TABLE)));
     }
 }

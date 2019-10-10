@@ -1,0 +1,12 @@
+{
+    "item": "minecraft:nether_star",
+    "enchantments": [
+        {
+            "enchantment": "minecraft:mending",
+            "probability": 1.0,
+            "reagentCost": 1,
+            "minimumEnchantmentLevel": 1,
+            "maximumEnchantmentLevel": 1
+        }
+    ]
+}

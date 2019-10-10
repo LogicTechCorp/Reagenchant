@@ -18,11 +18,9 @@
 package logictechcorp.reagenchant.client.gui.screen;
 
 import com.mojang.blaze3d.platform.GlStateManager;
-import logictechcorp.reagenchant.api.ReagenchantAPI;
-import logictechcorp.reagenchant.api.reagent.IReagent;
-import logictechcorp.reagenchant.init.ReagenchantTextures;
-import logictechcorp.reagenchant.inventory.ReagentTableContainer;
-import logictechcorp.reagenchant.inventory.ReagentTableManager;
+import logictechcorp.reagenchant.Reagenchant;
+import logictechcorp.reagenchant.inventory.container.ReagentTableContainer;
+import logictechcorp.reagenchant.reagent.Reagent;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.gui.screen.inventory.ContainerScreen;
@@ -32,14 +30,13 @@ import net.minecraft.client.renderer.entity.model.BookModel;
 import net.minecraft.client.resources.I18n;
 import net.minecraft.enchantment.Enchantment;
 import net.minecraft.enchantment.EnchantmentData;
-import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.EnchantmentNameParts;
 import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
+import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.TextFormatting;
-import net.minecraft.world.World;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 
@@ -49,10 +46,13 @@ import java.util.List;
 import java.util.Random;
 
 @OnlyIn(Dist.CLIENT)
-public class ReagentTableScreen extends ContainerScreen
+public class ReagentTableScreen extends ContainerScreen<ReagentTableContainer>
 {
+    private static final ResourceLocation REAGENT_TABLE_WITH_REAGENT_GUI = new ResourceLocation(Reagenchant.MOD_ID, "textures/gui/container/reagent_table_with_reagent.png");
+    private static final ResourceLocation REAGENT_TABLE_WITHOUT_REAGENT_GUI = new ResourceLocation(Reagenchant.MOD_ID, "textures/gui/container/reagent_table_without_reagent.png");
+    private static final ResourceLocation REAGENT_TABLE_BOOK = new ResourceLocation(Reagenchant.MOD_ID, "textures/entity/reagent_table_book.png");
     private static final BookModel MODEL_BOOK = new BookModel();
-    private final ReagentTableManager reagentTableManager;
+
     private final Random random;
     private float flip;
     private float flipPrev;
@@ -62,10 +62,9 @@ public class ReagentTableScreen extends ContainerScreen
     private float openPrev;
     private ItemStack last = ItemStack.EMPTY;
 
-    public ReagentTableScreen(ReagentTableContainer container)
+    public ReagentTableScreen(ReagentTableContainer container, PlayerInventory playerInventory, ITextComponent component)
     {
-        super(container, container.getReagentTableManager().getUser().inventory, container.getReagentTableManager().getReagentTable().getName());
-        this.reagentTableManager = container.getReagentTableManager();
+        super(container, playerInventory, component);
         this.random = new Random();
     }
 
@@ -89,14 +88,14 @@ public class ReagentTableScreen extends ContainerScreen
         int width = (this.width - this.xSize) / 2;
         int height = (this.height - this.ySize) / 2;
 
-        for(int k = 0; k < 3; ++k)
+        for(int enchantmentTier = 0; enchantmentTier < 3; enchantmentTier++)
         {
             double posX = mouseX - (double) (width + 60);
-            double posY = mouseY - (double) (height + 14 + 19 * k);
+            double posY = mouseY - (double) (height + 14 + 19 * enchantmentTier);
 
-            if(posX >= 0.0D && posY >= 0.0D && posX < 108.0D && posY < 19.0D && this.container.enchantItem(this.minecraft.player, k))
+            if(posX >= 0.0D && posY >= 0.0D && posX < 108.0D && posY < 19.0D && this.container.enchantItem(this.minecraft.player, enchantmentTier))
             {
-                this.minecraft.playerController.sendEnchantPacket((this.container).windowId, k);
+                this.minecraft.playerController.sendEnchantPacket((this.container).windowId, enchantmentTier);
                 return true;
             }
         }
@@ -109,13 +108,13 @@ public class ReagentTableScreen extends ContainerScreen
     {
         ResourceLocation guiTexture;
 
-        if(!this.reagentTableManager.getInventory().getStackInSlot(2).isEmpty())
+        if(!this.container.getItemStackHandler().getStackInSlot(2).isEmpty())
         {
-            guiTexture = ReagenchantTextures.REAGENT_TABLE_WITH_REAGENT_GUI;
+            guiTexture = REAGENT_TABLE_WITH_REAGENT_GUI;
         }
         else
         {
-            guiTexture = ReagenchantTextures.REAGENT_TABLE_WITHOUT_REAGENT_GUI;
+            guiTexture = REAGENT_TABLE_WITHOUT_REAGENT_GUI;
         }
 
         GlStateManager.color4f(1.0F, 1.0F, 1.0F, 1.0F);
@@ -138,7 +137,7 @@ public class ReagentTableScreen extends ContainerScreen
         GlStateManager.scalef(1.0F, 1.0F, 1.0F);
         GlStateManager.scalef(5.0F, 5.0F, 5.0F);
         GlStateManager.rotatef(180.0F, 0.0F, 0.0F, 1.0F);
-        this.minecraft.getTextureManager().bindTexture(ReagenchantTextures.REAGENT_TABLE_BOOK);
+        this.minecraft.getTextureManager().bindTexture(REAGENT_TABLE_BOOK);
         GlStateManager.rotatef(20.0F, 1.0F, 0.0F, 0.0F);
         float openFlip = MathHelper.lerp(partialTicks, this.openPrev, this.open);
         GlStateManager.translatef((1.0F - openFlip) * 0.2F, (1.0F - openFlip) * 0.1F, (1.0F - openFlip) * 0.25F);
@@ -146,8 +145,8 @@ public class ReagentTableScreen extends ContainerScreen
         GlStateManager.rotatef(180.0F, 1.0F, 0.0F, 0.0F);
         float pageOneFlip = MathHelper.lerp(partialTicks, this.flipPrev, this.flip) + 0.25F;
         float pageTwoFlip = MathHelper.lerp(partialTicks, this.flipPrev, this.flip) + 0.75F;
-        pageOneFlip = (pageOneFlip - (float) MathHelper.fastFloor((double) pageOneFlip)) * 1.6F - 0.3F;
-        pageTwoFlip = (pageTwoFlip - (float) MathHelper.fastFloor((double) pageTwoFlip)) * 1.6F - 0.3F;
+        pageOneFlip = (pageOneFlip - (float) MathHelper.fastFloor(pageOneFlip)) * 1.6F - 0.3F;
+        pageTwoFlip = (pageTwoFlip - (float) MathHelper.fastFloor(pageTwoFlip)) * 1.6F - 0.3F;
 
         if(pageOneFlip < 0.0F)
         {
@@ -170,7 +169,7 @@ public class ReagentTableScreen extends ContainerScreen
         }
 
         GlStateManager.enableRescaleNormal();
-        MODEL_BOOK.func_217103_a(0.0F, pageOneFlip, pageTwoFlip, openFlip, 0.0F, 0.0625F);
+        MODEL_BOOK.render(0.0F, pageOneFlip, pageTwoFlip, openFlip, 0.0F, 0.0625F);
         GlStateManager.disableRescaleNormal();
         RenderHelper.disableStandardItemLighting();
         GlStateManager.matrixMode(5889);
@@ -180,15 +179,15 @@ public class ReagentTableScreen extends ContainerScreen
         GlStateManager.popMatrix();
         RenderHelper.disableStandardItemLighting();
         GlStateManager.color4f(1.0F, 1.0F, 1.0F, 1.0F);
-        EnchantmentNameParts.getInstance().reseedRandomGenerator((long) this.reagentTableManager.getXpSeed());
+        EnchantmentNameParts.getInstance().reseedRandomGenerator(this.container.getXpSeed());
 
         for(int i = 0; i < 3; ++i)
         {
-            int rectanglePosX = width + 60;
+            int rectanglePosX = width + 62;
             int textPosX = rectanglePosX + 20;
             this.blitOffset = 0;
             this.minecraft.getTextureManager().bindTexture(guiTexture);
-            int enchantabilityLevel = this.reagentTableManager.getEnchantabilityLevels()[i];
+            int enchantabilityLevel = this.container.getEnchantabilityLevels()[i];
             GlStateManager.color4f(1.0F, 1.0F, 1.0F, 1.0F);
 
             if(enchantabilityLevel == 0)
@@ -203,7 +202,7 @@ public class ReagentTableScreen extends ContainerScreen
                 FontRenderer fontRenderer = this.minecraft.getFontResourceManager().getFontRenderer(Minecraft.standardGalacticFontRenderer);
                 int color = 6839882;
 
-                if(((this.reagentTableManager.getLapisAmount() < i + 1 || this.minecraft.player.experienceLevel < enchantabilityLevel) && !this.minecraft.player.abilities.isCreativeMode) || this.reagentTableManager.getEnchantments()[i] == -1)
+                if(((this.container.getLapisAmount() < i + 1 || this.minecraft.player.experienceLevel < enchantabilityLevel) && !this.minecraft.player.abilities.isCreativeMode) || this.container.getEnchantments()[i] == -1)
                 {
                     this.blit(rectanglePosX, height + 14 + 19 * i, 0, 185, 108, 19);
                     this.blit(rectanglePosX + 1, height + 15 + 19 * i, 16 * i, 239, 16, 16);
@@ -246,19 +245,19 @@ public class ReagentTableScreen extends ContainerScreen
 
         for(int i = 0; i < 3; i++)
         {
-            Enchantment enchantment = Enchantment.getEnchantmentByID(this.reagentTableManager.getEnchantments()[i]);
-            int enchantmentLevel = this.reagentTableManager.getEnchantmentLevels()[i];
-            int enchantabilityLevel = this.reagentTableManager.getEnchantabilityLevels()[i];
+            Enchantment enchantment = Enchantment.getEnchantmentByID(this.container.getEnchantments()[i]);
+            int enchantmentLevel = this.container.getEnchantmentLevels()[i];
+            int enchantabilityLevel = this.container.getEnchantabilityLevels()[i];
             int enchantmentTier = i + 1;
 
             if(this.isPointInRegion(62, 14 + 19 * i, 108, 17, mouseX, mouseY) && enchantabilityLevel > 0)
             {
                 List<String> list = new ArrayList<>();
-                list.add("" + TextFormatting.WHITE + TextFormatting.ITALIC + I18n.format("gui.reagenchant:reagent_table.enchantment.clue", enchantment == null ? "" : enchantment.getDisplayName(enchantmentLevel).getFormattedText()));
+                list.add("" + TextFormatting.WHITE + TextFormatting.ITALIC + I18n.format("gui.reagenchant.reagent_table.enchantment.clue", enchantment == null ? "" : enchantment.getDisplayName(enchantmentLevel).getFormattedText()));
 
                 if(enchantment == null)
                 {
-                    Collections.addAll(list, "", TextFormatting.RED + I18n.format("gui.reagenchant:reagent_table.enchantment.limited"));
+                    Collections.addAll(list, "", TextFormatting.RED + I18n.format("gui.reagenchant.reagent_table.enchantment.limited"));
                 }
                 else if(!this.minecraft.player.abilities.isCreativeMode)
                 {
@@ -266,34 +265,32 @@ public class ReagentTableScreen extends ContainerScreen
 
                     if(this.minecraft.player.experienceLevel < enchantabilityLevel)
                     {
-                        list.add(TextFormatting.RED + I18n.format("gui.reagenchant:reagent_table.experience.requirement", enchantabilityLevel));
+                        list.add(TextFormatting.RED + I18n.format("gui.reagenchant.reagent_table.experience.requirement", enchantabilityLevel));
                     }
                     else
                     {
-                        TextFormatting lapisTextFormatting = this.reagentTableManager.getLapisAmount() >= enchantmentTier ? TextFormatting.GRAY : TextFormatting.RED;
-                        list.add(lapisTextFormatting + "" + I18n.format("gui.reagenchant:reagent_table.lapis.cost", enchantmentTier));
+                        TextFormatting lapisTextFormatting = this.container.getLapisAmount() >= enchantmentTier ? TextFormatting.GRAY : TextFormatting.RED;
+                        list.add(lapisTextFormatting + "" + I18n.format("gui.reagenchant.reagent_table.lapis.cost", enchantmentTier));
 
-                        ItemStack reagentStack = this.reagentTableManager.getInventory().getStackInSlot(2);
+                        ItemStack reagentStack = this.container.getItemStackHandler().getStackInSlot(2);
 
                         if(!reagentStack.isEmpty())
                         {
-                            IReagent reagent = ReagenchantAPI.getInstance().getReagentRegistry().getReagent(reagentStack.getItem());
+                            Reagent reagent = Reagenchant.REAGENT_MANAGER.getReagent(reagentStack.getItem());
 
-                            if(reagent.getAssociatedEnchantments().contains(enchantment))
+                            if(reagent.getEnchantments().contains(enchantment))
                             {
-                                ItemStack unenchantedStack = this.reagentTableManager.getInventory().getStackInSlot(0);
-                                World world = this.reagentTableManager.getWorld();
-                                BlockPos pos = this.reagentTableManager.getPos();
-                                PlayerEntity player = this.reagentTableManager.getUser();
-                                Random random = this.reagentTableManager.getRandom();
-
-                                int reagentCost = reagent.getReagentCost(world, pos, player, unenchantedStack, reagentStack, new EnchantmentData(enchantment, enchantmentLevel), random);
-                                TextFormatting reagentTextFormatting = this.reagentTableManager.getReagentAmount() >= reagentCost ? TextFormatting.GRAY : TextFormatting.RED;
-                                list.add(reagentTextFormatting + "" + I18n.format("gui.reagenchant:reagent_table.reagent.cost", reagentCost));
+                                ItemStack unenchantedStack = this.container.getItemStackHandler().getStackInSlot(0);
+                                this.container.getWorldPosCallable().consume((world, pos) ->
+                                {
+                                    int reagentCost = reagent.getCost(world, pos, this.container.getPlayer(), unenchantedStack, reagentStack, new EnchantmentData(enchantment, enchantmentLevel), this.container.getRandom());
+                                    TextFormatting reagentTextFormatting = this.container.getReagentAmount() >= reagentCost ? TextFormatting.GRAY : TextFormatting.RED;
+                                    list.add(reagentTextFormatting + "" + I18n.format("gui.reagenchant.reagent_table.reagent.cost", reagentCost));
+                                });
                             }
                         }
 
-                        list.add(TextFormatting.GRAY + "" + I18n.format("gui.reagenchant:reagent_table.experience.cost", enchantmentTier));
+                        list.add(TextFormatting.GRAY + "" + I18n.format("gui.reagenchant.reagent_table.experience.cost", enchantmentTier));
                     }
                 }
 
@@ -328,7 +325,7 @@ public class ReagentTableScreen extends ContainerScreen
 
         for(int i = 0; i < 3; i++)
         {
-            if(this.reagentTableManager.getEnchantabilityLevels()[i] != 0)
+            if(this.container.getEnchantabilityLevels()[i] != 0)
             {
                 flag = true;
             }

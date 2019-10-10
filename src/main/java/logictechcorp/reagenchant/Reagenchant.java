@@ -17,86 +17,67 @@
 
 package logictechcorp.reagenchant;
 
-import logictechcorp.libraryex.api.IModData;
-import logictechcorp.libraryex.api.IProxy;
-import logictechcorp.reagenchant.api.ReagenchantAPI;
-import logictechcorp.reagenchant.api.internal.iface.IReagenchantAPI;
-import logictechcorp.reagenchant.api.internal.iface.IReagentManager;
-import logictechcorp.reagenchant.api.internal.iface.IReagentRegistry;
-import logictechcorp.reagenchant.init.ReagenchantReagents;
+import logictechcorp.libraryex.resource.OptionalResourcePack;
+import logictechcorp.reagenchant.block.ReagenchantBlocks;
+import logictechcorp.reagenchant.handler.UnbreakingHandler;
+import logictechcorp.reagenchant.inventory.container.ReagenchantContainers;
 import logictechcorp.reagenchant.proxy.ClientProxy;
 import logictechcorp.reagenchant.proxy.ServerProxy;
-import net.minecraft.item.ItemGroup;
-import net.minecraft.util.ResourceLocation;
+import logictechcorp.reagenchant.reagent.ReagentManager;
+import logictechcorp.reagenchant.tileentity.ReagenchantTileEntities;
+import net.minecraft.server.MinecraftServer;
+import net.minecraftforge.common.MinecraftForge;
+import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.fml.DistExecutor;
+import net.minecraftforge.fml.ModList;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
+import net.minecraftforge.fml.event.server.FMLServerAboutToStartEvent;
+import net.minecraftforge.fml.event.server.FMLServerStoppingEvent;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
+import net.minecraftforge.fml.loading.moddiscovery.ModFile;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 @Mod(Reagenchant.MOD_ID)
-public class Reagenchant implements IModData, IReagenchantAPI
+public class Reagenchant
 {
     public static final String MOD_ID = "reagenchant";
-
-    public static Reagenchant instance;
-    public static IProxy proxy;
+    public static final ReagentManager REAGENT_MANAGER = new ReagentManager();
 
     public static final Logger LOGGER = LogManager.getLogger("Reagenchant");
 
     public Reagenchant()
     {
-        Reagenchant.instance = this;
-        Reagenchant.proxy = DistExecutor.runForDist(() -> ClientProxy::new, () -> ServerProxy::new);
-        FMLJavaModLoadingContext.get().getModEventBus().addListener(this::commonSetup);
-        proxy.setupSidedListeners();
+        DistExecutor.runForDist(() -> ClientProxy::new, () -> ServerProxy::new);
+
+        IEventBus modEventBus = FMLJavaModLoadingContext.get().getModEventBus();
+        modEventBus.addListener(this::onCommonSetup);
+        ReagenchantBlocks.BLOCK_OVERRIDES.register(modEventBus);
+        ReagenchantTileEntities.TILE_ENTITIES.register(modEventBus);
+        ReagenchantContainers.CONTAINERS.register(modEventBus);
+
+        IEventBus forgeEventBus = MinecraftForge.EVENT_BUS;
+        forgeEventBus.addListener(this::onServerAboutToStart);
+        forgeEventBus.addListener(this::onServerStopping);
     }
 
-    private void commonSetup(FMLCommonSetupEvent event)
+    private void onCommonSetup(FMLCommonSetupEvent event)
     {
-        ReagenchantAPI.setInstance(this);
-        ReagenchantReagents.initReagents();
+        UnbreakingHandler.overrideBehavior();
     }
 
-    @Override
-    public String getModId()
+    private void onServerAboutToStart(FMLServerAboutToStartEvent event)
     {
-        return MOD_ID;
+        MinecraftServer server = event.getServer();
+        ModFile modFile = ModList.get().getModFileById(MOD_ID).getFile();
+
+        server.getResourcePacks().addPackFinder(new OptionalResourcePack(modFile, "reagent_pack", true));
+        server.getResourceManager().addReloadListener(REAGENT_MANAGER);
     }
 
-    @Override
-    public ItemGroup getItemGroup()
+    private void onServerStopping(FMLServerStoppingEvent event)
     {
-        return ItemGroup.DECORATIONS;
-    }
-
-    @Override
-    public boolean writeRecipesToJson()
-    {
-        return false;
-    }
-
-    @Override
-    public boolean isStub()
-    {
-        return false;
-    }
-
-    @Override
-    public IReagentRegistry getReagentRegistry()
-    {
-        return ReagentRegistry.INSTANCE;
-    }
-
-    @Override
-    public IReagentManager getReagentManager()
-    {
-        return ReagentManager.INSTANCE;
-    }
-
-    public static ResourceLocation getResource(String name)
-    {
-        return new ResourceLocation(Reagenchant.MOD_ID + ":" + name);
+        REAGENT_MANAGER.cleanup();
     }
 }

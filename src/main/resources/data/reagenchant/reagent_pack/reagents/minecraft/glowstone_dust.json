@@ -1,0 +1,12 @@
+{
+	"item": "minecraft:glowstone_dust",
+	"enchantments": [
+		{
+			"enchantment": "minecraft:bane_of_arthropods",
+			"probability": 0.5,
+			"reagentCost": 1,
+			"minimumEnchantmentLevel": 1,
+			"maximumEnchantmentLevel": 5
+		}
+	]
+}

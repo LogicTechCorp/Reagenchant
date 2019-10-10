@@ -1,6 +1,7 @@
 modLoader="javafml"
 loaderVersion="[26,)"
 issueTrackerURL="https://github.com/LogicTechCorp/Reagenchant/issues"
+
 [[mods]]
 modId="reagenchant"
 version="${file.jarVersion}"
@@ -9,9 +10,10 @@ displayURL="https://minecraft.curseforge.com/projects/reagenchant"
 logoFile="assets/reagenchant/logo.png"
 authors="LogicTechCorp, AnarchCassius, LapisWhovian, misterslime, MCvinnyq, and Cameron"
 description="A mod that makes enchanting a lot less random."
+
 [[dependencies.reagenchant]]
-    modId="libraryex"
-    mandatory=true
-    versionRange="[2.0.0,)"
-    ordering="AFTER"
-    side="BOTH"
+modId="libraryex"
+mandatory=true
+versionRange="[2.0.0,)"
+ordering="AFTER"
+side="BOTH"

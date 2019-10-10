@@ -18,14 +18,11 @@
 package logictechcorp.reagenchant.block;
 
 import logictechcorp.libraryex.block.TileEntityBlock;
-import logictechcorp.reagenchant.inventory.ReagentTableContainer;
-import logictechcorp.reagenchant.inventory.ReagentTableManager;
+import logictechcorp.reagenchant.inventory.container.ReagentTableContainer;
 import logictechcorp.reagenchant.tileentity.ReagentTableTileEntity;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockRenderType;
 import net.minecraft.block.BlockState;
-import net.minecraft.block.material.Material;
-import net.minecraft.block.material.MaterialColor;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.inventory.container.INamedContainerProvider;
@@ -33,8 +30,10 @@ import net.minecraft.inventory.container.SimpleNamedContainerProvider;
 import net.minecraft.item.ItemStack;
 import net.minecraft.particles.ParticleTypes;
 import net.minecraft.pathfinding.PathType;
+import net.minecraft.tileentity.EnchantingTableTileEntity;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.Hand;
+import net.minecraft.util.IWorldPosCallable;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.BlockRayTraceResult;
 import net.minecraft.util.math.shapes.ISelectionContext;
@@ -50,9 +49,9 @@ public class ReagentTableBlock extends TileEntityBlock<ReagentTableTileEntity>
 {
     protected static final VoxelShape SHAPE = Block.makeCuboidShape(0.0D, 0.0D, 0.0D, 16.0D, 12.0D, 16.0D);
 
-    public ReagentTableBlock()
+    public ReagentTableBlock(Properties properties)
     {
-        super(Block.Properties.create(Material.ROCK, MaterialColor.RED).hardnessAndResistance(5.0F, 2000.0F), ReagentTableTileEntity.class);
+        super(properties, ReagentTableTileEntity.class);
     }
 
     @Override
@@ -97,6 +96,7 @@ public class ReagentTableBlock extends TileEntityBlock<ReagentTableTileEntity>
         if(stack.hasDisplayName())
         {
             TileEntity tileEntity = world.getTileEntity(pos);
+
             if(tileEntity instanceof ReagentTableTileEntity)
             {
                 ((ReagentTableTileEntity) tileEntity).setCustomName(stack.getDisplayName());
@@ -114,6 +114,11 @@ public class ReagentTableBlock extends TileEntityBlock<ReagentTableTileEntity>
         }
         else
         {
+            if(world.getTileEntity(pos) instanceof EnchantingTableTileEntity)
+            {
+                world.setTileEntity(pos, this.createTileEntity(state, world));
+            }
+
             player.openContainer(state.getContainer(world, pos));
             return true;
         }
@@ -151,7 +156,7 @@ public class ReagentTableBlock extends TileEntityBlock<ReagentTableTileEntity>
         if(tileEntity instanceof ReagentTableTileEntity)
         {
             ReagentTableTileEntity reagentTable = (ReagentTableTileEntity) tileEntity;
-            return new SimpleNamedContainerProvider((id, inventory, player) -> new ReagentTableContainer(new ReagentTableManager(world, pos, player, reagentTable), id), reagentTable.getDisplayName());
+            return new SimpleNamedContainerProvider((id, playerInventory, player) -> new ReagentTableContainer(id, playerInventory, reagentTable.getItemStackHandler(), IWorldPosCallable.of(world, pos)), reagentTable.getDisplayName());
         }
         else
         {

@@ -18,8 +18,6 @@
 package logictechcorp.reagenchant.reagent;
 
 import logictechcorp.libraryex.utility.RandomHelper;
-import logictechcorp.reagenchant.api.reagent.IReagent;
-import logictechcorp.reagenchant.api.reagent.IReagentEnchantmentData;
 import net.minecraft.enchantment.Enchantment;
 import net.minecraft.enchantment.EnchantmentData;
 import net.minecraft.enchantment.EnchantmentHelper;
@@ -36,58 +34,33 @@ import net.minecraftforge.registries.ForgeRegistries;
 
 import java.util.*;
 
-/**
- * The base class for a Reagent.
- */
-public class Reagent implements IReagent
+public class Reagent
 {
-    protected final ResourceLocation name;
-    protected final Item associatedItem;
-    protected final Map<ResourceLocation, IReagentEnchantmentData> enchantments = new HashMap<>();
+    protected final Item item;
+    protected final Map<ResourceLocation, ReagentEnchantmentData> enchantments = new HashMap<>();
 
-    public Reagent(ResourceLocation name, Item associatedItem)
+    public Reagent(Item item)
     {
-        this.name = name;
-
-        if(associatedItem != null)
+        if(item != null)
         {
-            this.associatedItem = associatedItem;
+            this.item = item;
         }
         else
         {
-            this.associatedItem = Items.AIR;
+            this.item = Items.AIR;
         }
     }
 
-    public Reagent(ResourceLocation name, ResourceLocation associatedItemRegistryName)
+    public void addEnchantment(ReagentEnchantmentData reagentEnchantmentData)
     {
-        this.name = name;
-
-        Item associatedItem = ForgeRegistries.ITEMS.getValue(associatedItemRegistryName);
-
-        if(associatedItem != null)
-        {
-            this.associatedItem = associatedItem;
-        }
-        else
-        {
-            this.associatedItem = Items.AIR;
-        }
+        this.enchantments.put(reagentEnchantmentData.getEnchantment().getRegistryName(), reagentEnchantmentData);
     }
 
-    @Override
-    public void addEnchantment(Enchantment enchantment, IReagentEnchantmentData reagentEnchantmentData)
-    {
-        this.enchantments.put(enchantment.getRegistryName(), reagentEnchantmentData);
-    }
-
-    @Override
     public void removeEnchantment(Enchantment enchantment)
     {
         this.enchantments.remove(enchantment.getRegistryName());
     }
 
-    @Override
     public List<EnchantmentData> createEnchantmentList(World world, BlockPos pos, PlayerEntity player, ItemStack unenchantedStack, ItemStack reagentStack, int enchantmentTier, int enchantabilityLevel, Random random)
     {
         int enchantability = unenchantedStack.getItem().getItemEnchantability(unenchantedStack);
@@ -108,7 +81,7 @@ public class Reagent implements IReagent
 
             for(Enchantment enchantment : applicableEnchantments)
             {
-                IReagentEnchantmentData reagentEnchantmentData = this.getReagentEnchantmentData(enchantment);
+                ReagentEnchantmentData reagentEnchantmentData = this.getReagentEnchantmentData(enchantment);
                 int minimumEnchantmentLevel = reagentEnchantmentData.getMinimumEnchantmentLevel();
                 int maximumEnchantmentLevel = reagentEnchantmentData.getMaximumEnchantmentLevel();
                 int enchantmentLevel;
@@ -181,10 +154,9 @@ public class Reagent implements IReagent
         }
     }
 
-    @Override
     public boolean hasApplicableEnchantments(World world, BlockPos pos, PlayerEntity player, ItemStack unenchantedStack, ItemStack reagentStack, Random random)
     {
-        for(Enchantment enchantment : this.getAssociatedEnchantments())
+        for(Enchantment enchantment : this.getEnchantments())
         {
             if(enchantment.canApplyAtEnchantingTable(unenchantedStack) || (unenchantedStack.getItem() == Items.BOOK && enchantment.isAllowedOnBooks()))
             {
@@ -195,7 +167,6 @@ public class Reagent implements IReagent
         return false;
     }
 
-    @Override
     public boolean consumeReagent(World world, BlockPos pos, PlayerEntity player, ItemStack enchantedStack, ItemStack reagentStack, List<EnchantmentData> enchantmentList, Random random)
     {
         List<Enchantment> applicableEnchantments = this.getApplicableEnchantments(world, pos, player, enchantedStack, reagentStack, random);
@@ -211,20 +182,12 @@ public class Reagent implements IReagent
         return false;
     }
 
-    @Override
-    public Item getAssociatedItem()
+    public Item getItem()
     {
-        return this.associatedItem;
+        return this.item;
     }
 
-    @Override
-    public ResourceLocation getName()
-    {
-        return this.name;
-    }
-
-    @Override
-    public List<Enchantment> getAssociatedEnchantments()
+    public List<Enchantment> getEnchantments()
     {
         List<Enchantment> associatedEnchantments = new ArrayList<>();
 
@@ -236,12 +199,11 @@ public class Reagent implements IReagent
         return associatedEnchantments;
     }
 
-    @Override
     public List<Enchantment> getApplicableEnchantments(World world, BlockPos pos, PlayerEntity player, ItemStack unenchantedStack, ItemStack reagentStack, Random random)
     {
         List<Enchantment> enchantments = new ArrayList<>();
 
-        for(Enchantment enchantment : this.getAssociatedEnchantments())
+        for(Enchantment enchantment : this.getEnchantments())
         {
             if(enchantment.canApplyAtEnchantingTable(unenchantedStack) || (unenchantedStack.getItem() == Items.BOOK && enchantment.isAllowedOnBooks()))
             {
@@ -252,13 +214,11 @@ public class Reagent implements IReagent
         return enchantments;
     }
 
-    @Override
-    public IReagentEnchantmentData getReagentEnchantmentData(Enchantment enchantment)
+    public ReagentEnchantmentData getReagentEnchantmentData(Enchantment enchantment)
     {
         return this.enchantments.get(enchantment.getRegistryName());
     }
 
-    @Override
     public double getEnchantmentProbability(World world, BlockPos pos, PlayerEntity player, ItemStack unenchantedStack, ItemStack reagentStack, EnchantmentData enchantmentData, Random random)
     {
         Enchantment enchantment = enchantmentData.enchantment;
@@ -271,8 +231,7 @@ public class Reagent implements IReagent
         return 0.5D;
     }
 
-    @Override
-    public int getReagentCost(World world, BlockPos pos, PlayerEntity player, ItemStack unenchantedStack, ItemStack reagentStack, EnchantmentData enchantmentData, Random random)
+    public int getCost(World world, BlockPos pos, PlayerEntity player, ItemStack unenchantedStack, ItemStack reagentStack, EnchantmentData enchantmentData, Random random)
     {
         Enchantment enchantment = enchantmentData.enchantment;
 

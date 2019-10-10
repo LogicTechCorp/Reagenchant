@@ -18,10 +18,11 @@
 package logictechcorp.reagenchant.client.renderer.tileentity;
 
 import com.mojang.blaze3d.platform.GlStateManager;
-import logictechcorp.reagenchant.init.ReagenchantTextures;
+import logictechcorp.reagenchant.Reagenchant;
 import logictechcorp.reagenchant.tileentity.ReagentTableTileEntity;
 import net.minecraft.client.renderer.entity.model.BookModel;
 import net.minecraft.client.renderer.tileentity.TileEntityRenderer;
+import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.MathHelper;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
@@ -29,6 +30,8 @@ import net.minecraftforge.api.distmarker.OnlyIn;
 @OnlyIn(value = Dist.CLIENT)
 public class TileEntityReagentTableRenderer extends TileEntityRenderer<ReagentTableTileEntity>
 {
+    private static final ResourceLocation REAGENT_TABLE_BOOK = new ResourceLocation(Reagenchant.MOD_ID, "textures/entity/reagent_table_book.png");
+
     private final BookModel modelBook = new BookModel();
 
     @Override
@@ -52,7 +55,7 @@ public class TileEntityReagentTableRenderer extends TileEntityRenderer<ReagentTa
         float previousBookRotation = reagentTable.getBookRotationPrev() + bookRotation * partialTicks;
         GlStateManager.rotatef(-previousBookRotation * (180F / (float) Math.PI), 0.0F, 1.0F, 0.0F);
         GlStateManager.rotatef(80.0F, 0.0F, 0.0F, 1.0F);
-        this.bindTexture(ReagenchantTextures.REAGENT_TABLE_BOOK);
+        this.bindTexture(REAGENT_TABLE_BOOK);
         float pageOneFlip = reagentTable.getPageFlipPrev() + (reagentTable.getPageFlip() - reagentTable.getPageFlipPrev()) * partialTicks + 0.25F;
         float pageTwoFlip = reagentTable.getPageFlipPrev() + (reagentTable.getPageFlip() - reagentTable.getPageFlipPrev()) * partialTicks + 0.75F;
         pageOneFlip = (pageOneFlip - (float) MathHelper.fastFloor((double) pageOneFlip)) * 1.6F - 0.3F;
@@ -80,7 +83,7 @@ public class TileEntityReagentTableRenderer extends TileEntityRenderer<ReagentTa
 
         float bookSpread = reagentTable.getBookSpreadPrev() + (reagentTable.getBookSpread() - reagentTable.getBookSpreadPrev()) * partialTicks;
         GlStateManager.enableCull();
-        this.modelBook.func_217103_a(ticks, pageOneFlip, pageTwoFlip, bookSpread, 0.0F, 0.0625F);
+        this.modelBook.render(ticks, pageOneFlip, pageTwoFlip, bookSpread, 0.0F, 0.0625F);
         GlStateManager.popMatrix();
     }
 }
