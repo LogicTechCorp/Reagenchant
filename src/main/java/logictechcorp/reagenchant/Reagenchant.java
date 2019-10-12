@@ -21,6 +21,7 @@ import logictechcorp.libraryex.resource.OptionalResourcePack;
 import logictechcorp.reagenchant.block.ReagenchantBlocks;
 import logictechcorp.reagenchant.handler.UnbreakingHandler;
 import logictechcorp.reagenchant.inventory.container.ReagenchantContainers;
+import logictechcorp.reagenchant.item.ReagenchantItems;
 import logictechcorp.reagenchant.proxy.ClientProxy;
 import logictechcorp.reagenchant.proxy.ServerProxy;
 import logictechcorp.reagenchant.reagent.ReagentManager;
@@ -54,6 +55,7 @@ public class Reagenchant
         IEventBus modEventBus = FMLJavaModLoadingContext.get().getModEventBus();
         modEventBus.addListener(this::onCommonSetup);
         ReagenchantBlocks.BLOCK_OVERRIDES.register(modEventBus);
+        ReagenchantItems.ITEM_OVERRIDES.register(modEventBus);
         ReagenchantTileEntities.TILE_ENTITIES.register(modEventBus);
         ReagenchantContainers.CONTAINERS.register(modEventBus);
 
@@ -64,7 +66,7 @@ public class Reagenchant
 
     private void onCommonSetup(FMLCommonSetupEvent event)
     {
-        UnbreakingHandler.overrideBehavior();
+        UnbreakingHandler.setup();
     }
 
     private void onServerAboutToStart(FMLServerAboutToStartEvent event)

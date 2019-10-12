@@ -17,47 +17,45 @@
 
 package logictechcorp.reagenchant.handler;
 
-import logictechcorp.libraryex.utility.NBTHelper;
 import logictechcorp.reagenchant.Reagenchant;
-import net.minecraft.block.*;
+import net.minecraft.block.Blocks;
+import net.minecraft.block.DispenserBlock;
+import net.minecraft.block.TNTBlock;
 import net.minecraft.client.resources.I18n;
 import net.minecraft.dispenser.IBlockSource;
 import net.minecraft.dispenser.OptionalDispenseBehavior;
 import net.minecraft.enchantment.Enchantment;
 import net.minecraft.enchantment.EnchantmentHelper;
 import net.minecraft.enchantment.Enchantments;
-import net.minecraft.entity.Entity;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.inventory.EquipmentSlotType;
-import net.minecraft.item.*;
+import net.minecraft.item.IItemPropertyGetter;
+import net.minecraft.item.Item;
+import net.minecraft.item.ItemStack;
+import net.minecraft.item.Items;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.nbt.ListNBT;
-import net.minecraft.util.DamageSource;
 import net.minecraft.util.Hand;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.registry.Registry;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.TextFormatting;
 import net.minecraft.util.text.TranslationTextComponent;
-import net.minecraft.world.IWorld;
 import net.minecraft.world.World;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
-import net.minecraftforge.common.IShearable;
+import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.entity.living.LivingHurtEvent;
-import net.minecraftforge.event.entity.player.*;
-import net.minecraftforge.event.world.BlockEvent;
-import net.minecraftforge.eventbus.api.Event;
+import net.minecraftforge.event.entity.player.AnvilRepairEvent;
+import net.minecraftforge.event.entity.player.ItemTooltipEvent;
+import net.minecraftforge.event.entity.player.PlayerPickupXpEvent;
 import net.minecraftforge.eventbus.api.EventPriority;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
-import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.registries.ForgeRegistries;
 
 import java.util.List;
 
-@Mod.EventBusSubscriber(modid = Reagenchant.MOD_ID)
 public class UnbreakingHandler
 {
     private static final ResourceLocation BROKEN_PROPERTY_KEY = new ResourceLocation(Reagenchant.MOD_ID, "broken");
@@ -115,169 +113,31 @@ public class UnbreakingHandler
         }
     }
 
-    @SubscribeEvent
-    public static void onPlayerBreakSpeed(PlayerEvent.BreakSpeed event)
+    @SubscribeEvent(priority = EventPriority.LOWEST)
+    public static void onLivingHurt(LivingHurtEvent event)
     {
-        PlayerEntity player = event.getEntityPlayer();
-        ItemStack stack = player.getHeldItemMainhand();
+        LivingEntity hurtEntity = event.getEntityLiving();
 
-        if(isItemBroken(stack))
+        if(hurtEntity instanceof PlayerEntity)
         {
-            event.setNewSpeed(0.5F);
-        }
-    }
+            PlayerEntity player = (PlayerEntity) hurtEntity;
 
-    @SubscribeEvent
-    public static void onPlayerHarvestCheck(PlayerEvent.HarvestCheck event)
-    {
-        PlayerEntity player = event.getEntityPlayer();
-        BlockState state = event.getTargetBlock();
-        ItemStack stack = player.getHeldItemMainhand();
-
-        if(isItemBroken(stack) && !state.getMaterial().isToolNotRequired())
-        {
-            event.setCanHarvest(false);
-        }
-    }
-
-    @SubscribeEvent
-    public static void onBlockBreak(BlockEvent.BreakEvent event)
-    {
-        IWorld world = event.getWorld();
-        BlockPos pos = event.getPos();
-        BlockState state = event.getState();
-        PlayerEntity player = event.getPlayer();
-        Block block = state.getBlock();
-        ItemStack stack = player.getHeldItemMainhand();
-
-        if(isItemBroken(stack))
-        {
-            if(block instanceof IShearable)
+            for(EquipmentSlotType equipmentSlotType : EquipmentSlotType.values())
             {
-                if(((IShearable) block).isShearable(stack, world, pos))
+                if(equipmentSlotType.getSlotType() == EquipmentSlotType.Group.ARMOR)
                 {
-                    world.setBlockState(pos, Blocks.AIR.getDefaultState(), 3);
+                    ItemStack armorStack = player.inventory.armorInventory.get(equipmentSlotType.getIndex());
+
+                    if(canItemBeBroken(armorStack))
+                    {
+                        breakItem(player, armorStack, equipmentSlotType);
+                    }
                 }
-            }
-
-            if(!state.getMaterial().isToolNotRequired())
-            {
-                event.setExpToDrop(0);
-            }
-        }
-    }
-
-    @SubscribeEvent
-    public static void onHarvestDrops(BlockEvent.HarvestDropsEvent event)
-    {
-        BlockState state = event.getState();
-        PlayerEntity player = event.getHarvester();
-
-        if(player != null)
-        {
-            ItemStack mainStack = event.getHarvester().getHeldItemMainhand();
-            ItemStack offStack = event.getHarvester().getHeldItemOffhand();
-
-            if(isItemBroken(mainStack))
-            {
-                breakItem(player, mainStack, EquipmentSlotType.MAINHAND);
-
-                if(!state.getMaterial().isToolNotRequired())
-                {
-                    event.getDrops().clear();
-                }
-            }
-
-            if(isItemBroken(offStack))
-            {
-                breakItem(player, offStack, EquipmentSlotType.OFFHAND);
-
-                if(!state.getMaterial().isToolNotRequired())
-                {
-                    event.getDrops().clear();
-                }
-            }
-        }
-    }
-
-    @SubscribeEvent
-    public static void onRightClickBlock(PlayerInteractEvent.RightClickBlock event)
-    {
-        PlayerEntity player = event.getPlayer();
-        ItemStack stack = event.getItemStack();
-
-        if(isItemBroken(stack))
-        {
-            breakItem(player, stack, EquipmentSlotType.fromSlotTypeAndIndex(EquipmentSlotType.Group.HAND, event.getHand().ordinal()));
-            event.setUseItem(Event.Result.DENY);
-        }
-    }
-
-    @SubscribeEvent
-    public static void onRightClickItem(PlayerInteractEvent.RightClickItem event)
-    {
-        PlayerEntity player = event.getPlayer();
-        ItemStack stack = event.getItemStack();
-
-        if(isItemBroken(stack))
-        {
-            if(!(stack.getItem() instanceof ArmorItem))
-            {
-                breakItem(player, stack, EquipmentSlotType.fromSlotTypeAndIndex(EquipmentSlotType.Group.HAND, event.getHand().ordinal()));
-                event.setCanceled(true);
-            }
-        }
-    }
-
-    @SubscribeEvent
-    public static void onEntityInteract(PlayerInteractEvent.EntityInteract event)
-    {
-        PlayerEntity player = event.getPlayer();
-        Entity entity = event.getTarget();
-        ItemStack stack = event.getItemStack();
-        Hand hand = event.getHand();
-
-        if(isItemBroken(stack))
-        {
-            breakItem(player, stack, EquipmentSlotType.fromSlotTypeAndIndex(EquipmentSlotType.Group.HAND, hand.ordinal()));
-
-            if(entity instanceof LivingEntity && stack.getItem().itemInteractionForEntity(ItemStack.EMPTY, player, (LivingEntity) entity, hand))
-            {
-                event.setCanceled(true);
             }
         }
     }
 
     @SubscribeEvent(priority = EventPriority.LOWEST)
-    public static void onLivingHurt(LivingHurtEvent event)
-    {
-        DamageSource source = event.getSource();
-        Entity attacker = source.getTrueSource();
-
-        if(attacker instanceof PlayerEntity)
-        {
-            PlayerEntity player = (PlayerEntity) attacker;
-            boolean cancel = false;
-
-            for(ItemStack stack : player.getEquipmentAndArmor())
-            {
-                if(isItemBroken(stack))
-                {
-                    breakItem(player, stack, EquipmentSlotType.HEAD);
-                    cancel = true;
-                }
-            }
-
-            if(cancel)
-            {
-                attackPlayer(player);
-            }
-
-            event.setCanceled(cancel);
-        }
-    }
-
-    @SubscribeEvent
     public static void onAnvilRepair(AnvilRepairEvent event)
     {
         ItemStack inputStack = event.getItemInput();
@@ -289,10 +149,10 @@ public class UnbreakingHandler
         }
     }
 
-    @SubscribeEvent
+    @SubscribeEvent(priority = EventPriority.LOWEST)
     public static void onMending(PlayerPickupXpEvent event)
     {
-        PlayerEntity player = event.getEntityPlayer();
+        PlayerEntity player = event.getPlayer();
 
         for(Hand hand : Hand.values())
         {
@@ -305,7 +165,7 @@ public class UnbreakingHandler
         }
     }
 
-    public static void overrideBehavior()
+    public static void setup()
     {
         for(Item item : ForgeRegistries.ITEMS)
         {
@@ -344,11 +204,13 @@ public class UnbreakingHandler
                 return stack;
             }
         });
+
+        MinecraftForge.EVENT_BUS.register(UnbreakingHandler.class);
     }
 
-    private static void breakItem(LivingEntity entity, ItemStack stack, EquipmentSlotType slotType)
+    public static void breakItem(LivingEntity livingEntity, ItemStack stack, EquipmentSlotType equipmentSlotType)
     {
-        CompoundNBT stackCompound = NBTHelper.ensureTagExists(stack);
+        CompoundNBT stackCompound = stack.getOrCreateTag();
 
         if(!stackCompound.getBoolean(BROKEN_KEY))
         {
@@ -359,13 +221,13 @@ public class UnbreakingHandler
             {
                 for(int tagIndex = 0; tagIndex < enchantments.size(); tagIndex++)
                 {
-                    int enchantmentId = enchantments.getCompound(tagIndex).getShort("id");
+                    ResourceLocation enchantmentName = new ResourceLocation(enchantments.getCompound(tagIndex).getString("id"));
 
-                    if(enchantmentId == Registry.ENCHANTMENT.getId(Enchantments.BINDING_CURSE))
+                    if(enchantmentName.equals(Enchantments.BINDING_CURSE.getRegistryName()))
                     {
                         enchantments.remove(tagIndex);
                     }
-                    else if(enchantmentId != Registry.ENCHANTMENT.getId(Enchantments.UNBREAKING) && enchantmentId != Registry.ENCHANTMENT.getId(Enchantments.MENDING))
+                    else if(!enchantmentName.equals(Enchantments.UNBREAKING.getRegistryName()) && !enchantmentName.equals(Enchantments.MENDING.getRegistryName()))
                     {
                         disabledEnchantments.add(enchantments.remove(tagIndex));
                     }
@@ -374,14 +236,14 @@ public class UnbreakingHandler
                 stackCompound.put(DISABLED_ENCHANTMENTS_KEY, disabledEnchantments);
             }
 
-            entity.sendBreakAnimation(slotType);
             stackCompound.putBoolean(BROKEN_KEY, true);
+            livingEntity.sendBreakAnimation(equipmentSlotType);
         }
     }
 
-    private static void fixItem(ItemStack stack)
+    public static void fixItem(ItemStack stack)
     {
-        CompoundNBT stackCompound = NBTHelper.ensureTagExists(stack);
+        CompoundNBT stackCompound = stack.getOrCreateTag();
 
         if(stackCompound.getBoolean(BROKEN_KEY))
         {
@@ -403,22 +265,21 @@ public class UnbreakingHandler
         }
     }
 
-    private static boolean isItemBroken(ItemStack stack)
+    public static boolean canItemBeBroken(ItemStack stack)
     {
         int usesRemaining = (stack.getMaxDamage() - stack.getDamage());
         boolean canBeBroken = !stack.isEmpty() && EnchantmentHelper.getEnchantmentLevel(Enchantments.UNBREAKING, stack) > 0;
-        boolean isConsideredBroken = canBeBroken && usesRemaining <= 1;
 
-        if(usesRemaining == 0 && canBeBroken)
+        if(usesRemaining <= 0 && canBeBroken)
         {
             stack.setDamage(stack.getMaxDamage() - 1);
         }
 
-        return isConsideredBroken;
+        return (canBeBroken && usesRemaining <= 1);
     }
 
-    private static void attackPlayer(PlayerEntity player)
+    public static boolean isItemBroken(ItemStack stack)
     {
-
+        return stack.getOrCreateTag().getBoolean(BROKEN_KEY);
     }
 }
