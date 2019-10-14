@@ -30,11 +30,13 @@ public class ReagenchantItems
     static
     {
         ITEM_OVERRIDES.register("enchanting_table", () -> new BlockItem(Blocks.ENCHANTING_TABLE, new Item.Properties().group(ItemGroup.DECORATIONS)));
+        ITEM_OVERRIDES.register("bow", () -> new UnbreakableBowItem(new Item.Properties().maxDamage(384).group(ItemGroup.COMBAT)));
         ITEM_OVERRIDES.register("turtle_helmet", () -> new UnbreakableArmorItem(ArmorMaterial.TURTLE, EquipmentSlotType.HEAD, new Item.Properties().group(ItemGroup.COMBAT)));
         ITEM_OVERRIDES.register("iron_shovel", () -> new UnbreakableShovelItem(ItemTier.IRON, 1.5F, -3.0F, (new Item.Properties()).group(ItemGroup.TOOLS)));
         ITEM_OVERRIDES.register("iron_pickaxe", () -> new UnbreakablePickaxeItem(ItemTier.IRON, 1, -2.8F, (new Item.Properties()).group(ItemGroup.TOOLS)));
         ITEM_OVERRIDES.register("iron_axe", () -> new UnbreakableAxeItem(ItemTier.IRON, 6.0F, -3.1F, (new Item.Properties()).group(ItemGroup.TOOLS)));
         ITEM_OVERRIDES.register("iron_sword", () -> new UnbreakableSwordItem(ItemTier.IRON, 3, -2.4F, (new Item.Properties()).group(ItemGroup.COMBAT)));
+        ITEM_OVERRIDES.register("flint_and_steel", () -> new UnbreakableFlintAndSteelItem(new Item.Properties().maxDamage(64).group(ItemGroup.TOOLS)));
         ITEM_OVERRIDES.register("wooden_sword", () -> new UnbreakableSwordItem(ItemTier.WOOD, 3, -2.4F, (new Item.Properties()).group(ItemGroup.COMBAT)));
         ITEM_OVERRIDES.register("wooden_shovel", () -> new UnbreakableShovelItem(ItemTier.WOOD, 1.5F, -3.0F, (new Item.Properties()).group(ItemGroup.TOOLS)));
         ITEM_OVERRIDES.register("wooden_pickaxe", () -> new UnbreakablePickaxeItem(ItemTier.WOOD, 1, -2.8F, (new Item.Properties()).group(ItemGroup.TOOLS)));
@@ -76,6 +78,10 @@ public class ReagenchantItems
         ITEM_OVERRIDES.register("golden_chestplate", () -> new UnbreakableArmorItem(ArmorMaterial.GOLD, EquipmentSlotType.CHEST, new Item.Properties().group(ItemGroup.COMBAT)));
         ITEM_OVERRIDES.register("golden_leggings", () -> new UnbreakableArmorItem(ArmorMaterial.GOLD, EquipmentSlotType.LEGS, new Item.Properties().group(ItemGroup.COMBAT)));
         ITEM_OVERRIDES.register("golden_boots", () -> new UnbreakableArmorItem(ArmorMaterial.GOLD, EquipmentSlotType.FEET, new Item.Properties().group(ItemGroup.COMBAT)));
-        ITEM_OVERRIDES.register("shield", () -> new ShieldItem(new Item.Properties().maxDamage(336).group(ItemGroup.COMBAT)));
+        ITEM_OVERRIDES.register("fishing_rod", () -> new UnbreakableFishingRodItem((new Item.Properties()).maxDamage(64).group(ItemGroup.TOOLS)));
+        ITEM_OVERRIDES.register("shears", () -> new UnbreakableShearsItem((new Item.Properties()).maxDamage(238).group(ItemGroup.TOOLS)));
+        ITEM_OVERRIDES.register("carrot_on_a_stick", () -> new UnbreakableCarrotOnAStickItem((new Item.Properties()).maxDamage(25).group(ItemGroup.TRANSPORTATION)));
+        ITEM_OVERRIDES.register("shield", () -> new UnbreakableShieldItem(new Item.Properties().maxDamage(336).group(ItemGroup.COMBAT)));
+        ITEM_OVERRIDES.register("crossbow", () -> new UnbreakableCrossbowItem(new Item.Properties().maxStackSize(1).group(ItemGroup.COMBAT).maxDamage(326)));
     }
 }

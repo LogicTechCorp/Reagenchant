@@ -30,12 +30,11 @@ import net.minecraft.enchantment.Enchantments;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.inventory.EquipmentSlotType;
-import net.minecraft.item.IItemPropertyGetter;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemStack;
-import net.minecraft.item.Items;
+import net.minecraft.item.*;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.nbt.ListNBT;
+import net.minecraft.util.ActionResult;
+import net.minecraft.util.ActionResultType;
 import net.minecraft.util.Hand;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
@@ -55,6 +54,7 @@ import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.registries.ForgeRegistries;
 
 import java.util.List;
+import java.util.function.Supplier;
 
 public class UnbreakingHandler
 {
@@ -70,6 +70,54 @@ public class UnbreakingHandler
     };
     private static final String BROKEN_KEY = Reagenchant.MOD_ID + ":Broken";
     private static final String DISABLED_ENCHANTMENTS_KEY = Reagenchant.MOD_ID + ":DisabledEnchantments";
+
+    public static void setup()
+    {
+        for(Item item : ForgeRegistries.ITEMS)
+        {
+            item.addPropertyOverride(BROKEN_PROPERTY_KEY, BROKEN_PROPERTY);
+        }
+
+        DispenserBlock.registerDispenseBehavior(Items.FLINT_AND_STEEL, new OptionalDispenseBehavior()
+        {
+            @Override
+            protected ItemStack dispenseStack(IBlockSource source, ItemStack stack)
+            {
+                this.successful = false;
+
+                if(canItemBeBroken(stack, 1))
+                {
+                    breakItem(null, stack, null);
+                }
+
+                if(!isItemBroken(stack))
+                {
+                    World world = source.getWorld();
+                    BlockPos pos = source.getBlockPos().offset(source.getBlockState().get(DispenserBlock.FACING));
+                    this.successful = true;
+
+                    if(world.isAirBlock(pos))
+                    {
+                        world.setBlockState(pos, Blocks.FIRE.getDefaultState());
+
+                        if(stack.attemptDamageItem(1, world.rand, null))
+                        {
+                            stack.setCount(0);
+                        }
+                    }
+                    else if(world.getBlockState(pos).getBlock() == Blocks.TNT)
+                    {
+                        Blocks.TNT.onPlayerDestroy(world, pos, Blocks.TNT.getDefaultState().with(TNTBlock.UNSTABLE, true));
+                        world.setBlockState(pos, Blocks.AIR.getDefaultState(), 3);
+                    }
+                }
+
+                return stack;
+            }
+        });
+
+        MinecraftForge.EVENT_BUS.register(UnbreakingHandler.class);
+    }
 
     @SubscribeEvent
     @OnlyIn(Dist.CLIENT)
@@ -128,7 +176,7 @@ public class UnbreakingHandler
                 {
                     ItemStack armorStack = player.inventory.armorInventory.get(equipmentSlotType.getIndex());
 
-                    if(canItemBeBroken(armorStack))
+                    if(canItemBeBroken(armorStack, 0))
                     {
                         breakItem(player, armorStack, equipmentSlotType);
                     }
@@ -165,49 +213,6 @@ public class UnbreakingHandler
         }
     }
 
-    public static void setup()
-    {
-        for(Item item : ForgeRegistries.ITEMS)
-        {
-            item.addPropertyOverride(BROKEN_PROPERTY_KEY, BROKEN_PROPERTY);
-        }
-
-        DispenserBlock.registerDispenseBehavior(Items.FLINT_AND_STEEL, new OptionalDispenseBehavior()
-        {
-            @Override
-            protected ItemStack dispenseStack(IBlockSource source, ItemStack stack)
-            {
-                this.successful = false;
-
-                if(!isItemBroken(stack))
-                {
-                    World world = source.getWorld();
-                    BlockPos pos = source.getBlockPos().offset(source.getBlockState().get(DispenserBlock.FACING));
-                    this.successful = true;
-
-                    if(world.isAirBlock(pos))
-                    {
-                        world.setBlockState(pos, Blocks.FIRE.getDefaultState());
-
-                        if(stack.attemptDamageItem(1, world.rand, null))
-                        {
-                            stack.setCount(0);
-                        }
-                    }
-                    else if(world.getBlockState(pos).getBlock() == Blocks.TNT)
-                    {
-                        Blocks.TNT.onPlayerDestroy(world, pos, Blocks.TNT.getDefaultState().with(TNTBlock.UNSTABLE, true));
-                        world.setBlockState(pos, Blocks.AIR.getDefaultState(), 3);
-                    }
-                }
-
-                return stack;
-            }
-        });
-
-        MinecraftForge.EVENT_BUS.register(UnbreakingHandler.class);
-    }
-
     public static void breakItem(LivingEntity livingEntity, ItemStack stack, EquipmentSlotType equipmentSlotType)
     {
         CompoundNBT stackCompound = stack.getOrCreateTag();
@@ -237,7 +242,11 @@ public class UnbreakingHandler
             }
 
             stackCompound.putBoolean(BROKEN_KEY, true);
-            livingEntity.sendBreakAnimation(equipmentSlotType);
+
+            if(livingEntity != null && equipmentSlotType != null)
+            {
+                livingEntity.sendBreakAnimation(equipmentSlotType);
+            }
         }
     }
 
@@ -265,21 +274,98 @@ public class UnbreakingHandler
         }
     }
 
-    public static boolean canItemBeBroken(ItemStack stack)
+    public static int damageItem(ItemStack stack, LivingEntity livingEntity, int damageAmount)
     {
-        int usesRemaining = (stack.getMaxDamage() - stack.getDamage());
-        boolean canBeBroken = !stack.isEmpty() && EnchantmentHelper.getEnchantmentLevel(Enchantments.UNBREAKING, stack) > 0;
-
-        if(usesRemaining <= 0 && canBeBroken)
+        if(isItemBroken(stack))
         {
-            stack.setDamage(stack.getMaxDamage() - 1);
+            return 0;
         }
 
-        return (canBeBroken && usesRemaining <= 1);
+        if(canItemBeBroken(stack, damageAmount))
+        {
+            breakItem(livingEntity, stack, EquipmentSlotType.MAINHAND);
+            return 0;
+        }
+
+        return damageAmount;
     }
 
     public static boolean isItemBroken(ItemStack stack)
     {
         return stack.getOrCreateTag().getBoolean(BROKEN_KEY);
+    }
+
+    public static boolean canItemBeBroken(ItemStack stack, int damageAmount)
+    {
+        if(isItemBroken(stack))
+        {
+            return false;
+        }
+
+        int usesRemaining = (stack.getMaxDamage() - stack.getDamage());
+        boolean canBeBroken = !stack.isEmpty() && EnchantmentHelper.getEnchantmentLevel(Enchantments.UNBREAKING, stack) > 0;
+
+        if((usesRemaining - damageAmount) <= 0 && canBeBroken)
+        {
+            stack.setDamage(stack.getMaxDamage() - 1);
+            return true;
+        }
+
+        return false;
+    }
+
+    public static boolean canHarvestBlock(ItemStack stack, boolean canHarvest)
+    {
+        return !isItemBroken(stack) && canHarvest;
+    }
+
+    public static int getHarvestLevel(ItemStack stack, int harvestLevel)
+    {
+        return isItemBroken(stack) ? -1 : harvestLevel;
+    }
+
+    public static int getArmorAmount(ItemStack stack, int armorModifier)
+    {
+        return isItemBroken(stack) ? 0 : armorModifier;
+    }
+
+    public static int getUseDuration(ItemStack stack, int useDuration)
+    {
+        return isItemBroken(stack) ? 0 : useDuration;
+    }
+
+    public static float getDestroySpeed(ItemStack stack, float destroySpeed)
+    {
+        return isItemBroken(stack) ? 1.0F : destroySpeed;
+    }
+
+    public static float getAttackDamage(ItemStack stack, float attackDamage)
+    {
+        return isItemBroken(stack) ? 1.0F : attackDamage;
+    }
+
+    public static float getAttackSpeed(ItemStack stack, float attackSpeed)
+    {
+        return isItemBroken(stack) ? 1.0F : attackSpeed;
+    }
+
+    public static float getArmorToughness(ItemStack stack, float armorToughness)
+    {
+        return isItemBroken(stack) ? 0.0F : armorToughness;
+    }
+
+    public static UseAction getUseAction(ItemStack stack, UseAction useAction)
+    {
+        return isItemBroken(stack) ? UseAction.NONE : useAction;
+    }
+
+    public static ActionResult<ItemStack> getActionResult(ItemStack stack, Supplier<ActionResult<ItemStack>> actionResultSupplier)
+    {
+        return isItemBroken(stack) ? new ActionResult<>(ActionResultType.FAIL, stack) : actionResultSupplier.get();
+    }
+
+    public static ActionResultType getActionResultType(ItemStack stack, Supplier<ActionResultType> actionResultTypeSupplier)
+    {
+        return isItemBroken(stack) ? ActionResultType.FAIL : actionResultTypeSupplier.get();
     }
 }

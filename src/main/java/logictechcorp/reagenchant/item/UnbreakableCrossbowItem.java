@@ -3,8 +3,8 @@ package logictechcorp.reagenchant.item;
 import logictechcorp.reagenchant.handler.UnbreakingHandler;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.item.CrossbowItem;
 import net.minecraft.item.ItemStack;
-import net.minecraft.item.ShieldItem;
 import net.minecraft.item.UseAction;
 import net.minecraft.util.ActionResult;
 import net.minecraft.util.Hand;
@@ -12,9 +12,9 @@ import net.minecraft.world.World;
 
 import java.util.function.Consumer;
 
-public class UnbreakableShieldItem extends ShieldItem
+public class UnbreakableCrossbowItem extends CrossbowItem
 {
-    public UnbreakableShieldItem(Properties properties)
+    public UnbreakableCrossbowItem(Properties properties)
     {
         super(properties);
     }
@@ -34,12 +34,12 @@ public class UnbreakableShieldItem extends ShieldItem
     @Override
     public int getUseDuration(ItemStack stack)
     {
-        return UnbreakingHandler.getUseDuration(stack, 72000);
+        return UnbreakingHandler.getUseDuration(stack, super.getUseDuration(stack));
     }
 
     @Override
     public UseAction getUseAction(ItemStack stack)
     {
-        return UnbreakingHandler.getUseAction(stack, UseAction.BLOCK);
+        return UnbreakingHandler.getUseAction(stack, super.getUseAction(stack));
     }
 }

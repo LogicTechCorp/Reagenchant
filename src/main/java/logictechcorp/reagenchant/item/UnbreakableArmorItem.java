@@ -25,18 +25,7 @@ public class UnbreakableArmorItem extends ArmorItem
     @Override
     public <T extends LivingEntity> int damageItem(ItemStack stack, int amount, T entity, Consumer<T> onBroken)
     {
-        if(UnbreakingHandler.isItemBroken(stack))
-        {
-            return 0;
-        }
-
-        if(UnbreakingHandler.canItemBeBroken(stack))
-        {
-            UnbreakingHandler.breakItem(entity, stack, EquipmentSlotType.MAINHAND);
-            return 0;
-        }
-
-        return super.damageItem(stack, amount, entity, onBroken);
+        return UnbreakingHandler.damageItem(stack, entity, super.damageItem(stack, amount, entity, onBroken));
     }
 
     @Override
@@ -46,20 +35,10 @@ public class UnbreakableArmorItem extends ArmorItem
 
         if(equipmentSlotType == this.slot)
         {
-            multimap.put(SharedMonsterAttributes.ARMOR.getName(), new AttributeModifier(ARMOR_MODIFIERS[equipmentSlotType.getIndex()], "Armor modifier", this.getDamageReduceAmount(stack), AttributeModifier.Operation.ADDITION));
-            multimap.put(SharedMonsterAttributes.ARMOR_TOUGHNESS.getName(), new AttributeModifier(ARMOR_MODIFIERS[equipmentSlotType.getIndex()], "Armor toughness", this.getToughness(stack), AttributeModifier.Operation.ADDITION));
+            multimap.put(SharedMonsterAttributes.ARMOR.getName(), new AttributeModifier(ARMOR_MODIFIERS[equipmentSlotType.getIndex()], "Armor modifier", UnbreakingHandler.getArmorAmount(stack, this.damageReduceAmount), AttributeModifier.Operation.ADDITION));
+            multimap.put(SharedMonsterAttributes.ARMOR_TOUGHNESS.getName(), new AttributeModifier(ARMOR_MODIFIERS[equipmentSlotType.getIndex()], "Armor toughness", UnbreakingHandler.getArmorToughness(stack, this.toughness), AttributeModifier.Operation.ADDITION));
         }
 
         return multimap;
-    }
-
-    public int getDamageReduceAmount(ItemStack stack)
-    {
-        return UnbreakingHandler.isItemBroken(stack) ? 0 : this.damageReduceAmount;
-    }
-
-    public float getToughness(ItemStack stack)
-    {
-        return UnbreakingHandler.isItemBroken(stack) ? 0 : this.toughness;
     }
 }
