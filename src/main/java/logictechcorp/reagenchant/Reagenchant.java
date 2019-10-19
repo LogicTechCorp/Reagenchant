@@ -17,8 +17,10 @@
 
 package logictechcorp.reagenchant;
 
+import com.mojang.brigadier.CommandDispatcher;
 import logictechcorp.libraryex.resource.OptionalResourcePack;
 import logictechcorp.reagenchant.block.ReagenchantBlocks;
+import logictechcorp.reagenchant.command.ReagentCommand;
 import logictechcorp.reagenchant.handler.UnbreakingHandler;
 import logictechcorp.reagenchant.inventory.container.ReagenchantContainers;
 import logictechcorp.reagenchant.item.ReagenchantItems;
@@ -26,6 +28,7 @@ import logictechcorp.reagenchant.proxy.ClientProxy;
 import logictechcorp.reagenchant.proxy.ServerProxy;
 import logictechcorp.reagenchant.reagent.ReagentManager;
 import logictechcorp.reagenchant.tileentity.ReagenchantTileEntities;
+import net.minecraft.command.CommandSource;
 import net.minecraft.server.MinecraftServer;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.eventbus.api.IEventBus;
@@ -34,6 +37,7 @@ import net.minecraftforge.fml.ModList;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
 import net.minecraftforge.fml.event.server.FMLServerAboutToStartEvent;
+import net.minecraftforge.fml.event.server.FMLServerStartingEvent;
 import net.minecraftforge.fml.event.server.FMLServerStoppingEvent;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 import net.minecraftforge.fml.loading.moddiscovery.ModFile;
@@ -61,7 +65,8 @@ public class Reagenchant
 
         IEventBus forgeEventBus = MinecraftForge.EVENT_BUS;
         forgeEventBus.addListener(this::onServerAboutToStart);
-        forgeEventBus.addListener(this::onServerStopping);
+        forgeEventBus.addListener(this::onServerAboutToStart);
+        forgeEventBus.addListener(this::onServerStarting);
     }
 
     private void onCommonSetup(FMLCommonSetupEvent event)
@@ -76,6 +81,12 @@ public class Reagenchant
 
         server.getResourcePacks().addPackFinder(new OptionalResourcePack(modFile, "reagent_pack", true));
         server.getResourceManager().addReloadListener(REAGENT_MANAGER);
+    }
+
+    private void onServerStarting(FMLServerStartingEvent event)
+    {
+        CommandDispatcher<CommandSource> dispatcher = event.getCommandDispatcher();
+        ReagentCommand.register(dispatcher);
     }
 
     private void onServerStopping(FMLServerStoppingEvent event)
