@@ -12,7 +12,7 @@
     "gui.reagenchant.reagent_table.probability.base": "Base Probability: %s%%",
     "gui.reagenchant.reagent_table.reagent.base_cost": "Base Reagent cost: %s",
     "command.reagenchant.reagent.create.success": "Created reagent for %s",
-    "command.reagenchant.reagent.create.error": "Unable to create reagent for %s",
+    "command.reagenchant.reagent.create.override": "Overriding the %s reagent",
     "command.reagenchant.reagent.add.success": "Added %s to the %s reagent",
     "command.reagenchant.reagent.add.error": "Unable to add %s to the %s reagent",
     "command.reagenchant.reagent.remove.success": "Removed %s from the %s reagent",

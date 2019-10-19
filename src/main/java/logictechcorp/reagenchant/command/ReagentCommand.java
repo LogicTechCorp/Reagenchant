@@ -60,20 +60,22 @@ public class ReagentCommand
 
         if(item != Items.AIR)
         {
-            Reagent existingReagent = getExistingReagent(server, item);
+            Reagent reagent = Reagenchant.REAGENT_MANAGER.getReagent(item);
             String itemName = item.getRegistryName().toString();
 
             if(commandAction == CommandAction.CREATE)
             {
-                if(existingReagent == null)
+                if(reagent == null)
                 {
-                    saveReagent(server, new Reagent(item));
+                    reagent = new Reagent(item);
                     source.sendFeedback(new TranslationTextComponent("command.reagenchant.reagent.create.success", itemName), true);
                 }
                 else
                 {
-                    source.sendErrorMessage(new TranslationTextComponent("command.reagenchant.reagent.create.error", itemName));
+                    source.sendErrorMessage(new TranslationTextComponent("command.reagenchant.reagent.create.override", itemName));
                 }
+
+                saveReagent(server, reagent);
             }
             else if(commandAction == CommandAction.ADD)
             {
@@ -103,47 +105,49 @@ public class ReagentCommand
 
         if(item != Items.AIR)
         {
-            Reagent existingReagent = getExistingReagent(server, item);
+            Reagent reagent = Reagenchant.REAGENT_MANAGER.getReagent(item);
             String itemName = item.getRegistryName().toString();
             String enchantmentName = enchantment.getRegistryName().toString();
 
             if(commandAction == CommandAction.CREATE)
             {
-                if(existingReagent == null)
+                if(reagent == null)
                 {
-                    saveReagent(server, new Reagent(item));
+                    reagent = new Reagent(item);
                     source.sendFeedback(new TranslationTextComponent("command.reagenchant.reagent.create.success", itemName), true);
                 }
                 else
                 {
-                    source.sendErrorMessage(new TranslationTextComponent("command.reagenchant.reagent.create.error", itemName));
+                    source.sendErrorMessage(new TranslationTextComponent("command.reagenchant.reagent.create.override", itemName));
                 }
+
+                saveReagent(server, reagent);
             }
             else if(commandAction == CommandAction.ADD)
             {
-                if(existingReagent == null)
+                if(reagent == null)
                 {
                     source.sendErrorMessage(new TranslationTextComponent("command.reagenchant.reagent.add.error", enchantmentName, itemName));
                 }
                 else
                 {
-                    existingReagent.addEnchantment(new ReagentEnchantmentData(enchantment, minimumLevel, maximumLevel, probability, cost));
+                    reagent.addEnchantment(new ReagentEnchantmentData(enchantment, minimumLevel, maximumLevel, probability, cost));
 
-                    saveReagent(server, existingReagent);
+                    saveReagent(server, reagent);
                     source.sendFeedback(new TranslationTextComponent("command.reagenchant.reagent.add.success", enchantmentName, itemName), true);
                 }
             }
             else if(commandAction == CommandAction.REMOVE)
             {
-                if(existingReagent == null)
+                if(reagent == null)
                 {
                     source.sendErrorMessage(new TranslationTextComponent("command.reagenchant.reagent.remove.error", enchantmentName, itemName));
                 }
                 else
                 {
-                    existingReagent.removeEnchantment(enchantment);
+                    reagent.removeEnchantment(enchantment);
 
-                    saveReagent(server, existingReagent);
+                    saveReagent(server, reagent);
                     source.sendFeedback(new TranslationTextComponent("command.reagenchant.reagent.remove.success", enchantmentName, itemName), true);
                 }
             }
@@ -163,47 +167,49 @@ public class ReagentCommand
 
         if(item != Items.AIR)
         {
-            Reagent existingReagent = getExistingReagent(server, item);
+            Reagent reagent = Reagenchant.REAGENT_MANAGER.getReagent(item);
             String itemName = item.getRegistryName().toString();
             String enchantmentName = enchantment.getRegistryName().toString();
 
             if(commandAction == CommandAction.CREATE)
             {
-                if(existingReagent == null)
+                if(reagent == null)
                 {
-                    saveReagent(server, new Reagent(item));
+                    reagent = new Reagent(item);
                     source.sendFeedback(new TranslationTextComponent("command.reagenchant.reagent.create.success", itemName), true);
                 }
                 else
                 {
-                    source.sendErrorMessage(new TranslationTextComponent("command.reagenchant.reagent.create.error", itemName));
+                    source.sendErrorMessage(new TranslationTextComponent("command.reagenchant.reagent.create.override", itemName));
                 }
+
+                saveReagent(server, reagent);
             }
             else if(commandAction == CommandAction.ADD)
             {
-                if(existingReagent == null)
+                if(reagent == null)
                 {
                     source.sendErrorMessage(new TranslationTextComponent("command.reagenchant.reagent.add.error", enchantmentName, itemName));
                 }
                 else
                 {
-                    existingReagent.addEnchantment(new ReagentEnchantmentData(enchantment, 0.5F, 1));
+                    reagent.addEnchantment(new ReagentEnchantmentData(enchantment, 0.5F, 1));
 
-                    saveReagent(server, existingReagent);
+                    saveReagent(server, reagent);
                     source.sendFeedback(new TranslationTextComponent("command.reagenchant.reagent.add.success", enchantmentName, itemName), true);
                 }
             }
             else if(commandAction == CommandAction.REMOVE)
             {
-                if(existingReagent == null)
+                if(reagent == null)
                 {
                     source.sendErrorMessage(new TranslationTextComponent("command.reagenchant.reagent.remove.error", enchantmentName, itemName));
                 }
                 else
                 {
-                    existingReagent.removeEnchantment(enchantment);
+                    reagent.removeEnchantment(enchantment);
 
-                    saveReagent(server, existingReagent);
+                    saveReagent(server, reagent);
                     source.sendFeedback(new TranslationTextComponent("command.reagenchant.reagent.remove.success", enchantmentName, itemName), true);
                 }
             }
@@ -275,19 +281,5 @@ public class ReagentCommand
         {
             e.printStackTrace();
         }
-    }
-
-    private static Reagent getExistingReagent(MinecraftServer server, Item item)
-    {
-        File datapackDirectory = server.getActiveAnvilConverter().getFile(server.getFolderName(), "datapacks");
-        File customReagentDirectory = new File(datapackDirectory, "custom_reagent_pack/data/" + Reagenchant.MOD_ID + "/reagents");
-        File customReagentFile = new File(customReagentDirectory, item.getRegistryName().toString().replace(":", "/") + ".json");
-
-        if(!customReagentFile.exists())
-        {
-            return null;
-        }
-
-        return Reagenchant.REAGENT_MANAGER.getReagent(item);
     }
 }
