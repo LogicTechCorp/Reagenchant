@@ -14,6 +14,7 @@ public class UnbreakableFlintAndSteelItem extends FlintAndSteelItem
     public UnbreakableFlintAndSteelItem(Properties properties)
     {
         super(properties);
+        this.addPropertyOverride(UnbreakingHandler.BROKEN_PROPERTY_KEY, UnbreakingHandler.BROKEN_PROPERTY);
     }
 
     @Override

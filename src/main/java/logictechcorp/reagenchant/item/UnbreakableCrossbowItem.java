@@ -17,6 +17,7 @@ public class UnbreakableCrossbowItem extends CrossbowItem
     public UnbreakableCrossbowItem(Properties properties)
     {
         super(properties);
+        this.addPropertyOverride(UnbreakingHandler.BROKEN_PROPERTY_KEY, UnbreakingHandler.BROKEN_PROPERTY);
     }
 
     @Override

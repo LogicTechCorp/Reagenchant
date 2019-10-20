@@ -16,6 +16,7 @@ public class UnbreakableFishingRodItem extends FishingRodItem
     public UnbreakableFishingRodItem(Properties properties)
     {
         super(properties);
+        this.addPropertyOverride(UnbreakingHandler.BROKEN_PROPERTY_KEY, UnbreakingHandler.BROKEN_PROPERTY);
     }
 
     @Override

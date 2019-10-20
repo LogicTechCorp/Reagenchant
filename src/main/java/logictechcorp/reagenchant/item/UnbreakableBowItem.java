@@ -17,6 +17,7 @@ public class UnbreakableBowItem extends BowItem
     public UnbreakableBowItem(Properties properties)
     {
         super(properties);
+        this.addPropertyOverride(UnbreakingHandler.BROKEN_PROPERTY_KEY, UnbreakingHandler.BROKEN_PROPERTY);
     }
 
     @Override

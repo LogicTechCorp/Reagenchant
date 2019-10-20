@@ -20,6 +20,7 @@ public class UnbreakableAxeItem extends AxeItem
     public UnbreakableAxeItem(IItemTier itemTier, float attackDamage, float attackSpeed, Item.Properties properties)
     {
         super(itemTier, attackDamage, attackSpeed, properties);
+        this.addPropertyOverride(UnbreakingHandler.BROKEN_PROPERTY_KEY, UnbreakingHandler.BROKEN_PROPERTY);
     }
 
     @Override

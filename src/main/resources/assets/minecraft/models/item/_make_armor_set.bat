@@ -36,7 +36,7 @@ for %%x in (%*) do (
 		echo {
 		echo 	"parent": "item/generated",
 		echo 	"textures": {
-		echo 		"layer0": "reagenchant:items/broken_%%x_helmet"
+		echo 		"layer0": "reagenchant:item/broken_%%x_helmet"
 		echo 	}
 		echo }
 	) > broken_%%x_helmet.json
@@ -68,7 +68,7 @@ for %%x in (%*) do (
 		echo {
 		echo 	"parent": "item/generated",
 		echo 	"textures": {
-		echo 		"layer0": "reagenchant:items/broken_%%x_chestplate"
+		echo 		"layer0": "reagenchant:item/broken_%%x_chestplate"
 		echo 	}
 		echo }
 	) > broken_%%x_chestplate.json
@@ -100,7 +100,7 @@ for %%x in (%*) do (
 		echo {
 		echo 	"parent": "item/generated",
 		echo 	"textures": {
-		echo 		"layer0": "reagenchant:items/broken_%%x_leggings"
+		echo 		"layer0": "reagenchant:item/broken_%%x_leggings"
 		echo 	}
 		echo }
 	) > broken_%%x_leggings.json
@@ -132,7 +132,7 @@ for %%x in (%*) do (
 		echo {
 		echo 	"parent": "item/generated",
 		echo 	"textures": {
-		echo 		"layer0": "reagenchant:items/broken_%%x_boots"
+		echo 		"layer0": "reagenchant:item/broken_%%x_boots"
 		echo 	}
 		echo }
 	) > broken_%%x_boots.json

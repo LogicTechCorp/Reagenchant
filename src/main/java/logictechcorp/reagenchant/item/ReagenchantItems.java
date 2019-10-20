@@ -82,6 +82,7 @@ public class ReagenchantItems
         ITEM_OVERRIDES.register("shears", () -> new UnbreakableShearsItem((new Item.Properties()).maxDamage(238).group(ItemGroup.TOOLS)));
         ITEM_OVERRIDES.register("carrot_on_a_stick", () -> new UnbreakableCarrotOnAStickItem((new Item.Properties()).maxDamage(25).group(ItemGroup.TRANSPORTATION)));
         ITEM_OVERRIDES.register("shield", () -> new UnbreakableShieldItem(new Item.Properties().maxDamage(336).group(ItemGroup.COMBAT)));
+        ITEM_OVERRIDES.register("trident", () -> new UnbreakableTridentItem((new Item.Properties()).maxDamage(250).group(ItemGroup.COMBAT)));
         ITEM_OVERRIDES.register("crossbow", () -> new UnbreakableCrossbowItem(new Item.Properties().maxStackSize(1).group(ItemGroup.COMBAT).maxDamage(326)));
     }
 }

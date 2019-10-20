@@ -16,6 +16,7 @@ public class UnbreakableCarrotOnAStickItem extends CarrotOnAStickItem
     public UnbreakableCarrotOnAStickItem(Properties properties)
     {
         super(properties);
+        this.addPropertyOverride(UnbreakingHandler.BROKEN_PROPERTY_KEY, UnbreakingHandler.BROKEN_PROPERTY);
     }
 
     @Override

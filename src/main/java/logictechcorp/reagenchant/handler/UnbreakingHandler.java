@@ -30,7 +30,10 @@ import net.minecraft.enchantment.Enchantments;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.inventory.EquipmentSlotType;
-import net.minecraft.item.*;
+import net.minecraft.item.IItemPropertyGetter;
+import net.minecraft.item.ItemStack;
+import net.minecraft.item.Items;
+import net.minecraft.item.UseAction;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.nbt.ListNBT;
 import net.minecraft.util.ActionResult;
@@ -51,33 +54,19 @@ import net.minecraftforge.event.entity.player.ItemTooltipEvent;
 import net.minecraftforge.event.entity.player.PlayerPickupXpEvent;
 import net.minecraftforge.eventbus.api.EventPriority;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
-import net.minecraftforge.registries.ForgeRegistries;
 
 import java.util.List;
 import java.util.function.Supplier;
 
 public class UnbreakingHandler
 {
-    private static final ResourceLocation BROKEN_PROPERTY_KEY = new ResourceLocation(Reagenchant.MOD_ID, "broken");
-    private static final IItemPropertyGetter BROKEN_PROPERTY = new IItemPropertyGetter()
-    {
-        @Override
-        @OnlyIn(Dist.CLIENT)
-        public float call(ItemStack stack, World world, LivingEntity entity)
-        {
-            return isItemBroken(stack) ? 1.0F : 0.0F;
-        }
-    };
-    private static final String BROKEN_KEY = Reagenchant.MOD_ID + ":Broken";
-    private static final String DISABLED_ENCHANTMENTS_KEY = Reagenchant.MOD_ID + ":DisabledEnchantments";
+    public static final ResourceLocation BROKEN_PROPERTY_KEY = new ResourceLocation(Reagenchant.MOD_ID, "broken");
+    public static final IItemPropertyGetter BROKEN_PROPERTY = (stack, world, livingEntity) -> isItemBroken(stack) ? 1.0F : 0.0F;
+    public static final String BROKEN_KEY = Reagenchant.MOD_ID + ":Broken";
+    public static final String DISABLED_ENCHANTMENTS_KEY = Reagenchant.MOD_ID + ":DisabledEnchantments";
 
     public static void setup()
     {
-        for(Item item : ForgeRegistries.ITEMS)
-        {
-            item.addPropertyOverride(BROKEN_PROPERTY_KEY, BROKEN_PROPERTY);
-        }
-
         DispenserBlock.registerDispenseBehavior(Items.FLINT_AND_STEEL, new OptionalDispenseBehavior()
         {
             @Override
@@ -339,19 +328,19 @@ public class UnbreakingHandler
         return isItemBroken(stack) ? 1.0F : destroySpeed;
     }
 
-    public static float getAttackDamage(ItemStack stack, float attackDamage)
+    public static double getAttackDamage(ItemStack stack, double attackDamage)
     {
-        return isItemBroken(stack) ? 1.0F : attackDamage;
+        return isItemBroken(stack) ? 1.0D : attackDamage;
     }
 
-    public static float getAttackSpeed(ItemStack stack, float attackSpeed)
+    public static double getAttackSpeed(ItemStack stack, double attackSpeed)
     {
-        return isItemBroken(stack) ? 1.0F : attackSpeed;
+        return isItemBroken(stack) ? 1.0D : attackSpeed;
     }
 
-    public static float getArmorToughness(ItemStack stack, float armorToughness)
+    public static double getArmorToughness(ItemStack stack, double armorToughness)
     {
-        return isItemBroken(stack) ? 0.0F : armorToughness;
+        return isItemBroken(stack) ? 0.0D : armorToughness;
     }
 
     public static UseAction getUseAction(ItemStack stack, UseAction useAction)

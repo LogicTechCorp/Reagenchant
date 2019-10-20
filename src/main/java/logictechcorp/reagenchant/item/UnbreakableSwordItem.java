@@ -26,6 +26,7 @@ public class UnbreakableSwordItem extends SwordItem
         super(itemTier, attackDamage, attackSpeed, properties);
         this.attackSpeed = attackSpeed;
         this.attackDamage = (float) attackDamage + itemTier.getAttackDamage();
+        this.addPropertyOverride(UnbreakingHandler.BROKEN_PROPERTY_KEY, UnbreakingHandler.BROKEN_PROPERTY);
     }
 
     @Override

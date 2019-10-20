@@ -20,6 +20,7 @@ public class UnbreakableArmorItem extends ArmorItem
     public UnbreakableArmorItem(IArmorMaterial armorMaterial, EquipmentSlotType equipmentSlotType, Properties properties)
     {
         super(armorMaterial, equipmentSlotType, properties);
+        this.addPropertyOverride(UnbreakingHandler.BROKEN_PROPERTY_KEY, UnbreakingHandler.BROKEN_PROPERTY);
     }
 
     @Override

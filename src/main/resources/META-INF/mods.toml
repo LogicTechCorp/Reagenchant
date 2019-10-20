@@ -7,7 +7,7 @@ modId="reagenchant"
 version="${file.jarVersion}"
 displayName="Reagenchant"
 displayURL="https://minecraft.curseforge.com/projects/reagenchant"
-logoFile="assets/reagenchant/logo.png"
+logoFile="assets/reagenchant/textures/logo.png"
 authors="LogicTechCorp, AnarchCassius, LapisWhovian, misterslime, MCvinnyq, and Cameron"
 description="A mod that makes enchanting a lot less random."
 

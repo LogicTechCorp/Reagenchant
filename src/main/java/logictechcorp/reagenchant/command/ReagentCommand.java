@@ -90,6 +90,68 @@ public class ReagentCommand
         return commandAction.ordinal();
     }
 
+    private static int defaultReagent(CommandContext<CommandSource> context)
+    {
+        CommandSource source = context.getSource();
+        MinecraftServer server = source.getServer();
+
+        CommandAction commandAction = CommandActionArgument.getCommandAction(context, "action");
+        Item item = ItemArgument.getItem(context, "item").getItem();
+        Enchantment enchantment = EnchantmentArgument.getEnchantment(context, "enchantment");
+
+        if(item != Items.AIR)
+        {
+            Reagent reagent = Reagenchant.REAGENT_MANAGER.getReagent(item);
+            String itemName = item.getRegistryName().toString();
+            String enchantmentName = enchantment.getRegistryName().toString();
+
+            if(commandAction == CommandAction.CREATE)
+            {
+                if(reagent == null)
+                {
+                    reagent = new Reagent(item);
+                    source.sendFeedback(new TranslationTextComponent("command.reagenchant.reagent.create.success", itemName), true);
+                }
+                else
+                {
+                    source.sendErrorMessage(new TranslationTextComponent("command.reagenchant.reagent.create.override", itemName));
+                }
+
+                saveReagent(server, reagent);
+            }
+            else if(commandAction == CommandAction.ADD)
+            {
+                if(reagent == null)
+                {
+                    source.sendErrorMessage(new TranslationTextComponent("command.reagenchant.reagent.add.error", enchantmentName, itemName));
+                }
+                else
+                {
+                    reagent.addEnchantment(new ReagentEnchantmentData(enchantment, 0.5D, 1));
+
+                    saveReagent(server, reagent);
+                    source.sendFeedback(new TranslationTextComponent("command.reagenchant.reagent.add.success", enchantmentName, itemName), true);
+                }
+            }
+            else if(commandAction == CommandAction.REMOVE)
+            {
+                if(reagent == null)
+                {
+                    source.sendErrorMessage(new TranslationTextComponent("command.reagenchant.reagent.remove.error", enchantmentName, itemName));
+                }
+                else
+                {
+                    reagent.removeEnchantment(enchantment);
+
+                    saveReagent(server, reagent);
+                    source.sendFeedback(new TranslationTextComponent("command.reagenchant.reagent.remove.success", enchantmentName, itemName), true);
+                }
+            }
+        }
+
+        return commandAction.ordinal();
+    }
+
     private static int customReagent(CommandContext<CommandSource> context)
     {
         CommandSource source = context.getSource();
@@ -132,68 +194,6 @@ public class ReagentCommand
                 else
                 {
                     reagent.addEnchantment(new ReagentEnchantmentData(enchantment, minimumLevel, maximumLevel, probability, cost));
-
-                    saveReagent(server, reagent);
-                    source.sendFeedback(new TranslationTextComponent("command.reagenchant.reagent.add.success", enchantmentName, itemName), true);
-                }
-            }
-            else if(commandAction == CommandAction.REMOVE)
-            {
-                if(reagent == null)
-                {
-                    source.sendErrorMessage(new TranslationTextComponent("command.reagenchant.reagent.remove.error", enchantmentName, itemName));
-                }
-                else
-                {
-                    reagent.removeEnchantment(enchantment);
-
-                    saveReagent(server, reagent);
-                    source.sendFeedback(new TranslationTextComponent("command.reagenchant.reagent.remove.success", enchantmentName, itemName), true);
-                }
-            }
-        }
-
-        return commandAction.ordinal();
-    }
-
-    private static int defaultReagent(CommandContext<CommandSource> context)
-    {
-        CommandSource source = context.getSource();
-        MinecraftServer server = source.getServer();
-
-        CommandAction commandAction = CommandActionArgument.getCommandAction(context, "action");
-        Item item = ItemArgument.getItem(context, "item").getItem();
-        Enchantment enchantment = EnchantmentArgument.getEnchantment(context, "enchantment");
-
-        if(item != Items.AIR)
-        {
-            Reagent reagent = Reagenchant.REAGENT_MANAGER.getReagent(item);
-            String itemName = item.getRegistryName().toString();
-            String enchantmentName = enchantment.getRegistryName().toString();
-
-            if(commandAction == CommandAction.CREATE)
-            {
-                if(reagent == null)
-                {
-                    reagent = new Reagent(item);
-                    source.sendFeedback(new TranslationTextComponent("command.reagenchant.reagent.create.success", itemName), true);
-                }
-                else
-                {
-                    source.sendErrorMessage(new TranslationTextComponent("command.reagenchant.reagent.create.override", itemName));
-                }
-
-                saveReagent(server, reagent);
-            }
-            else if(commandAction == CommandAction.ADD)
-            {
-                if(reagent == null)
-                {
-                    source.sendErrorMessage(new TranslationTextComponent("command.reagenchant.reagent.add.error", enchantmentName, itemName));
-                }
-                else
-                {
-                    reagent.addEnchantment(new ReagentEnchantmentData(enchantment, 0.5F, 1));
 
                     saveReagent(server, reagent);
                     source.sendFeedback(new TranslationTextComponent("command.reagenchant.reagent.add.success", enchantmentName, itemName), true);

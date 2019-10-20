@@ -22,6 +22,7 @@ public class UnbreakableShovelItem extends ShovelItem
     public UnbreakableShovelItem(IItemTier itemTier, float attackDamage, float attackSpeed, Properties properties)
     {
         super(itemTier, attackDamage, attackSpeed, properties);
+        this.addPropertyOverride(UnbreakingHandler.BROKEN_PROPERTY_KEY, UnbreakingHandler.BROKEN_PROPERTY);
     }
 
     @Override

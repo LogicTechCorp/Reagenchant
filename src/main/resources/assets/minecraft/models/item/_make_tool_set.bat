@@ -36,7 +36,7 @@ for %%x in (%*) do (
 		echo {
 		echo 	"parent": "item/handheld",
 		echo 	"textures": {
-		echo 		"layer0": "reagenchant:items/broken_%%x_sword"
+		echo 		"layer0": "reagenchant:item/broken_%%x_sword"
 		echo 	}
 		echo }
 	) > broken_%%x_sword.json
@@ -68,7 +68,7 @@ for %%x in (%*) do (
 		echo {
 		echo 	"parent": "item/handheld",
 		echo 	"textures": {
-		echo 		"layer0": "reagenchant:items/broken_%%x_pickaxe"
+		echo 		"layer0": "reagenchant:item/broken_%%x_pickaxe"
 		echo 	}
 		echo }
 	) > broken_%%x_pickaxe.json
@@ -100,7 +100,7 @@ for %%x in (%*) do (
 		echo {
 		echo 	"parent": "item/handheld",
 		echo 	"textures": {
-		echo 		"layer0": "reagenchant:items/broken_%%x_shovel"
+		echo 		"layer0": "reagenchant:item/broken_%%x_shovel"
 		echo 	}
 		echo }
 	) > broken_%%x_shovel.json
@@ -132,7 +132,7 @@ for %%x in (%*) do (
 		echo {
 		echo 	"parent": "item/handheld",
 		echo 	"textures": {
-		echo 		"layer0": "reagenchant:items/broken_%%x_axe"
+		echo 		"layer0": "reagenchant:item/broken_%%x_axe"
 		echo 	}
 		echo }
 	) > broken_%%x_axe.json
@@ -164,7 +164,7 @@ for %%x in (%*) do (
 		echo {
 		echo 	"parent": "item/handheld",
 		echo 	"textures": {
-		echo 		"layer0": "reagenchant:items/broken_%%x_hoe"
+		echo 		"layer0": "reagenchant:item/broken_%%x_hoe"
 		echo 	}
 		echo }
 	) > broken_%%x_hoe.json

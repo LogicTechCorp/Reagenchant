@@ -25,6 +25,7 @@ public class UnbreakableHoeItem extends HoeItem
     {
         super(itemTier, attackSpeed, properties);
         this.attackSpeed = attackSpeed;
+        this.addPropertyOverride(UnbreakingHandler.BROKEN_PROPERTY_KEY, UnbreakingHandler.BROKEN_PROPERTY);
     }
 
     @Override

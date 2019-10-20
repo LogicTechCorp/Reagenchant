@@ -65,8 +65,8 @@ public class Reagenchant
 
         IEventBus forgeEventBus = MinecraftForge.EVENT_BUS;
         forgeEventBus.addListener(this::onServerAboutToStart);
-        forgeEventBus.addListener(this::onServerAboutToStart);
         forgeEventBus.addListener(this::onServerStarting);
+        forgeEventBus.addListener(this::onServerStopping);
     }
 
     private void onCommonSetup(FMLCommonSetupEvent event)

@@ -1,0 +1,7 @@
+{
+    "parent": "item/generated",
+    "textures": {
+        "layer0": "reagenchant:item/broken_leather_chestplate",
+        "layer1": "reagenchant:item/broken_leather_chestplate_overlay"
+    }
+}

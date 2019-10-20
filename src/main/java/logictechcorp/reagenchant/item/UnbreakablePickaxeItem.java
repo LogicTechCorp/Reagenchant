@@ -21,6 +21,7 @@ public class UnbreakablePickaxeItem extends PickaxeItem
     public UnbreakablePickaxeItem(IItemTier itemTier, int attackDamage, float attackSpeed, Properties properties)
     {
         super(itemTier, attackDamage, attackSpeed, properties);
+        this.addPropertyOverride(UnbreakingHandler.BROKEN_PROPERTY_KEY, UnbreakingHandler.BROKEN_PROPERTY);
     }
 
     @Override

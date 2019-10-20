@@ -1,0 +1,6 @@
+{
+    "parent": "item/handheld_rod",
+    "textures": {
+        "layer0": "reagenchant:item/broken_fishing_rod"
+    }
+}

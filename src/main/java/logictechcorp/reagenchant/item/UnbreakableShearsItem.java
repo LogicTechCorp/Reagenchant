@@ -15,6 +15,7 @@ public class UnbreakableShearsItem extends ShearsItem
     public UnbreakableShearsItem(Properties properties)
     {
         super(properties);
+        this.addPropertyOverride(UnbreakingHandler.BROKEN_PROPERTY_KEY, UnbreakingHandler.BROKEN_PROPERTY);
     }
 
     @Override
