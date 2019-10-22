@@ -9,3 +9,4 @@
 !gradle.properties
 !settings.gradle
 !/LibraryEx/
+/src/generated/resources/.cache/
