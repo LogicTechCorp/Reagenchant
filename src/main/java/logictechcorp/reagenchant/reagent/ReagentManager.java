@@ -204,7 +204,7 @@ public class ReagentManager extends ReloadListener<Map<ResourceLocation, JsonObj
         this.reagents.clear();
     }
 
-    public boolean isReagentItem(Item item)
+    public boolean isReagent(Item item)
     {
         return this.reagents.containsKey(item.getRegistryName());
     }

@@ -127,7 +127,7 @@ public class ReagentTableContainer extends Container
             @Override
             public boolean isItemValid(ItemStack stack)
             {
-                return Reagenchant.REAGENT_MANAGER.isReagentItem(stack.getItem());
+                return Reagenchant.REAGENT_MANAGER.isReagent(stack.getItem());
             }
 
             @Override
@@ -483,7 +483,7 @@ public class ReagentTableContainer extends Container
                     return ItemStack.EMPTY;
                 }
             }
-            else if(Reagenchant.REAGENT_MANAGER.isReagentItem(slotStack.getItem()))
+            else if(Reagenchant.REAGENT_MANAGER.isReagent(slotStack.getItem()))
             {
                 if(!this.mergeItemStack(slotStack, 2, 3, true))
                 {

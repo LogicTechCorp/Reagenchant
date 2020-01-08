@@ -11,9 +11,9 @@ logoFile="assets/reagenchant/textures/logo.png"
 authors="LogicTechCorp, AnarchCassius, LapisWhovian, misterslime, MCvinnyq, and Cameron"
 description="A mod that makes enchanting a lot less random."
 
-#[[dependencies.reagenchant]]
-#modId="libraryex"
-#mandatory=true
-#versionRange="[2.0.0,)"
-#ordering="BEFORE"
-#side="BOTH"
+[[dependencies.reagenchant]]
+modId="libraryex"
+mandatory=true
+versionRange="[2.0.0,)"
+ordering="BEFORE"
+side="BOTH"
