@@ -18,8 +18,9 @@
 package logictechcorp.reagenchant.inventory;
 
 import logictechcorp.libraryex.utility.RandomHelper;
-import logictechcorp.reagenchant.api.ReagenchantAPI;
-import logictechcorp.reagenchant.api.reagent.IReagent;
+import logictechcorp.reagenchant.Reagenchant;
+import logictechcorp.reagenchant.reagent.Reagent;
+import logictechcorp.reagenchant.reagent.ReagentManager;
 import logictechcorp.reagenchant.tileentity.TileEntityReagentTable;
 import net.minecraft.advancements.CriteriaTriggers;
 import net.minecraft.enchantment.Enchantment;
@@ -134,7 +135,7 @@ public class ReagentTableManager
                             if(!reagentStack.isEmpty())
                             {
                                 EntityPlayer player = this.reagentTable.getUser();
-                                IReagent reagent = ReagenchantAPI.getInstance().getReagentRegistry().getReagent(reagentStack.getItem());
+                                Reagent reagent = Reagenchant.REAGENT_MANAGER.getReagent(reagentStack.getItem());
 
                                 for(Enchantment enchantment : reagent.getReagentEnchantmentData())
                                 {
@@ -177,7 +178,7 @@ public class ReagentTableManager
 
         if(!reagentStack.isEmpty())
         {
-            IReagent reagent = ReagenchantAPI.getInstance().getReagentRegistry().getReagent(reagentStack.getItem());
+            Reagent reagent = Reagenchant.REAGENT_MANAGER.getReagent(reagentStack.getItem());
 
             if(reagent.hasApplicableEnchantments(this.world, this.pos, this.reagentTable.getUser(), unenchantedStack, reagentStack, this.random))
             {
@@ -229,11 +230,11 @@ public class ReagentTableManager
                         this.inventory.setStackInSlot(0, unenchantedStack);
                     }
 
-                    IReagent reagent = null;
+                    Reagent reagent = null;
 
                     if(!reagentStack.isEmpty())
                     {
-                        reagent = ReagenchantAPI.getInstance().getReagentRegistry().getReagent(reagentStack.getItem());
+                        reagent = Reagenchant.REAGENT_MANAGER.getReagent(reagentStack.getItem());
                     }
 
                     int reagentCost = 0;

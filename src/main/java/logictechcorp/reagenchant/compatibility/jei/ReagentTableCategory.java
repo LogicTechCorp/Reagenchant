@@ -18,9 +18,9 @@
 package logictechcorp.reagenchant.compatibility.jei;
 
 import logictechcorp.reagenchant.Reagenchant;
-import logictechcorp.reagenchant.api.reagent.IReagent;
 import logictechcorp.reagenchant.init.ReagenchantBlocks;
 import logictechcorp.reagenchant.init.ReagenchantTextures;
+import logictechcorp.reagenchant.reagent.Reagent;
 import mezz.jei.api.IGuiHelper;
 import mezz.jei.api.gui.IDrawable;
 import mezz.jei.api.gui.IRecipeLayout;
@@ -85,7 +85,7 @@ class ReagentTableCategory implements IRecipeCategory<ReagentWrapper>
     @Override
     public void setRecipe(IRecipeLayout recipeLayout, ReagentWrapper reagentWrapper, IIngredients ingredients)
     {
-        IReagent reagent = reagentWrapper.getReagent();
+        Reagent reagent = reagentWrapper.getReagent();
 
         recipeLayout.getIngredientsGroup(VanillaTypes.ITEM).addTooltipCallback((slotIndex, input, ingredient, tooltip) ->
         {

@@ -18,7 +18,6 @@
 package logictechcorp.reagenchant.handler;
 
 import logictechcorp.reagenchant.Reagenchant;
-import logictechcorp.reagenchant.reagent.ReagentConfigManager;
 import net.minecraft.world.DimensionType;
 import net.minecraft.world.World;
 import net.minecraftforge.event.world.WorldEvent;
@@ -37,7 +36,8 @@ public class WorldHandler
         {
             if(world.provider.getDimension() == DimensionType.OVERWORLD.getId())
             {
-                ReagentConfigManager.readReagentConfigs();
+                Reagenchant.REAGENT_MANAGER.createReagentConfigs(event);
+                Reagenchant.REAGENT_MANAGER.readReagentConfigs(event);
             }
         }
     }
@@ -51,7 +51,7 @@ public class WorldHandler
         {
             if(world.provider.getDimension() == DimensionType.OVERWORLD.getId())
             {
-                ReagentConfigManager.writeReagentConfigs();
+                Reagenchant.REAGENT_MANAGER.cleanup();
             }
         }
     }

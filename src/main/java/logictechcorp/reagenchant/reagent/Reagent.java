@@ -20,8 +20,6 @@ package logictechcorp.reagenchant.reagent;
 import com.electronwill.nightconfig.core.Config;
 import com.electronwill.nightconfig.json.JsonFormat;
 import logictechcorp.libraryex.utility.RandomHelper;
-import logictechcorp.reagenchant.api.reagent.IReagent;
-import logictechcorp.reagenchant.api.reagent.IReagentEnchantmentData;
 import net.minecraft.enchantment.Enchantment;
 import net.minecraft.enchantment.EnchantmentData;
 import net.minecraft.enchantment.EnchantmentHelper;
@@ -41,10 +39,10 @@ import java.util.*;
 /**
  * The base class for a Reagent.
  */
-public class Reagent implements IReagent
+public class Reagent
 {
     protected final Item item;
-    protected final Map<ResourceLocation, IReagentEnchantmentData> reagentEnchantmentData;
+    protected final Map<ResourceLocation, ReagentEnchantmentData> reagentEnchantmentData;
 
     public Reagent(Item item)
     {
@@ -65,19 +63,16 @@ public class Reagent implements IReagent
         this(ForgeRegistries.ITEMS.getValue(itemRegistryName));
     }
 
-    @Override
-    public void addReagentEnchantmentData(IReagentEnchantmentData reagentEnchantmentData)
+    public void addReagentEnchantmentData(ReagentEnchantmentData reagentEnchantmentData)
     {
         this.reagentEnchantmentData.put(reagentEnchantmentData.getEnchantment().getRegistryName(), reagentEnchantmentData);
     }
 
-    @Override
     public void removeReagentEnchantmentData(Enchantment enchantment)
     {
         this.reagentEnchantmentData.remove(enchantment.getRegistryName());
     }
 
-    @Override
     public void readFromConfig(Config config)
     {
         this.reagentEnchantmentData.clear();
@@ -118,15 +113,14 @@ public class Reagent implements IReagent
         }
     }
 
-    @Override
     public void writeToConfig(Config config)
     {
         List<Config> enchantmentConfigs = new ArrayList<>();
         config.set("item", this.item.getRegistryName().toString());
 
-        for(Map.Entry<ResourceLocation, IReagentEnchantmentData> entry : this.reagentEnchantmentData.entrySet())
+        for(Map.Entry<ResourceLocation, ReagentEnchantmentData> entry : this.reagentEnchantmentData.entrySet())
         {
-            IReagentEnchantmentData reagenchantmentData = entry.getValue();
+            ReagentEnchantmentData reagenchantmentData = entry.getValue();
 
             Config enchantmentConfig = JsonFormat.newConfig(LinkedHashMap::new);
             enchantmentConfig.add("enchantment", entry.getKey().toString());
@@ -140,7 +134,6 @@ public class Reagent implements IReagent
         config.set("enchantments", enchantmentConfigs);
     }
 
-    @Override
     public List<EnchantmentData> createEnchantmentList(World world, BlockPos pos, EntityPlayer player, ItemStack unenchantedStack, ItemStack reagentStack, int enchantmentTier, int enchantabilityLevel, Random random)
     {
         int itemEnchantability = unenchantedStack.getItem().getItemEnchantability(unenchantedStack);
@@ -207,7 +200,6 @@ public class Reagent implements IReagent
         }
     }
 
-    @Override
     public boolean hasApplicableEnchantments(World world, BlockPos pos, EntityPlayer player, ItemStack unenchantedStack, ItemStack reagentStack, Random random)
     {
         for(Enchantment enchantment : this.getReagentEnchantmentData())
@@ -221,19 +213,16 @@ public class Reagent implements IReagent
         return false;
     }
 
-    @Override
     public boolean consumeReagent(World world, BlockPos pos, EntityPlayer player, ItemStack unenchantedStack, ItemStack reagentStack, List<EnchantmentData> enchantmentList, Random random)
     {
         return true;
     }
 
-    @Override
     public Item getItem()
     {
         return this.item;
     }
 
-    @Override
     public List<Enchantment> getReagentEnchantmentData()
     {
         List<Enchantment> associatedEnchantments = new ArrayList<>();
@@ -246,7 +235,6 @@ public class Reagent implements IReagent
         return associatedEnchantments;
     }
 
-    @Override
     public List<Enchantment> getApplicableEnchantments(World world, BlockPos pos, EntityPlayer player, ItemStack unenchantedStack, ItemStack reagentStack, Random random)
     {
         List<Enchantment> enchantments = new ArrayList<>();
@@ -262,16 +250,14 @@ public class Reagent implements IReagent
         return enchantments;
     }
 
-    @Override
-    public IReagentEnchantmentData getReagentEnchantmentData(Enchantment enchantment)
+    public ReagentEnchantmentData getReagentEnchantmentData(Enchantment enchantment)
     {
         return this.reagentEnchantmentData.get(enchantment.getRegistryName());
     }
 
-    @Override
     public int getEnchantmentLevel(Enchantment enchantment, int enchantmentTier, int enchantabilityLevel, Random random)
     {
-        IReagentEnchantmentData reagentEnchantmentData = this.reagentEnchantmentData.get(enchantment.getRegistryName());
+        ReagentEnchantmentData reagentEnchantmentData = this.reagentEnchantmentData.get(enchantment.getRegistryName());
         int minimumEnchantmentLevel = reagentEnchantmentData.getMinimumEnchantmentLevel();
         int maximumEnchantmentLevel = reagentEnchantmentData.getMaximumEnchantmentLevel();
         int enchantmentLevel;
@@ -310,7 +296,6 @@ public class Reagent implements IReagent
         return enchantmentLevel;
     }
 
-    @Override
     public double getEnchantmentProbability(World world, BlockPos pos, EntityPlayer player, ItemStack unenchantedStack, ItemStack reagentStack, EnchantmentData enchantmentData, Random random)
     {
         ResourceLocation enchantmentRegistryName = enchantmentData.enchantment.getRegistryName();
@@ -323,7 +308,6 @@ public class Reagent implements IReagent
         return 0.5D;
     }
 
-    @Override
     public int getReagentCost(World world, BlockPos pos, EntityPlayer player, ItemStack unenchantedStack, ItemStack reagentStack, EnchantmentData enchantmentData, Random random)
     {
         ResourceLocation enchantmentRegistryName = enchantmentData.enchantment.getRegistryName();

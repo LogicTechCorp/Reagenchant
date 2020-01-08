@@ -17,7 +17,7 @@
 
 package logictechcorp.reagenchant.compatibility.jei;
 
-import logictechcorp.reagenchant.api.reagent.IReagent;
+import logictechcorp.reagenchant.reagent.Reagent;
 import mezz.jei.api.ingredients.IIngredients;
 import mezz.jei.api.ingredients.VanillaTypes;
 import mezz.jei.api.recipe.IRecipeWrapper;
@@ -32,9 +32,9 @@ import java.util.List;
 
 class ReagentWrapper implements IRecipeWrapper
 {
-    private final IReagent reagent;
+    private final Reagent reagent;
 
-    ReagentWrapper(IReagent reagent)
+    ReagentWrapper(Reagent reagent)
     {
         this.reagent = reagent;
     }
@@ -60,7 +60,7 @@ class ReagentWrapper implements IRecipeWrapper
         ingredients.setOutputLists(VanillaTypes.ITEM, slots);
     }
 
-    public IReagent getReagent()
+    public Reagent getReagent()
     {
         return this.reagent;
     }

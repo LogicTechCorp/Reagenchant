@@ -17,7 +17,7 @@
 
 package logictechcorp.reagenchant.proxy;
 
-import logictechcorp.libraryex.api.IProxy;
+import logictechcorp.libraryex.proxy.IProxy;
 import logictechcorp.reagenchant.client.renderer.tileentity.TileEntityReagentTableRenderer;
 import logictechcorp.reagenchant.tileentity.TileEntityReagentTable;
 import net.minecraft.client.Minecraft;

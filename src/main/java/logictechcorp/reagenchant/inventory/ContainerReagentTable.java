@@ -17,7 +17,8 @@
 
 package logictechcorp.reagenchant.inventory;
 
-import logictechcorp.reagenchant.api.ReagenchantAPI;
+import logictechcorp.reagenchant.Reagenchant;
+import logictechcorp.reagenchant.reagent.ReagentManager;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.init.Blocks;
@@ -103,7 +104,7 @@ public class ContainerReagentTable extends Container
             @Override
             public boolean isItemValid(ItemStack stack)
             {
-                return ReagenchantAPI.getInstance().getReagentRegistry().hasReagent(stack.getItem());
+                return Reagenchant.REAGENT_MANAGER.hasReagent(stack.getItem());
             }
 
             @Override
@@ -238,7 +239,7 @@ public class ContainerReagentTable extends Container
                     return ItemStack.EMPTY;
                 }
             }
-            else if(ReagenchantAPI.getInstance().getReagentRegistry().hasReagent(slotStack.getItem()))
+            else if(Reagenchant.REAGENT_MANAGER.hasReagent(slotStack.getItem()))
             {
                 if(!this.mergeItemStack(slotStack, 2, 3, true))
                 {

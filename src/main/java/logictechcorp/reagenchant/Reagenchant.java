@@ -17,16 +17,12 @@
 
 package logictechcorp.reagenchant;
 
-import logictechcorp.libraryex.api.IModData;
-import logictechcorp.libraryex.api.IProxy;
-import logictechcorp.reagenchant.api.ReagenchantAPI;
-import logictechcorp.reagenchant.api.internal.IReagenchantAPI;
-import logictechcorp.reagenchant.api.internal.IReagentRegistry;
+import logictechcorp.libraryex.IModData;
+import logictechcorp.libraryex.proxy.IProxy;
 import logictechcorp.reagenchant.handler.GuiHandler;
 import logictechcorp.reagenchant.handler.UnbreakingHandler;
 import logictechcorp.reagenchant.init.ReagenchantReagents;
-import logictechcorp.reagenchant.reagent.ReagentConfigManager;
-import logictechcorp.reagenchant.reagent.ReagentRegistry;
+import logictechcorp.reagenchant.reagent.ReagentManager;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.fml.common.Mod;
@@ -39,12 +35,12 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 @Mod(modid = Reagenchant.MOD_ID, name = Reagenchant.NAME, version = Reagenchant.VERSION, dependencies = Reagenchant.DEPENDENCIES)
-public class Reagenchant implements IModData, IReagenchantAPI
+public class Reagenchant implements IModData
 {
     public static final String MOD_ID = "reagenchant";
     public static final String NAME = "Reagenchant";
-    public static final String VERSION = "1.0.0";
-    public static final String DEPENDENCIES = "required-after:libraryex@[1.0.9,);";
+    public static final String VERSION = "1.1.0";
+    public static final String DEPENDENCIES = "required-after:libraryex@[1.1.0,);";
 
     @Mod.Instance(MOD_ID)
     public static Reagenchant instance;
@@ -52,12 +48,12 @@ public class Reagenchant implements IModData, IReagenchantAPI
     @SidedProxy(clientSide = "logictechcorp.reagenchant.proxy.ClientProxy", serverSide = "logictechcorp.reagenchant.proxy.ServerProxy")
     public static IProxy proxy;
 
+    public static final ReagentManager REAGENT_MANAGER = new ReagentManager(MOD_ID, NAME);
     public static final Logger LOGGER = LogManager.getLogger("Reagenchant");
 
     @Mod.EventHandler
     public void onFMLPreInitialization(FMLPreInitializationEvent event)
     {
-        ReagenchantAPI.setInstance(this);
         ReagenchantReagents.initReagents();
         NetworkRegistry.INSTANCE.registerGuiHandler(this, new GuiHandler());
         proxy.preInit();
@@ -67,14 +63,13 @@ public class Reagenchant implements IModData, IReagenchantAPI
     public void onFMLInitialization(FMLInitializationEvent event)
     {
         UnbreakingHandler.overrideBehavior();
-        ReagentConfigManager.readReagentConfigs();
         proxy.init();
     }
 
     @Mod.EventHandler
     public void onFMLPostInitialization(FMLPostInitializationEvent event)
     {
-        ReagentConfigManager.writeReagentConfigs();
+        REAGENT_MANAGER.setup();
         proxy.postInit();
     }
 
@@ -88,18 +83,6 @@ public class Reagenchant implements IModData, IReagenchantAPI
     public CreativeTabs getCreativeTab()
     {
         return CreativeTabs.DECORATIONS;
-    }
-
-    @Override
-    public boolean isStub()
-    {
-        return false;
-    }
-
-    @Override
-    public IReagentRegistry getReagentRegistry()
-    {
-        return ReagentRegistry.INSTANCE;
     }
 
     public static ResourceLocation getResource(String name)
