@@ -18,45 +18,43 @@
 package logictechcorp.reagenchant.handler;
 
 import logictechcorp.reagenchant.Reagenchant;
-import net.minecraft.block.Blocks;
-import net.minecraft.block.DispenserBlock;
-import net.minecraft.block.TNTBlock;
+import net.minecraft.block.*;
 import net.minecraft.client.resources.I18n;
 import net.minecraft.dispenser.IBlockSource;
 import net.minecraft.dispenser.OptionalDispenseBehavior;
 import net.minecraft.enchantment.Enchantment;
 import net.minecraft.enchantment.EnchantmentHelper;
 import net.minecraft.enchantment.Enchantments;
+import net.minecraft.entity.Entity;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.inventory.EquipmentSlotType;
+import net.minecraft.item.ArmorItem;
 import net.minecraft.item.IItemPropertyGetter;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
-import net.minecraft.item.UseAction;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.nbt.ListNBT;
-import net.minecraft.util.ActionResult;
-import net.minecraft.util.ActionResultType;
 import net.minecraft.util.Hand;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.TextFormatting;
 import net.minecraft.util.text.TranslationTextComponent;
+import net.minecraft.world.IWorld;
 import net.minecraft.world.World;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
+import net.minecraftforge.common.IShearable;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.entity.living.LivingHurtEvent;
-import net.minecraftforge.event.entity.player.AnvilRepairEvent;
-import net.minecraftforge.event.entity.player.ItemTooltipEvent;
-import net.minecraftforge.event.entity.player.PlayerPickupXpEvent;
+import net.minecraftforge.event.entity.player.*;
+import net.minecraftforge.event.world.BlockEvent;
+import net.minecraftforge.eventbus.api.Event;
 import net.minecraftforge.eventbus.api.EventPriority;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 
 import java.util.List;
-import java.util.function.Supplier;
 
 public class UnbreakingHandler
 {
@@ -150,6 +148,106 @@ public class UnbreakingHandler
         }
     }
 
+    @SubscribeEvent
+    public static void onPlayerBreakSpeed(PlayerEvent.BreakSpeed event)
+    {
+        PlayerEntity player = event.getPlayer();
+        ItemStack stack = player.getHeldItemMainhand();
+
+        if(isItemBroken(stack))
+        {
+            event.setNewSpeed(0.5F);
+        }
+    }
+
+    @SubscribeEvent
+    public static void onPlayerHarvestCheck(PlayerEvent.HarvestCheck event)
+    {
+        PlayerEntity player = event.getPlayer();
+        BlockState state = event.getTargetBlock();
+        ItemStack stack = player.getHeldItemMainhand();
+
+        if(isItemBroken(stack) && !state.getMaterial().isToolNotRequired())
+        {
+            event.setCanHarvest(false);
+        }
+    }
+
+    @SubscribeEvent
+    public static void onBlockBreak(BlockEvent.BreakEvent event)
+    {
+        IWorld world = event.getWorld();
+        BlockPos pos = event.getPos();
+        BlockState state = event.getState();
+        PlayerEntity player = event.getPlayer();
+        Block block = state.getBlock();
+        ItemStack stack = player.getHeldItemMainhand();
+
+        if(isItemBroken(stack))
+        {
+            if(block instanceof IShearable)
+            {
+                if(((IShearable) block).isShearable(stack, world, pos))
+                {
+                    world.setBlockState(pos, Blocks.AIR.getDefaultState(), 3);
+                }
+            }
+
+            if(!state.getMaterial().isToolNotRequired())
+            {
+                event.setExpToDrop(0);
+            }
+        }
+    }
+
+    @SubscribeEvent
+    public static void onRightClickBlock(PlayerInteractEvent.RightClickBlock event)
+    {
+        PlayerEntity player = event.getPlayer();
+        ItemStack stack = event.getItemStack();
+
+        if(isItemBroken(stack))
+        {
+            breakItem(player, stack, EquipmentSlotType.fromSlotTypeAndIndex(EquipmentSlotType.Group.HAND, event.getHand().ordinal()));
+            event.setUseItem(Event.Result.DENY);
+        }
+    }
+
+    @SubscribeEvent
+    public static void onRightClickItem(PlayerInteractEvent.RightClickItem event)
+    {
+        PlayerEntity player = event.getPlayer();
+        ItemStack stack = event.getItemStack();
+
+        if(isItemBroken(stack))
+        {
+            if(!(stack.getItem() instanceof ArmorItem))
+            {
+                breakItem(player, stack, EquipmentSlotType.fromSlotTypeAndIndex(EquipmentSlotType.Group.HAND, event.getHand().ordinal()));
+                event.setCanceled(true);
+            }
+        }
+    }
+
+    @SubscribeEvent
+    public static void onEntityInteract(PlayerInteractEvent.EntityInteract event)
+    {
+        PlayerEntity player = event.getPlayer();
+        Entity entity = event.getTarget();
+        ItemStack stack = event.getItemStack();
+        Hand hand = event.getHand();
+
+        if(isItemBroken(stack))
+        {
+            breakItem(player, stack, EquipmentSlotType.fromSlotTypeAndIndex(EquipmentSlotType.Group.HAND, hand.ordinal()));
+
+            if(entity instanceof LivingEntity && stack.getItem().itemInteractionForEntity(ItemStack.EMPTY, player, (LivingEntity) entity, hand))
+            {
+                event.setCanceled(true);
+            }
+        }
+    }
+
     @SubscribeEvent(priority = EventPriority.LOWEST)
     public static void onLivingHurt(LivingHurtEvent event)
     {
@@ -165,7 +263,7 @@ public class UnbreakingHandler
                 {
                     ItemStack armorStack = player.inventory.armorInventory.get(equipmentSlotType.getIndex());
 
-                    if(canItemBeBroken(armorStack, 0))
+                    if(canItemBeBroken(armorStack, 1))
                     {
                         breakItem(player, armorStack, equipmentSlotType);
                     }
@@ -187,7 +285,7 @@ public class UnbreakingHandler
     }
 
     @SubscribeEvent(priority = EventPriority.LOWEST)
-    public static void onMending(PlayerPickupXpEvent event)
+    public static void onMending(PlayerXpEvent.PickupXp event)
     {
         PlayerEntity player = event.getPlayer();
 
@@ -263,22 +361,6 @@ public class UnbreakingHandler
         }
     }
 
-    public static int damageItem(ItemStack stack, LivingEntity livingEntity, int damageAmount)
-    {
-        if(isItemBroken(stack))
-        {
-            return 0;
-        }
-
-        if(canItemBeBroken(stack, damageAmount))
-        {
-            breakItem(livingEntity, stack, EquipmentSlotType.MAINHAND);
-            return 0;
-        }
-
-        return damageAmount;
-    }
-
     public static boolean isItemBroken(ItemStack stack)
     {
         return stack.getOrCreateTag().getBoolean(BROKEN_KEY);
@@ -293,68 +375,6 @@ public class UnbreakingHandler
 
         int usesRemaining = (stack.getMaxDamage() - stack.getDamage());
         boolean canBeBroken = !stack.isEmpty() && EnchantmentHelper.getEnchantmentLevel(Enchantments.UNBREAKING, stack) > 0;
-
-        if((usesRemaining - damageAmount) <= 0 && canBeBroken)
-        {
-            stack.setDamage(stack.getMaxDamage() - 1);
-            return true;
-        }
-
-        return false;
-    }
-
-    public static boolean canHarvestBlock(ItemStack stack, boolean canHarvest)
-    {
-        return !isItemBroken(stack) && canHarvest;
-    }
-
-    public static int getHarvestLevel(ItemStack stack, int harvestLevel)
-    {
-        return isItemBroken(stack) ? -1 : harvestLevel;
-    }
-
-    public static int getArmorAmount(ItemStack stack, int armorModifier)
-    {
-        return isItemBroken(stack) ? 0 : armorModifier;
-    }
-
-    public static int getUseDuration(ItemStack stack, int useDuration)
-    {
-        return isItemBroken(stack) ? 0 : useDuration;
-    }
-
-    public static float getDestroySpeed(ItemStack stack, float destroySpeed)
-    {
-        return isItemBroken(stack) ? 1.0F : destroySpeed;
-    }
-
-    public static double getAttackDamage(ItemStack stack, double attackDamage)
-    {
-        return isItemBroken(stack) ? 1.0D : attackDamage;
-    }
-
-    public static double getAttackSpeed(ItemStack stack, double attackSpeed)
-    {
-        return isItemBroken(stack) ? 1.0D : attackSpeed;
-    }
-
-    public static double getArmorToughness(ItemStack stack, double armorToughness)
-    {
-        return isItemBroken(stack) ? 0.0D : armorToughness;
-    }
-
-    public static UseAction getUseAction(ItemStack stack, UseAction useAction)
-    {
-        return isItemBroken(stack) ? UseAction.NONE : useAction;
-    }
-
-    public static ActionResult<ItemStack> getActionResult(ItemStack stack, Supplier<ActionResult<ItemStack>> actionResultSupplier)
-    {
-        return isItemBroken(stack) ? new ActionResult<>(ActionResultType.FAIL, stack) : actionResultSupplier.get();
-    }
-
-    public static ActionResultType getActionResultType(ItemStack stack, Supplier<ActionResultType> actionResultTypeSupplier)
-    {
-        return isItemBroken(stack) ? ActionResultType.FAIL : actionResultTypeSupplier.get();
+        return (usesRemaining - damageAmount) <= 0 && canBeBroken;
     }
 }

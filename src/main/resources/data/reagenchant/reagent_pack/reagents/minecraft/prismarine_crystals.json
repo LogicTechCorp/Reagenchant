@@ -1,26 +1,33 @@
 {
-	"item": "minecraft:prismarine_crystals",
-	"enchantments": [
-		{
-			"enchantment": "minecraft:luck_of_the_sea",
-			"probability": 0.5,
-			"reagentCost": 1,
-			"minimumEnchantmentLevel": 1,
-			"maximumEnchantmentLevel": 3
-		}, 
-		{
-			"enchantment": "minecraft:respiration",
-			"probability": 0.5,
-			"reagentCost": 1,
-			"minimumEnchantmentLevel": 1,
-			"maximumEnchantmentLevel": 3
-		}, 
-		{
-			"enchantment": "minecraft:depth_strider",
-			"probability": 0.5,
-			"reagentCost": 1,
-			"minimumEnchantmentLevel": 1,
-			"maximumEnchantmentLevel": 3
-		}
-	]
+  "item": "minecraft:prismarine_crystals",
+  "enchantments": [
+    {
+      "enchantment": "minecraft:luck_of_the_sea",
+      "minimumEnchantmentLevel": 1,
+      "maximumEnchantmentLevel": 3,
+      "probability": 0.5,
+      "reagentCost": 1
+    },
+    {
+      "enchantment": "minecraft:respiration",
+      "minimumEnchantmentLevel": 1,
+      "maximumEnchantmentLevel": 3,
+      "probability": 0.5,
+      "reagentCost": 1
+    },
+    {
+      "enchantment": "minecraft:loyalty",
+      "minimumEnchantmentLevel": 1,
+      "maximumEnchantmentLevel": 3,
+      "probability": 0.5,
+      "reagentCost": 1
+    },
+    {
+      "enchantment": "minecraft:depth_strider",
+      "minimumEnchantmentLevel": 1,
+      "maximumEnchantmentLevel": 3,
+      "probability": 0.5,
+      "reagentCost": 1
+    }
+  ]
 }

@@ -1,19 +1,47 @@
 {
-	"item": "minecraft:gunpowder",
-	"enchantments": [
-		{
-			"enchantment": "minecraft:feather_falling",
-			"probability": 0.5,
-			"reagentCost": 1,
-			"minimumEnchantmentLevel": 1,
-			"maximumEnchantmentLevel": 4
-		}, 
-		{
-			"enchantment": "minecraft:smite",
-			"probability": 0.5,
-			"reagentCost": 1,
-			"minimumEnchantmentLevel": 1,
-			"maximumEnchantmentLevel": 5
-		}
-	]
+  "item": "minecraft:gunpowder",
+  "enchantments": [
+    {
+      "enchantment": "ffenchants:archers_revenge",
+      "minimumEnchantmentLevel": 1,
+      "maximumEnchantmentLevel": 3,
+      "probability": 0.5,
+      "reagentCost": 1
+    },
+    {
+      "enchantment": "minecraft:feather_falling",
+      "minimumEnchantmentLevel": 1,
+      "maximumEnchantmentLevel": 4,
+      "probability": 0.5,
+      "reagentCost": 1
+    },
+    {
+      "enchantment": "ensorcellation:weeding",
+      "minimumEnchantmentLevel": 1,
+      "maximumEnchantmentLevel": 1,
+      "probability": 0.5,
+      "reagentCost": 1
+    },
+    {
+      "enchantment": "minecraft:smite",
+      "minimumEnchantmentLevel": 1,
+      "maximumEnchantmentLevel": 5,
+      "probability": 0.5,
+      "reagentCost": 1
+    },
+    {
+      "enchantment": "minecraft:bane_of_arthropods",
+      "minimumEnchantmentLevel": 1,
+      "maximumEnchantmentLevel": 5,
+      "probability": 0.5,
+      "reagentCost": 1
+    },
+    {
+      "enchantment": "minecraft:blast_protection",
+      "minimumEnchantmentLevel": 1,
+      "maximumEnchantmentLevel": 4,
+      "probability": 0.5,
+      "reagentCost": 1
+    }
+  ]
 }

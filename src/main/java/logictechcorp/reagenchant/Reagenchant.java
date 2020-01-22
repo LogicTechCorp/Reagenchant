@@ -67,6 +67,7 @@ public class Reagenchant
         forgeEventBus.addListener(this::onServerAboutToStart);
         forgeEventBus.addListener(this::onServerStarting);
         forgeEventBus.addListener(this::onServerStopping);
+        ReagenchantConfig.registerConfigs();
     }
 
     private void onCommonSetup(FMLCommonSetupEvent event)

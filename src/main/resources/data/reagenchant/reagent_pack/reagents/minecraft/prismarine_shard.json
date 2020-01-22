@@ -1,19 +1,33 @@
 {
-	"item": "minecraft:prismarine_shard",
-	"enchantments": [
-		{
-			"enchantment": "minecraft:aqua_affinity",
-			"probability": 0.5,
-			"reagentCost": 1,
-			"minimumEnchantmentLevel": 1,
-			"maximumEnchantmentLevel": 1
-		}, 
-		{
-			"enchantment": "minecraft:lure",
-			"probability": 0.5,
-			"reagentCost": 1,
-			"minimumEnchantmentLevel": 1,
-			"maximumEnchantmentLevel": 3
-		}
-	]
+  "item": "minecraft:prismarine_shard",
+  "enchantments": [
+    {
+      "enchantment": "minecraft:riptide",
+      "minimumEnchantmentLevel": 1,
+      "maximumEnchantmentLevel": 3,
+      "probability": 0.5,
+      "reagentCost": 1
+    },
+    {
+      "enchantment": "minecraft:aqua_affinity",
+      "minimumEnchantmentLevel": 1,
+      "maximumEnchantmentLevel": 1,
+      "probability": 0.5,
+      "reagentCost": 1
+    },
+    {
+      "enchantment": "minecraft:feather_falling",
+      "minimumEnchantmentLevel": 1,
+      "maximumEnchantmentLevel": 4,
+      "probability": 0.5,
+      "reagentCost": 1
+    },
+    {
+      "enchantment": "minecraft:lure",
+      "minimumEnchantmentLevel": 1,
+      "maximumEnchantmentLevel": 3,
+      "probability": 0.5,
+      "reagentCost": 1
+    }
+  ]
 }

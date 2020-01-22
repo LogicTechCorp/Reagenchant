@@ -1,12 +1,47 @@
 {
-	"item": "minecraft:glowstone_dust",
-	"enchantments": [
-		{
-			"enchantment": "minecraft:bane_of_arthropods",
-			"probability": 0.5,
-			"reagentCost": 1,
-			"minimumEnchantmentLevel": 1,
-			"maximumEnchantmentLevel": 5
-		}
-	]
+  "item": "minecraft:glowstone_dust",
+  "enchantments": [
+    {
+      "enchantment": "minecraft:impaling",
+      "minimumEnchantmentLevel": 1,
+      "maximumEnchantmentLevel": 5,
+      "probability": 0.5,
+      "reagentCost": 1
+    },
+    {
+      "enchantment": "ensorcellation:reach",
+      "minimumEnchantmentLevel": 1,
+      "maximumEnchantmentLevel": 3,
+      "probability": 0.5,
+      "reagentCost": 1
+    },
+    {
+      "enchantment": "minecraft:power",
+      "minimumEnchantmentLevel": 1,
+      "maximumEnchantmentLevel": 5,
+      "probability": 0.5,
+      "reagentCost": 1
+    },
+    {
+      "enchantment": "minecraft:sharpness",
+      "minimumEnchantmentLevel": 1,
+      "maximumEnchantmentLevel": 5,
+      "probability": 0.5,
+      "reagentCost": 1
+    },
+    {
+      "enchantment": "minecraft:protection",
+      "minimumEnchantmentLevel": 1,
+      "maximumEnchantmentLevel": 4,
+      "probability": 0.5,
+      "reagentCost": 1
+    },
+    {
+      "enchantment": "minecraft:bane_of_arthropods",
+      "minimumEnchantmentLevel": 1,
+      "maximumEnchantmentLevel": 5,
+      "probability": 0.5,
+      "reagentCost": 1
+    }
+  ]
 }
