@@ -1,26 +1,26 @@
 {
-  "item": "minecraft:blue_ice",
-  "enchantments": [
-	{
-      "enchantment": "minecraft:frost_walker",
-      "minimumEnchantmentLevel": 1,
-      "maximumEnchantmentLevel": 2,
-      "probability": 0.5,
-      "reagentCost": 1
-    },
-	{
-      "enchantment": "ensorcellation:frost_rebuke",
-      "minimumEnchantmentLevel": 1,
-      "maximumEnchantmentLevel": 3,
-      "probability": 0.5,
-      "reagentCost": 1
-    },
-	{
-      "enchantment": "ensorcellation:frost_aspect",
-      "minimumEnchantmentLevel": 1,
-      "maximumEnchantmentLevel": 2,
-      "probability": 0.5,
-      "reagentCost": 1
-    }
-  ]
+    "item": "minecraft:blue_ice",
+    "enchantments": [
+        {
+            "enchantment": "minecraft:frost_walker",
+            "minimumEnchantmentLevel": 1,
+            "maximumEnchantmentLevel": 2,
+            "probability": 0.5,
+            "reagentCost": 1
+        },
+        {
+            "enchantment": "ensorcellation:frost_rebuke",
+            "minimumEnchantmentLevel": 1,
+            "maximumEnchantmentLevel": 3,
+            "probability": 0.5,
+            "reagentCost": 1
+        },
+        {
+            "enchantment": "ensorcellation:frost_aspect",
+            "minimumEnchantmentLevel": 1,
+            "maximumEnchantmentLevel": 2,
+            "probability": 0.5,
+            "reagentCost": 1
+        }
+    ]
 }

@@ -1,6 +1,6 @@
 /*
  * Reagenchant
- * Copyright (c) 2019 by LogicTechCorp
+ * Copyright (c) 2019-2020 by LogicTechCorp
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -18,6 +18,7 @@
 package logictechcorp.reagenchant.handler;
 
 import logictechcorp.reagenchant.Reagenchant;
+import logictechcorp.reagenchant.ReagenchantConfig;
 import net.minecraft.block.*;
 import net.minecraft.client.resources.I18n;
 import net.minecraft.dispenser.IBlockSource;
@@ -29,10 +30,7 @@ import net.minecraft.entity.Entity;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.inventory.EquipmentSlotType;
-import net.minecraft.item.ArmorItem;
-import net.minecraft.item.IItemPropertyGetter;
-import net.minecraft.item.ItemStack;
-import net.minecraft.item.Items;
+import net.minecraft.item.*;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.nbt.ListNBT;
 import net.minecraft.util.Hand;
@@ -50,9 +48,9 @@ import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.entity.living.LivingHurtEvent;
 import net.minecraftforge.event.entity.player.*;
 import net.minecraftforge.event.world.BlockEvent;
-import net.minecraftforge.eventbus.api.Event;
 import net.minecraftforge.eventbus.api.EventPriority;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
+import net.minecraftforge.registries.ForgeRegistries;
 
 import java.util.List;
 
@@ -61,49 +59,58 @@ public class UnbreakingHandler
     public static final ResourceLocation BROKEN_PROPERTY_KEY = new ResourceLocation(Reagenchant.MOD_ID, "broken");
     public static final IItemPropertyGetter BROKEN_PROPERTY = (stack, world, livingEntity) -> isItemBroken(stack) ? 1.0F : 0.0F;
     public static final String BROKEN_KEY = Reagenchant.MOD_ID + ":Broken";
+    public static final String BROKEN_EFFECT_KEY = Reagenchant.MOD_ID + ":BrokenEffect";
     public static final String DISABLED_ENCHANTMENTS_KEY = Reagenchant.MOD_ID + ":DisabledEnchantments";
 
     public static void setup()
     {
-        DispenserBlock.registerDispenseBehavior(Items.FLINT_AND_STEEL, new OptionalDispenseBehavior()
+        if(ReagenchantConfig.ENCHANTMENT.unbreakingPreventsItemDestruction.get())
         {
-            @Override
-            protected ItemStack dispenseStack(IBlockSource source, ItemStack stack)
+            DispenserBlock.registerDispenseBehavior(Items.FLINT_AND_STEEL, new OptionalDispenseBehavior()
             {
-                this.successful = false;
-
-                if(canItemBeBroken(stack, 1))
+                @Override
+                protected ItemStack dispenseStack(IBlockSource source, ItemStack stack)
                 {
-                    breakItem(null, stack, null);
-                }
+                    this.successful = false;
 
-                if(!isItemBroken(stack))
-                {
-                    World world = source.getWorld();
-                    BlockPos pos = source.getBlockPos().offset(source.getBlockState().get(DispenserBlock.FACING));
-                    this.successful = true;
-
-                    if(world.isAirBlock(pos))
+                    if(canItemBeBroken(stack, 1))
                     {
-                        world.setBlockState(pos, Blocks.FIRE.getDefaultState());
+                        breakItem(stack);
+                    }
 
-                        if(stack.attemptDamageItem(1, world.rand, null))
+                    if(!isItemBroken(stack))
+                    {
+                        World world = source.getWorld();
+                        BlockPos pos = source.getBlockPos().offset(source.getBlockState().get(DispenserBlock.FACING));
+                        this.successful = true;
+
+                        if(world.isAirBlock(pos))
                         {
-                            stack.setCount(0);
+                            world.setBlockState(pos, Blocks.FIRE.getDefaultState());
+
+                            if(stack.attemptDamageItem(1, world.rand, null))
+                            {
+                                stack.setCount(0);
+                            }
+                        }
+                        else if(world.getBlockState(pos).getBlock() == Blocks.TNT)
+                        {
+                            Blocks.TNT.onPlayerDestroy(world, pos, Blocks.TNT.getDefaultState().with(TNTBlock.UNSTABLE, true));
+                            world.setBlockState(pos, Blocks.AIR.getDefaultState(), 3);
                         }
                     }
-                    else if(world.getBlockState(pos).getBlock() == Blocks.TNT)
-                    {
-                        Blocks.TNT.onPlayerDestroy(world, pos, Blocks.TNT.getDefaultState().with(TNTBlock.UNSTABLE, true));
-                        world.setBlockState(pos, Blocks.AIR.getDefaultState(), 3);
-                    }
+
+                    return stack;
                 }
+            });
 
-                return stack;
+            for(Item item : ForgeRegistries.ITEMS)
+            {
+                item.addPropertyOverride(BROKEN_PROPERTY_KEY, BROKEN_PROPERTY);
             }
-        });
 
-        MinecraftForge.EVENT_BUS.register(UnbreakingHandler.class);
+            MinecraftForge.EVENT_BUS.register(UnbreakingHandler.class);
+        }
     }
 
     @SubscribeEvent
@@ -197,6 +204,8 @@ public class UnbreakingHandler
             {
                 event.setExpToDrop(0);
             }
+
+            sendBreakEffect(player, stack, EquipmentSlotType.MAINHAND);
         }
     }
 
@@ -208,8 +217,8 @@ public class UnbreakingHandler
 
         if(isItemBroken(stack))
         {
-            breakItem(player, stack, EquipmentSlotType.fromSlotTypeAndIndex(EquipmentSlotType.Group.HAND, event.getHand().ordinal()));
-            event.setUseItem(Event.Result.DENY);
+            sendBreakEffect(player, stack, EquipmentSlotType.fromSlotTypeAndIndex(EquipmentSlotType.Group.HAND, event.getHand().ordinal()));
+            event.setCanceled(true);
         }
     }
 
@@ -223,7 +232,7 @@ public class UnbreakingHandler
         {
             if(!(stack.getItem() instanceof ArmorItem))
             {
-                breakItem(player, stack, EquipmentSlotType.fromSlotTypeAndIndex(EquipmentSlotType.Group.HAND, event.getHand().ordinal()));
+                sendBreakEffect(player, stack, EquipmentSlotType.fromSlotTypeAndIndex(EquipmentSlotType.Group.HAND, event.getHand().ordinal()));
                 event.setCanceled(true);
             }
         }
@@ -239,7 +248,7 @@ public class UnbreakingHandler
 
         if(isItemBroken(stack))
         {
-            breakItem(player, stack, EquipmentSlotType.fromSlotTypeAndIndex(EquipmentSlotType.Group.HAND, hand.ordinal()));
+            sendBreakEffect(player, stack, EquipmentSlotType.fromSlotTypeAndIndex(EquipmentSlotType.Group.HAND, hand.ordinal()));
 
             if(entity instanceof LivingEntity && stack.getItem().itemInteractionForEntity(ItemStack.EMPTY, player, (LivingEntity) entity, hand))
             {
@@ -265,7 +274,8 @@ public class UnbreakingHandler
 
                     if(canItemBeBroken(armorStack, 1))
                     {
-                        breakItem(player, armorStack, equipmentSlotType);
+                        breakItem(armorStack);
+                        sendBreakEffect(player, armorStack, equipmentSlotType);
                     }
                 }
             }
@@ -300,7 +310,7 @@ public class UnbreakingHandler
         }
     }
 
-    public static void breakItem(LivingEntity livingEntity, ItemStack stack, EquipmentSlotType equipmentSlotType)
+    public static void breakItem(ItemStack stack)
     {
         CompoundNBT stackCompound = stack.getOrCreateTag();
 
@@ -329,11 +339,17 @@ public class UnbreakingHandler
             }
 
             stackCompound.putBoolean(BROKEN_KEY, true);
+        }
+    }
 
-            if(livingEntity != null && equipmentSlotType != null)
-            {
-                livingEntity.sendBreakAnimation(equipmentSlotType);
-            }
+    public static void sendBreakEffect(LivingEntity livingEntity, ItemStack stack, EquipmentSlotType equipmentSlotType)
+    {
+        CompoundNBT stackCompound = stack.getOrCreateTag();
+
+        if(livingEntity != null && equipmentSlotType != null && !stackCompound.getBoolean(BROKEN_EFFECT_KEY))
+        {
+            livingEntity.sendBreakAnimation(equipmentSlotType);
+            stackCompound.putBoolean(BROKEN_EFFECT_KEY, true);
         }
     }
 
@@ -358,12 +374,13 @@ public class UnbreakingHandler
             stackCompound.remove(DISABLED_ENCHANTMENTS_KEY);
             stackCompound.put("Enchantments", enchantments);
             stackCompound.putBoolean(BROKEN_KEY, false);
+            stackCompound.putBoolean(BROKEN_EFFECT_KEY, false);
         }
     }
 
     public static boolean isItemBroken(ItemStack stack)
     {
-        return stack.getOrCreateTag().getBoolean(BROKEN_KEY);
+        return stack.getItem() != Items.AIR && stack.getOrCreateTag().getBoolean(BROKEN_KEY);
     }
 
     public static boolean canItemBeBroken(ItemStack stack, int damageAmount)

@@ -1,68 +1,68 @@
 {
-  "item": "minecraft:gold_ingot",
-  "enchantments": [
-    {
-      "enchantment": "minecraft:sweeping",
-      "minimumEnchantmentLevel": 1,
-      "maximumEnchantmentLevel": 3,
-      "probability": 0.5,
-      "reagentCost": 1
-    },
-    {
-      "enchantment": "minecraft:silk_touch",
-      "minimumEnchantmentLevel": 1,
-      "maximumEnchantmentLevel": 1,
-      "probability": 0.5,
-      "reagentCost": 1
-    },
-    {
-      "enchantment": "minecraft:protection",
-      "minimumEnchantmentLevel": 1,
-      "maximumEnchantmentLevel": 4,
-      "probability": 0.5,
-      "reagentCost": 1
-    },
-    {
-      "enchantment": "minecraft:infinity",
-      "minimumEnchantmentLevel": 1,
-      "maximumEnchantmentLevel": 1,
-      "probability": 0.5,
-      "reagentCost": 1
-    },
-    {
-      "enchantment": "minecraft:channeling",
-      "minimumEnchantmentLevel": 1,
-      "maximumEnchantmentLevel": 1,
-      "probability": 0.5,
-      "reagentCost": 1
-    },
-    {
-      "enchantment": "minecraft:piercing",
-      "minimumEnchantmentLevel": 1,
-      "maximumEnchantmentLevel": 4,
-      "probability": 0.5,
-      "reagentCost": 1
-    },
-    {
-      "enchantment": "minecraft:smite",
-      "minimumEnchantmentLevel": 1,
-      "maximumEnchantmentLevel": 5,
-      "probability": 0.5,
-      "reagentCost": 1
-    },
-    {
-      "enchantment": "ensorcellation:gourmand",
-      "minimumEnchantmentLevel": 1,
-      "maximumEnchantmentLevel": 2,
-      "probability": 0.5,
-      "reagentCost": 1
-    },
-    {
-      "enchantment": "minecraft:thorns",
-      "minimumEnchantmentLevel": 1,
-      "maximumEnchantmentLevel": 4,
-      "probability": 0.5,
-      "reagentCost": 1
-    }
-  ]
+    "item": "minecraft:gold_ingot",
+    "enchantments": [
+        {
+            "enchantment": "minecraft:sweeping",
+            "minimumEnchantmentLevel": 1,
+            "maximumEnchantmentLevel": 3,
+            "probability": 0.5,
+            "reagentCost": 1
+        },
+        {
+            "enchantment": "minecraft:silk_touch",
+            "minimumEnchantmentLevel": 1,
+            "maximumEnchantmentLevel": 1,
+            "probability": 0.5,
+            "reagentCost": 1
+        },
+        {
+            "enchantment": "minecraft:protection",
+            "minimumEnchantmentLevel": 1,
+            "maximumEnchantmentLevel": 4,
+            "probability": 0.5,
+            "reagentCost": 1
+        },
+        {
+            "enchantment": "minecraft:infinity",
+            "minimumEnchantmentLevel": 1,
+            "maximumEnchantmentLevel": 1,
+            "probability": 0.5,
+            "reagentCost": 1
+        },
+        {
+            "enchantment": "minecraft:channeling",
+            "minimumEnchantmentLevel": 1,
+            "maximumEnchantmentLevel": 1,
+            "probability": 0.5,
+            "reagentCost": 1
+        },
+        {
+            "enchantment": "minecraft:piercing",
+            "minimumEnchantmentLevel": 1,
+            "maximumEnchantmentLevel": 4,
+            "probability": 0.5,
+            "reagentCost": 1
+        },
+        {
+            "enchantment": "minecraft:smite",
+            "minimumEnchantmentLevel": 1,
+            "maximumEnchantmentLevel": 5,
+            "probability": 0.5,
+            "reagentCost": 1
+        },
+        {
+            "enchantment": "ensorcellation:gourmand",
+            "minimumEnchantmentLevel": 1,
+            "maximumEnchantmentLevel": 2,
+            "probability": 0.5,
+            "reagentCost": 1
+        },
+        {
+            "enchantment": "minecraft:thorns",
+            "minimumEnchantmentLevel": 1,
+            "maximumEnchantmentLevel": 4,
+            "probability": 0.5,
+            "reagentCost": 1
+        }
+    ]
 }

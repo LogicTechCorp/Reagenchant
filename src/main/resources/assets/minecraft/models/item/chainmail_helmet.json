@@ -1,14 +1,14 @@
 {
-	"parent": "item/generated",
-	"textures": {
-		"layer0": "item/chainmail_helmet"
-	},
-   "overrides": [
-       {
-           "predicate": {
-               "reagenchant:broken": 1.0
-           },
-           "model": "reagenchant:item/broken_chainmail_helmet"
-       }
-   ]
+    "parent": "item/generated",
+    "textures": {
+        "layer0": "item/chainmail_helmet"
+    },
+    "overrides": [
+        {
+            "predicate": {
+                "reagenchant:broken": 1.0
+            },
+            "model": "reagenchant:item/broken_chainmail_helmet"
+        }
+    ]
 }

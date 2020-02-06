@@ -1,61 +1,61 @@
 {
-  "item": "minecraft:diamond",
-  "enchantments": [
-    {
-      "enchantment": "ensorcellation:magic_protection",
-      "minimumEnchantmentLevel": 1,
-      "maximumEnchantmentLevel": 4,
-      "probability": 0.5,
-      "reagentCost": 1
-    },
-    {
-      "enchantment": "minecraft:looting",
-      "minimumEnchantmentLevel": 1,
-      "maximumEnchantmentLevel": 3,
-      "probability": 0.5,
-      "reagentCost": 1
-    },
-    {
-      "enchantment": "ensorcellation:angler",
-      "minimumEnchantmentLevel": 1,
-      "maximumEnchantmentLevel": 2,
-      "probability": 0.5,
-      "reagentCost": 1
-    },
-    {
-      "enchantment": "minecraft:fortune",
-      "minimumEnchantmentLevel": 1,
-      "maximumEnchantmentLevel": 3,
-      "probability": 0.5,
-      "reagentCost": 1
-    },
-    {
-      "enchantment": "minecraft:infinity",
-      "minimumEnchantmentLevel": 1,
-      "maximumEnchantmentLevel": 1,
-      "probability": 0.5,
-      "reagentCost": 1
-    },
-    {
-      "enchantment": "minecraft:multishot",
-      "minimumEnchantmentLevel": 1,
-      "maximumEnchantmentLevel": 1,
-      "probability": 0.5,
-      "reagentCost": 1
-    },
-    {
-      "enchantment": "minecraft:blast_protection",
-      "minimumEnchantmentLevel": 1,
-      "maximumEnchantmentLevel": 4,
-      "probability": 0.5,
-      "reagentCost": 1
-    },
-    {
-      "enchantment": "ensorcellation:hunter",
-      "minimumEnchantmentLevel": 1,
-      "maximumEnchantmentLevel": 2,
-      "probability": 0.5,
-      "reagentCost": 1
-    }
-  ]
+    "item": "minecraft:diamond",
+    "enchantments": [
+        {
+            "enchantment": "ensorcellation:magic_protection",
+            "minimumEnchantmentLevel": 1,
+            "maximumEnchantmentLevel": 4,
+            "probability": 0.5,
+            "reagentCost": 1
+        },
+        {
+            "enchantment": "minecraft:looting",
+            "minimumEnchantmentLevel": 1,
+            "maximumEnchantmentLevel": 3,
+            "probability": 0.5,
+            "reagentCost": 1
+        },
+        {
+            "enchantment": "ensorcellation:angler",
+            "minimumEnchantmentLevel": 1,
+            "maximumEnchantmentLevel": 2,
+            "probability": 0.5,
+            "reagentCost": 1
+        },
+        {
+            "enchantment": "minecraft:fortune",
+            "minimumEnchantmentLevel": 1,
+            "maximumEnchantmentLevel": 3,
+            "probability": 0.5,
+            "reagentCost": 1
+        },
+        {
+            "enchantment": "minecraft:infinity",
+            "minimumEnchantmentLevel": 1,
+            "maximumEnchantmentLevel": 1,
+            "probability": 0.5,
+            "reagentCost": 1
+        },
+        {
+            "enchantment": "minecraft:multishot",
+            "minimumEnchantmentLevel": 1,
+            "maximumEnchantmentLevel": 1,
+            "probability": 0.5,
+            "reagentCost": 1
+        },
+        {
+            "enchantment": "minecraft:blast_protection",
+            "minimumEnchantmentLevel": 1,
+            "maximumEnchantmentLevel": 4,
+            "probability": 0.5,
+            "reagentCost": 1
+        },
+        {
+            "enchantment": "ensorcellation:hunter",
+            "minimumEnchantmentLevel": 1,
+            "maximumEnchantmentLevel": 2,
+            "probability": 0.5,
+            "reagentCost": 1
+        }
+    ]
 }

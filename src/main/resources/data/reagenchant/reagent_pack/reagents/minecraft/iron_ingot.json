@@ -1,54 +1,54 @@
 {
-  "item": "minecraft:iron_ingot",
-  "enchantments": [
-    {
-      "enchantment": "enchantable:stomping",
-      "minimumEnchantmentLevel": 1,
-      "maximumEnchantmentLevel": 4,
-      "probability": 0.5,
-      "reagentCost": 1
-    },
-    {
-      "enchantment": "enchantable:iron_skull",
-      "minimumEnchantmentLevel": 1,
-      "maximumEnchantmentLevel": 1,
-      "probability": 0.5,
-      "reagentCost": 1
-    },
-    {
-      "enchantment": "minecraft:punch",
-      "minimumEnchantmentLevel": 1,
-      "maximumEnchantmentLevel": 2,
-      "probability": 0.5,
-      "reagentCost": 1
-    },
-    {
-      "enchantment": "minecraft:projectile_protection",
-      "minimumEnchantmentLevel": 1,
-      "maximumEnchantmentLevel": 4,
-      "probability": 0.5,
-      "reagentCost": 1
-    },
-    {
-      "enchantment": "minecraft:knockback",
-      "minimumEnchantmentLevel": 1,
-      "maximumEnchantmentLevel": 2,
-      "probability": 0.5,
-      "reagentCost": 1
-    },
-    {
-      "enchantment": "ensorcellation:bulwark",
-      "minimumEnchantmentLevel": 1,
-      "maximumEnchantmentLevel": 1,
-      "probability": 0.5,
-      "reagentCost": 1
-    },
-    {
-      "enchantment": "enchantable:replanting",
-      "minimumEnchantmentLevel": 1,
-      "maximumEnchantmentLevel": 1,
-      "probability": 0.5,
-      "reagentCost": 1
-    }
-  ]
+    "item": "minecraft:iron_ingot",
+    "enchantments": [
+        {
+            "enchantment": "enchantable:stomping",
+            "minimumEnchantmentLevel": 1,
+            "maximumEnchantmentLevel": 4,
+            "probability": 0.5,
+            "reagentCost": 1
+        },
+        {
+            "enchantment": "enchantable:iron_skull",
+            "minimumEnchantmentLevel": 1,
+            "maximumEnchantmentLevel": 1,
+            "probability": 0.5,
+            "reagentCost": 1
+        },
+        {
+            "enchantment": "minecraft:punch",
+            "minimumEnchantmentLevel": 1,
+            "maximumEnchantmentLevel": 2,
+            "probability": 0.5,
+            "reagentCost": 1
+        },
+        {
+            "enchantment": "minecraft:projectile_protection",
+            "minimumEnchantmentLevel": 1,
+            "maximumEnchantmentLevel": 4,
+            "probability": 0.5,
+            "reagentCost": 1
+        },
+        {
+            "enchantment": "minecraft:knockback",
+            "minimumEnchantmentLevel": 1,
+            "maximumEnchantmentLevel": 2,
+            "probability": 0.5,
+            "reagentCost": 1
+        },
+        {
+            "enchantment": "ensorcellation:bulwark",
+            "minimumEnchantmentLevel": 1,
+            "maximumEnchantmentLevel": 1,
+            "probability": 0.5,
+            "reagentCost": 1
+        },
+        {
+            "enchantment": "enchantable:replanting",
+            "minimumEnchantmentLevel": 1,
+            "maximumEnchantmentLevel": 1,
+            "probability": 0.5,
+            "reagentCost": 1
+        }
+    ]
 }

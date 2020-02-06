@@ -3,32 +3,39 @@ var ASMAPI = Java.type('net.minecraftforge.coremod.api.ASMAPI');
 function initializeCoreMod() {
     ASMAPI.loadFile("asm/asm-base.js");
     return {
-        'damage-item': {
+        'attempt-damage-item': {
             'target': {
                 'type': 'CLASS',
                 'name': 'net.minecraft.item.ItemStack'
             },
             'transformer': function(classNode) {
-                var transformedMethodName = ASMAPI.mapMethod("func_222118_a");
+                var methodName = ASMAPI.mapMethod("func_96631_a");
+                var methodNode = findMethodNode(classNode, methodName);
+
+                //setDamage
                 var newInsnList = ASMAPI.listOf(
+                    new VarInsnNode(Opcodes.ALOAD, 3),
                     ASMAPI.buildMethodCall(
                         "logictechcorp/reagenchant/asm/UnbreakingHooks",
-                        "attemptDamageItem",
-                        "(Lnet/minecraft/item/ItemStack;ILjava/util/Random;Lnet/minecraft/entity/player/ServerPlayerEntity;)Z",
+                        "adjustSetDamage",
+                        "(Lnet/minecraft/item/ItemStack;ILnet/minecraft/entity/LivingEntity;)I",
                         ASMAPI.MethodType.STATIC
-                    )
+                    ),
+                    new VarInsnNode(Opcodes.ISTORE, 4),
+                    new VarInsnNode(Opcodes.ALOAD, 0),
+                    new VarInsnNode(Opcodes.ILOAD, 4)
                 );
                 var transformed = ASMAPI.insertInsnList(
-                    findMethodNode(classNode, transformedMethodName),
+                    methodNode,
                     ASMAPI.MethodType.VIRTUAL,
                     "net/minecraft/item/ItemStack",
-                    ASMAPI.mapMethod("func_96631_a"),
-                    "(ILjava/util/Random;Lnet/minecraft/entity/player/ServerPlayerEntity;)Z",
+                    ASMAPI.mapMethod("func_196085_b"),
+                    "(I)V",
                     newInsnList,
-                    ASMAPI.InsertMode.REMOVE_ORIGINAL
+                    ASMAPI.InsertMode.INSERT_BEFORE
                 );
 
-                logTransformation(transformed, classNode.name, transformedMethodName);
+                logTransformation(transformed, classNode.name, methodName);
                 return classNode;
             }
         },
@@ -38,7 +45,10 @@ function initializeCoreMod() {
                 'name': 'net.minecraft.item.ItemStack'
             },
             'transformer': function(classNode) {
-                var transformedMethodName = ASMAPI.mapMethod("func_179548_a");
+                var methodName = ASMAPI.mapMethod("func_179548_a");
+                var methodNode = findMethodNode(classNode, methodName);
+
+                //onBlockDestroyed
                 var newInsnList = ASMAPI.listOf(
                     ASMAPI.buildMethodCall(
                         "logictechcorp/reagenchant/asm/UnbreakingHooks",
@@ -48,7 +58,7 @@ function initializeCoreMod() {
                     )
                 );
                 var transformed = ASMAPI.insertInsnList(
-                    findMethodNode(classNode, transformedMethodName),
+                    methodNode,
                     ASMAPI.MethodType.VIRTUAL,
                     "net/minecraft/item/Item",
                     ASMAPI.mapMethod("func_179218_a"),
@@ -57,7 +67,7 @@ function initializeCoreMod() {
                     ASMAPI.InsertMode.REMOVE_ORIGINAL
                 );
 
-                logTransformation(transformed, classNode.name, transformedMethodName);
+                logTransformation(transformed, classNode.name, methodName);
                 return classNode;
             }
         },
@@ -67,7 +77,10 @@ function initializeCoreMod() {
                 'name': 'net.minecraft.item.ItemStack'
             },
             'transformer': function(classNode) {
-                var transformedMethodName = ASMAPI.mapMethod("func_111283_C");
+                var methodName = ASMAPI.mapMethod("func_111283_C");
+                var methodNode = findMethodNode(classNode, methodName);
+
+                //getAttributeModifiers
                 var newInsnList = ASMAPI.listOf(
                     new VarInsnNode(Opcodes.ALOAD, 1),
                     ASMAPI.buildMethodCall(
@@ -81,7 +94,7 @@ function initializeCoreMod() {
                     new InsnNode(Opcodes.ARETURN)
                 );
                 var transformed = ASMAPI.insertInsnList(
-                    findMethodNode(classNode, transformedMethodName),
+                    methodNode,
                     ASMAPI.MethodType.VIRTUAL,
                     "net/minecraft/item/ItemStack",
                     ASMAPI.mapMethod("func_184543_l"),
@@ -90,7 +103,7 @@ function initializeCoreMod() {
                     ASMAPI.InsertMode.REMOVE_ORIGINAL
                 );
 
-                logTransformation(true, classNode.name, transformedMethodName);
+                logTransformation(true, classNode.name, methodName);
                 return classNode;
             }
         },
@@ -100,9 +113,12 @@ function initializeCoreMod() {
                 'name': 'net.minecraft.item.Item'
             },
             'transformer': function(classNode) {
-                var transformedMethodName = "getHarvestLevel";
+                var methodName = "getHarvestLevel";
+                var methodNode = findMethodNode(classNode, methodName);
+
+                //intValue
                 var newInsnList = ASMAPI.listOf(
-                    new VarInsnNode(Opcodes.ISTORE,5),
+                    new VarInsnNode(Opcodes.ISTORE, 5),
                     new VarInsnNode(Opcodes.ALOAD, 1),
                     new VarInsnNode(Opcodes.ILOAD, 5),
                     ASMAPI.buildMethodCall(
@@ -113,7 +129,7 @@ function initializeCoreMod() {
                     )
                 );
                 var transformed = ASMAPI.insertInsnList(
-                    findMethodNode(classNode, transformedMethodName),
+                    methodNode,
                     ASMAPI.MethodType.VIRTUAL,
                     "java/lang/Integer",
                     "intValue",
@@ -122,7 +138,7 @@ function initializeCoreMod() {
                     ASMAPI.InsertMode.INSERT_AFTER
                 );
 
-                logTransformation(transformed, classNode.name, transformedMethodName);
+                logTransformation(transformed, classNode.name, methodName);
                 return classNode;
             }
         }

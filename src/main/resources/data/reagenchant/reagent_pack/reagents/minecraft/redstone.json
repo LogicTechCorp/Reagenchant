@@ -1,68 +1,68 @@
 {
-  "item": "minecraft:redstone",
-  "enchantments": [
-    {
-      "enchantment": "minecraft:efficiency",
-      "minimumEnchantmentLevel": 1,
-      "maximumEnchantmentLevel": 5,
-      "probability": 0.5,
-      "reagentCost": 1
-    },
-    {
-      "enchantment": "ensorcellation:air_affinity",
-      "minimumEnchantmentLevel": 1,
-      "maximumEnchantmentLevel": 1,
-      "probability": 0.5,
-      "reagentCost": 1
-    },
-    {
-      "enchantment": "ensorcellation:phalanx",
-      "minimumEnchantmentLevel": 1,
-      "maximumEnchantmentLevel": 2,
-      "probability": 0.5,
-      "reagentCost": 1
-    },
-    {
-      "enchantment": "minecraft:sweeping",
-      "minimumEnchantmentLevel": 1,
-      "maximumEnchantmentLevel": 3,
-      "probability": 0.5,
-      "reagentCost": 1
-    },
-    {
-      "enchantment": "minecraft:quick_charge",
-      "minimumEnchantmentLevel": 1,
-      "maximumEnchantmentLevel": 3,
-      "probability": 0.5,
-      "reagentCost": 1
-    },
-    {
-      "enchantment": "minecraft:power",
-      "minimumEnchantmentLevel": 1,
-      "maximumEnchantmentLevel": 5,
-      "probability": 0.5,
-      "reagentCost": 1
-    },
-    {
-      "enchantment": "minecraft:sharpness",
-      "minimumEnchantmentLevel": 1,
-      "maximumEnchantmentLevel": 5,
-      "probability": 0.5,
-      "reagentCost": 1
-    },
-    {
-      "enchantment": "minecraft:thorns",
-      "minimumEnchantmentLevel": 1,
-      "maximumEnchantmentLevel": 3,
-      "probability": 0.5,
-      "reagentCost": 1
-    },
-    {
-      "enchantment": "ensorcellation:fire_rebuke",
-      "minimumEnchantmentLevel": 1,
-      "maximumEnchantmentLevel": 3,
-      "probability": 0.5,
-      "reagentCost": 1
-    }
-  ]
+    "item": "minecraft:redstone",
+    "enchantments": [
+        {
+            "enchantment": "minecraft:efficiency",
+            "minimumEnchantmentLevel": 1,
+            "maximumEnchantmentLevel": 5,
+            "probability": 0.5,
+            "reagentCost": 1
+        },
+        {
+            "enchantment": "ensorcellation:air_affinity",
+            "minimumEnchantmentLevel": 1,
+            "maximumEnchantmentLevel": 1,
+            "probability": 0.5,
+            "reagentCost": 1
+        },
+        {
+            "enchantment": "ensorcellation:phalanx",
+            "minimumEnchantmentLevel": 1,
+            "maximumEnchantmentLevel": 2,
+            "probability": 0.5,
+            "reagentCost": 1
+        },
+        {
+            "enchantment": "minecraft:sweeping",
+            "minimumEnchantmentLevel": 1,
+            "maximumEnchantmentLevel": 3,
+            "probability": 0.5,
+            "reagentCost": 1
+        },
+        {
+            "enchantment": "minecraft:quick_charge",
+            "minimumEnchantmentLevel": 1,
+            "maximumEnchantmentLevel": 3,
+            "probability": 0.5,
+            "reagentCost": 1
+        },
+        {
+            "enchantment": "minecraft:power",
+            "minimumEnchantmentLevel": 1,
+            "maximumEnchantmentLevel": 5,
+            "probability": 0.5,
+            "reagentCost": 1
+        },
+        {
+            "enchantment": "minecraft:sharpness",
+            "minimumEnchantmentLevel": 1,
+            "maximumEnchantmentLevel": 5,
+            "probability": 0.5,
+            "reagentCost": 1
+        },
+        {
+            "enchantment": "minecraft:thorns",
+            "minimumEnchantmentLevel": 1,
+            "maximumEnchantmentLevel": 3,
+            "probability": 0.5,
+            "reagentCost": 1
+        },
+        {
+            "enchantment": "ensorcellation:fire_rebuke",
+            "minimumEnchantmentLevel": 1,
+            "maximumEnchantmentLevel": 3,
+            "probability": 0.5,
+            "reagentCost": 1
+        }
+    ]
 }
