@@ -21,23 +21,18 @@ import logictechcorp.libraryex.utility.RandomHelper;
 import net.minecraft.enchantment.Enchantment;
 import net.minecraft.enchantment.EnchantmentData;
 import net.minecraft.enchantment.EnchantmentHelper;
-import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
-import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.WeightedRandom;
-import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
-import net.minecraft.world.World;
-import net.minecraftforge.registries.ForgeRegistries;
 
 import java.util.*;
 
 public class Reagent
 {
     protected final Item item;
-    protected final Map<ResourceLocation, ReagentEnchantmentData> enchantments = new HashMap<>();
+    protected final Map<Enchantment, ReagentEnchantmentData> enchantments = new HashMap<>();
 
     public Reagent(Item item)
     {
@@ -53,17 +48,17 @@ public class Reagent
 
     public void addEnchantment(ReagentEnchantmentData reagentEnchantmentData)
     {
-        this.enchantments.put(reagentEnchantmentData.getEnchantment().getRegistryName(), reagentEnchantmentData);
+        this.enchantments.put(reagentEnchantmentData.getEnchantment(), reagentEnchantmentData);
     }
 
     public void removeEnchantment(Enchantment enchantment)
     {
-        this.enchantments.remove(enchantment.getRegistryName());
+        this.enchantments.remove(enchantment);
     }
 
-    public List<EnchantmentData> createEnchantmentList(World world, BlockPos pos, PlayerEntity player, ItemStack unenchantedStack, ItemStack reagentStack, int enchantmentTier, int enchantabilityLevel, Random random)
+    public List<EnchantmentData> createEnchantmentList(ItemStack unenchantedStack, ItemStack reagentStack, int enchantmentTier, int enchantabilityLevel, Random random)
     {
-        int enchantability = unenchantedStack.getItem().getItemEnchantability(unenchantedStack);
+        int enchantability = unenchantedStack.getItemEnchantability();
 
         if(enchantability <= 0)
         {
@@ -76,12 +71,12 @@ public class Reagent
             enchantabilityLevel = MathHelper.clamp(Math.round((float) enchantabilityLevel + (float) enchantabilityLevel * enchantmentMultiplier), 1, Integer.MAX_VALUE);
 
             List<EnchantmentData> aggregateEnchantmentData = new ArrayList<>();
-            List<Enchantment> applicableEnchantments = this.getApplicableEnchantments(world, pos, player, unenchantedStack, reagentStack, random);
+            List<Enchantment> applicableEnchantments = this.getApplicableEnchantments(unenchantedStack, reagentStack, random);
             Collections.shuffle(applicableEnchantments, random);
 
             for(Enchantment enchantment : applicableEnchantments)
             {
-                ReagentEnchantmentData reagentEnchantmentData = this.getReagentEnchantmentData(enchantment);
+                ReagentEnchantmentData reagentEnchantmentData = this.enchantments.get(enchantment);
                 int minimumEnchantmentLevel = reagentEnchantmentData.getMinimumEnchantmentLevel();
                 int maximumEnchantmentLevel = reagentEnchantmentData.getMaximumEnchantmentLevel();
                 int enchantmentLevel;
@@ -121,7 +116,7 @@ public class Reagent
                 {
                     EnchantmentData enchantmentData = new EnchantmentData(enchantment, enchantmentLevel);
 
-                    if(this.getEnchantmentProbability(world, pos, player, unenchantedStack, reagentStack, enchantmentData, random) >= random.nextDouble())
+                    if(this.getEnchantmentProbability(unenchantedStack, reagentStack, enchantmentData, random) >= random.nextDouble())
                     {
                         aggregateEnchantmentData.add(enchantmentData);
                     }
@@ -154,9 +149,9 @@ public class Reagent
         }
     }
 
-    public boolean hasApplicableEnchantments(World world, BlockPos pos, PlayerEntity player, ItemStack unenchantedStack, ItemStack reagentStack, Random random)
+    public boolean hasApplicableEnchantments(ItemStack unenchantedStack, ItemStack reagentStack, Random random)
     {
-        for(Enchantment enchantment : this.getEnchantments())
+        for(Enchantment enchantment : this.enchantments.keySet())
         {
             if(enchantment.canApplyAtEnchantingTable(unenchantedStack) || (unenchantedStack.getItem() == Items.BOOK && enchantment.isAllowedOnBooks()))
             {
@@ -167,9 +162,9 @@ public class Reagent
         return false;
     }
 
-    public boolean consumeReagent(World world, BlockPos pos, PlayerEntity player, ItemStack enchantedStack, ItemStack reagentStack, List<EnchantmentData> enchantmentList, Random random)
+    public boolean consumeReagent(ItemStack unenchantedStack, ItemStack enchantedStack, ItemStack reagentStack, List<EnchantmentData> enchantmentList, Random random)
     {
-        List<Enchantment> applicableEnchantments = this.getApplicableEnchantments(world, pos, player, enchantedStack, reagentStack, random);
+        List<Enchantment> applicableEnchantments = this.getApplicableEnchantments(unenchantedStack, reagentStack, random);
 
         for(EnchantmentData enchantmentData : enchantmentList)
         {
@@ -187,23 +182,21 @@ public class Reagent
         return this.item;
     }
 
-    public List<Enchantment> getEnchantments()
+    public Set<Enchantment> getEnchantments()
     {
-        List<Enchantment> associatedEnchantments = new ArrayList<>();
-
-        for(ResourceLocation registryName : this.enchantments.keySet())
-        {
-            associatedEnchantments.add(ForgeRegistries.ENCHANTMENTS.getValue(registryName));
-        }
-
-        return associatedEnchantments;
+        return Collections.unmodifiableSet(this.enchantments.keySet());
     }
 
-    public List<Enchantment> getApplicableEnchantments(World world, BlockPos pos, PlayerEntity player, ItemStack unenchantedStack, ItemStack reagentStack, Random random)
+    public ReagentEnchantmentData getReagentEnchantmentData(Enchantment enchantment)
+    {
+        return this.enchantments.get(enchantment);
+    }
+
+    public List<Enchantment> getApplicableEnchantments(ItemStack unenchantedStack, ItemStack reagentStack, Random random)
     {
         List<Enchantment> enchantments = new ArrayList<>();
 
-        for(Enchantment enchantment : this.getEnchantments())
+        for(Enchantment enchantment : this.enchantments.keySet())
         {
             if(enchantment.canApplyAtEnchantingTable(unenchantedStack) || (unenchantedStack.getItem() == Items.BOOK && enchantment.isAllowedOnBooks()))
             {
@@ -214,32 +207,27 @@ public class Reagent
         return enchantments;
     }
 
-    public ReagentEnchantmentData getReagentEnchantmentData(Enchantment enchantment)
-    {
-        return this.enchantments.get(enchantment.getRegistryName());
-    }
-
-    public double getEnchantmentProbability(World world, BlockPos pos, PlayerEntity player, ItemStack unenchantedStack, ItemStack reagentStack, EnchantmentData enchantmentData, Random random)
+    public double getEnchantmentProbability(ItemStack unenchantedStack, ItemStack reagentStack, EnchantmentData enchantmentData, Random random)
     {
         Enchantment enchantment = enchantmentData.enchantment;
 
-        if(this.enchantments.containsKey(enchantment.getRegistryName()))
+        if(this.enchantments.containsKey(enchantment))
         {
-            return this.getReagentEnchantmentData(enchantment).getEnchantmentProbability();
+            return this.enchantments.get(enchantment).getEnchantmentProbability();
         }
 
-        return 0.5D;
+        return 0.0D;
     }
 
-    public int getCost(World world, BlockPos pos, PlayerEntity player, ItemStack unenchantedStack, ItemStack reagentStack, EnchantmentData enchantmentData, Random random)
+    public int getCost(ItemStack unenchantedStack, ItemStack reagentStack, EnchantmentData enchantmentData, Random random)
     {
         Enchantment enchantment = enchantmentData.enchantment;
 
-        if(this.enchantments.containsKey(enchantment.getRegistryName()))
+        if(this.enchantments.containsKey(enchantment))
         {
-            return this.getReagentEnchantmentData(enchantment).getReagentCost();
+            return this.enchantments.get(enchantment).getReagentCost();
         }
 
-        return 1;
+        return 0;
     }
 }

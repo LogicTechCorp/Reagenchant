@@ -281,12 +281,9 @@ public class ReagentTableScreen extends ContainerScreen<ReagentTableContainer>
                             if(reagent.getEnchantments().contains(enchantment))
                             {
                                 ItemStack unenchantedStack = this.container.getItemStackHandler().getStackInSlot(0);
-                                this.container.getWorldPosCallable().consume((world, pos) ->
-                                {
-                                    int reagentCost = reagent.getCost(world, pos, this.container.getPlayer(), unenchantedStack, reagentStack, new EnchantmentData(enchantment, enchantmentLevel), this.container.getRandom());
-                                    TextFormatting reagentTextFormatting = this.container.getReagentAmount() >= reagentCost ? TextFormatting.GRAY : TextFormatting.RED;
-                                    list.add(reagentTextFormatting + "" + I18n.format("gui.reagenchant.reagent_table.reagent.cost", reagentCost));
-                                });
+                                int reagentCost = reagent.getCost(unenchantedStack, reagentStack, new EnchantmentData(enchantment, enchantmentLevel), this.container.getRandom());
+                                TextFormatting reagentTextFormatting = this.container.getReagentAmount() >= reagentCost ? TextFormatting.GRAY : TextFormatting.RED;
+                                list.add(reagentTextFormatting + "" + I18n.format("gui.reagenchant.reagent_table.reagent.cost", reagentCost));
                             }
                         }
 
@@ -308,15 +305,11 @@ public class ReagentTableScreen extends ContainerScreen<ReagentTableContainer>
         {
             this.last = stack;
 
-            while(true)
+            do
             {
                 this.flipRandom += (float) (this.random.nextInt(4) - this.random.nextInt(4));
-
-                if(this.flip > this.flipRandom + 1.0F || this.flip < this.flipRandom - 1.0F)
-                {
-                    break;
-                }
             }
+            while(!(this.flip > this.flipRandom + 1.0F) && !(this.flip < this.flipRandom - 1.0F));
         }
 
         this.flipPrev = this.flip;
