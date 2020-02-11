@@ -64,15 +64,12 @@ public class ReagentTableTileEntity extends TileEntityInventory implements ITick
             {
                 float randomFlip = this.flipRandom;
 
-                while(true)
+                do
                 {
                     this.flipRandom += (float) (this.random.nextInt(4) - this.random.nextInt(4));
 
-                    if(randomFlip != this.flipRandom)
-                    {
-                        break;
-                    }
                 }
+                while(randomFlip == this.flipRandom);
             }
         }
         else
@@ -101,10 +98,11 @@ public class ReagentTableTileEntity extends TileEntityInventory implements ITick
             this.offsetRotation += ((float) Math.PI * 2F);
         }
 
-        float rotation;
+        float rotation = this.offsetRotation - this.bookRotation;
 
-        for(rotation = this.offsetRotation - this.bookRotation; rotation >= (float) Math.PI; rotation -= ((float) Math.PI * 2F))
+        while(rotation >= (float) Math.PI)
         {
+            rotation -= ((float) Math.PI * 2F);
         }
 
         while(rotation < -(float) Math.PI)

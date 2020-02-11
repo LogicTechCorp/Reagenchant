@@ -94,6 +94,12 @@ public class ReagentTableContainer extends Container
             {
                 return 1;
             }
+
+            @Override
+            public int getItemStackLimit(ItemStack stack)
+            {
+                return 1;
+            }
         });
         this.addSlot(new SlotItemHandler(this.itemStackHandler, 1, 24, 47)
         {
@@ -108,12 +114,6 @@ public class ReagentTableContainer extends Container
             {
                 return stack.getItem().isIn(Tags.Items.GEMS_LAPIS);
             }
-
-            @Override
-            public int getSlotStackLimit()
-            {
-                return 64;
-            }
         });
         this.addSlot(new SlotItemHandler(this.itemStackHandler, 2, 42, 47)
         {
@@ -127,12 +127,6 @@ public class ReagentTableContainer extends Container
             public boolean isItemValid(ItemStack stack)
             {
                 return Reagenchant.REAGENT_MANAGER.isReagent(stack.getItem());
-            }
-
-            @Override
-            public int getSlotStackLimit()
-            {
-                return 64;
             }
         });
 
@@ -150,8 +144,6 @@ public class ReagentTableContainer extends Container
         }
 
         this.xpSeed.set(playerInventory.player.getXPSeed());
-        this.onContentsChanged();
-
         this.trackInt(IntReferenceHolder.create(this.enchantmentLevels, 0));
         this.trackInt(IntReferenceHolder.create(this.enchantmentLevels, 1));
         this.trackInt(IntReferenceHolder.create(this.enchantmentLevels, 2));
@@ -164,7 +156,7 @@ public class ReagentTableContainer extends Container
         this.trackInt(IntReferenceHolder.create(this.enchantabilityLevels, 2));
     }
 
-    private void onContentsChanged()
+    public void onContentsChanged()
     {
         ItemStack unenchantedStack = this.itemStackHandler.getStackInSlot(0);
 

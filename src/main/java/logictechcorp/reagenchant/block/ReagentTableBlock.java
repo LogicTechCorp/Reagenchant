@@ -25,6 +25,7 @@ import net.minecraft.block.BlockRenderType;
 import net.minecraft.block.BlockState;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.inventory.container.Container;
 import net.minecraft.inventory.container.INamedContainerProvider;
 import net.minecraft.inventory.container.SimpleNamedContainerProvider;
 import net.minecraft.item.ItemStack;
@@ -108,11 +109,7 @@ public class ReagentTableBlock extends TileEntityBlock<ReagentTableTileEntity>
     @Override
     public boolean onBlockActivated(BlockState state, World world, BlockPos pos, PlayerEntity player, Hand hand, BlockRayTraceResult rayTraceResult)
     {
-        if(world.isRemote)
-        {
-            return true;
-        }
-        else
+        if(!world.isRemote)
         {
             if(world.getTileEntity(pos) instanceof EnchantingTableTileEntity)
             {
@@ -120,8 +117,15 @@ public class ReagentTableBlock extends TileEntityBlock<ReagentTableTileEntity>
             }
 
             player.openContainer(state.getContainer(world, pos));
-            return true;
+            Container openContainer = player.openContainer;
+
+            if(openContainer instanceof ReagentTableContainer)
+            {
+                ((ReagentTableContainer) openContainer).onContentsChanged();
+            }
         }
+
+        return true;
     }
 
     @Override
