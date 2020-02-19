@@ -20,7 +20,7 @@ package logictechcorp.reagenchant;
 import com.mojang.brigadier.CommandDispatcher;
 import logictechcorp.libraryex.resource.OptionalResourcePack;
 import logictechcorp.reagenchant.block.ReagenchantBlocks;
-import logictechcorp.reagenchant.command.ReagentCommand;
+import logictechcorp.reagenchant.command.ReagenchantCommand;
 import logictechcorp.reagenchant.handler.UnbreakingHandler;
 import logictechcorp.reagenchant.inventory.container.ReagenchantContainers;
 import logictechcorp.reagenchant.item.ReagenchantItems;
@@ -87,7 +87,7 @@ public class Reagenchant
     private void onServerStarting(FMLServerStartingEvent event)
     {
         CommandDispatcher<CommandSource> dispatcher = event.getCommandDispatcher();
-        ReagentCommand.register(dispatcher);
+        ReagenchantCommand.register(dispatcher);
     }
 
     private void onServerStopping(FMLServerStoppingEvent event)

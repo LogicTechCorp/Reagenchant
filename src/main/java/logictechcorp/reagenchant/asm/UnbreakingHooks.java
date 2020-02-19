@@ -50,7 +50,7 @@ public class UnbreakingHooks
         return damage;
     }
 
-    public static boolean onBlockDestroyed(ItemStack stack, World world, BlockState state, BlockPos pos, LivingEntity entityLiving)
+    public static boolean onBlockDestroyed(ItemStack stack, World world, BlockState state, BlockPos pos, LivingEntity livingEntity)
     {
         if(ReagenchantConfig.ENCHANTMENT.unbreakingPreventsItemDestruction.get() && UnbreakingHandler.isItemBroken(stack))
         {
@@ -58,7 +58,7 @@ public class UnbreakingHooks
         }
         else
         {
-            return stack.getItem().onBlockDestroyed(stack, world, state, pos, entityLiving);
+            return stack.getItem().onBlockDestroyed(stack, world, state, pos, livingEntity);
         }
     }
 
@@ -76,7 +76,6 @@ public class UnbreakingHooks
 
     public static Multimap<String, AttributeModifier> getAttributeModifiers(ItemStack stack, EquipmentSlotType slot)
     {
-
         if(ReagenchantConfig.ENCHANTMENT.unbreakingPreventsItemDestruction.get() && UnbreakingHandler.isItemBroken(stack))
         {
             return HashMultimap.create();

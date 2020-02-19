@@ -162,6 +162,16 @@ public class ReagentManager extends ReloadListener<Map<ResourceLocation, JsonObj
         return new Reagent(item);
     }
 
+    public void registerReagent(Reagent reagent)
+    {
+        this.reagents.put(reagent.getItem().getRegistryName(), reagent);
+    }
+
+    public void unregisterReagent(Reagent reagent)
+    {
+        this.reagents.remove(reagent.getItem().getRegistryName());
+    }
+
     protected <T> ReagentEnchantmentData deserializeReagentEnchantmentData(Dynamic<T> dynamic)
     {
         Enchantment enchantment = ForgeRegistries.ENCHANTMENTS.getValue(new ResourceLocation(dynamic.get("enchantment").asString("null")));

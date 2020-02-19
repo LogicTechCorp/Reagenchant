@@ -380,7 +380,8 @@ public class UnbreakingHandler
 
     public static boolean isItemBroken(ItemStack stack)
     {
-        return stack.getItem() != Items.AIR && stack.getOrCreateTag().getBoolean(BROKEN_KEY);
+        CompoundNBT tag = stack.getTag();
+        return stack.getItem() != Items.AIR && tag != null && tag.getBoolean(BROKEN_KEY);
     }
 
     public static boolean canItemBeBroken(ItemStack stack, int damageAmount)
