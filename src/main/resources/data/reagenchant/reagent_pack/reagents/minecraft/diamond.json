@@ -30,23 +30,9 @@
             "reagentCost": 1
         },
         {
-            "enchantment": "minecraft:infinity",
-            "minimumEnchantmentLevel": 1,
-            "maximumEnchantmentLevel": 1,
-            "probability": 0.5,
-            "reagentCost": 1
-        },
-        {
             "enchantment": "minecraft:multishot",
             "minimumEnchantmentLevel": 1,
             "maximumEnchantmentLevel": 1,
-            "probability": 0.5,
-            "reagentCost": 1
-        },
-        {
-            "enchantment": "minecraft:blast_protection",
-            "minimumEnchantmentLevel": 1,
-            "maximumEnchantmentLevel": 4,
             "probability": 0.5,
             "reagentCost": 1
         },

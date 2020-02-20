@@ -9,23 +9,9 @@
             "reagentCost": 1
         },
         {
-            "enchantment": "minecraft:feather_falling",
-            "minimumEnchantmentLevel": 1,
-            "maximumEnchantmentLevel": 4,
-            "probability": 0.5,
-            "reagentCost": 1
-        },
-        {
             "enchantment": "ensorcellation:weeding",
             "minimumEnchantmentLevel": 1,
             "maximumEnchantmentLevel": 1,
-            "probability": 0.5,
-            "reagentCost": 1
-        },
-        {
-            "enchantment": "minecraft:smite",
-            "minimumEnchantmentLevel": 1,
-            "maximumEnchantmentLevel": 5,
             "probability": 0.5,
             "reagentCost": 1
         },
