@@ -21,7 +21,6 @@ import com.mojang.brigadier.CommandDispatcher;
 import logictechcorp.libraryex.resource.OptionalResourcePack;
 import logictechcorp.reagenchant.block.ReagenchantBlocks;
 import logictechcorp.reagenchant.command.ReagenchantCommand;
-import logictechcorp.reagenchant.handler.UnbreakingHandler;
 import logictechcorp.reagenchant.inventory.container.ReagenchantContainers;
 import logictechcorp.reagenchant.item.ReagenchantItems;
 import logictechcorp.reagenchant.proxy.ClientProxy;
@@ -35,7 +34,6 @@ import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.fml.DistExecutor;
 import net.minecraftforge.fml.ModList;
 import net.minecraftforge.fml.common.Mod;
-import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
 import net.minecraftforge.fml.event.server.FMLServerAboutToStartEvent;
 import net.minecraftforge.fml.event.server.FMLServerStartingEvent;
 import net.minecraftforge.fml.event.server.FMLServerStoppingEvent;
@@ -57,7 +55,6 @@ public class Reagenchant
         DistExecutor.runForDist(() -> ClientProxy::new, () -> ServerProxy::new);
 
         IEventBus modEventBus = FMLJavaModLoadingContext.get().getModEventBus();
-        modEventBus.addListener(this::onCommonSetup);
         ReagenchantBlocks.BLOCK_OVERRIDES.register(modEventBus);
         ReagenchantItems.ITEM_OVERRIDES.register(modEventBus);
         ReagenchantTileEntities.TILE_ENTITIES.register(modEventBus);
@@ -67,12 +64,6 @@ public class Reagenchant
         forgeEventBus.addListener(this::onServerAboutToStart);
         forgeEventBus.addListener(this::onServerStarting);
         forgeEventBus.addListener(this::onServerStopping);
-        ReagenchantConfig.registerConfigs();
-    }
-
-    private void onCommonSetup(FMLCommonSetupEvent event)
-    {
-        UnbreakingHandler.setup();
     }
 
     private void onServerAboutToStart(FMLServerAboutToStartEvent event)
