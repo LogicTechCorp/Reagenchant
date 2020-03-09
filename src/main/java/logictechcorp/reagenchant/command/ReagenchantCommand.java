@@ -28,11 +28,7 @@ public class ReagenchantCommand
     {
         dispatcher.register(LiteralArgumentBuilder
                 .<CommandSource>literal(Reagenchant.MOD_ID)
-                .then(ReagentCommands.registerCreation())
-                .then(ReagentCommands.registerAddition())
-                .then(ReagentCommands.registerRemoval())
-                .then(ReagentCommands.registerDeletion())
+                .then(ReagentCommand.register())
         );
-
     }
 }

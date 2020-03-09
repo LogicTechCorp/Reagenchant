@@ -45,46 +45,56 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 
-public class ReagentCommands
+public class ReagentCommand
 {
     private static final Gson GSON = new GsonBuilder().setPrettyPrinting().disableHtmlEscaping().create();
 
-    public static ArgumentBuilder<CommandSource, ?> registerCreation()
+    public static ArgumentBuilder<CommandSource, ?> register()
     {
         return Commands
-                .literal("createReagent")
-                .requires(source -> source.hasPermissionLevel(2))
-                .then(Commands.argument("item", ItemArgument.item()).executes(ReagentCommands::createReagent));
+                .literal("reagent")
+                .then(registerCreation())
+                .then(registerAddition())
+                .then(registerRemoval())
+                .then(registerDeletion());
     }
 
-    public static ArgumentBuilder<CommandSource, ?> registerAddition()
+    private static ArgumentBuilder<CommandSource, ?> registerCreation()
     {
         return Commands
-                .literal("addToReagent")
+                .literal("create")
+                .requires(source -> source.hasPermissionLevel(2))
+                .then(Commands.argument("item", ItemArgument.item()).executes(ReagentCommand::createReagent));
+    }
+
+    private static ArgumentBuilder<CommandSource, ?> registerAddition()
+    {
+        return Commands
+                .literal("addEnchantment")
                 .requires(source -> source.hasPermissionLevel(2))
                 .then(Commands.argument("item", ItemArgument.item())
                         .then(Commands.argument("enchantment", EnchantmentArgument.enchantment())
                                 .then(Commands.argument("minimum level", IntegerArgumentType.integer(1))
                                         .then(Commands.argument("maximum level", IntegerArgumentType.integer(1))
                                                 .then(Commands.argument("probability", DoubleArgumentType.doubleArg(0.0D))
-                                                        .then(Commands.argument("cost", IntegerArgumentType.integer(0)).executes(ReagentCommands::addToReagent)))))));
+                                                        .then(Commands.argument("cost", IntegerArgumentType.integer(0)).executes(ReagentCommand::addToReagent)))))));
     }
 
-    public static ArgumentBuilder<CommandSource, ?> registerRemoval()
+    private static ArgumentBuilder<CommandSource, ?> registerRemoval()
     {
         return Commands
-                .literal("removeFromReagent")
+                .literal("removeEnchantment")
                 .requires(source -> source.hasPermissionLevel(2))
                 .then(Commands.argument("item", ItemArgument.item())
-                        .then(Commands.argument("enchantment", EnchantmentArgument.enchantment()).executes(ReagentCommands::removeFromReagent)));
+                        .then(Commands.argument("enchantment", EnchantmentArgument.enchantment()).executes(ReagentCommand::removeFromReagent)));
     }
 
-    public static ArgumentBuilder<CommandSource, ?> registerDeletion()
+    private static ArgumentBuilder<CommandSource, ?> registerDeletion()
     {
         return Commands
-                .literal("deleteReagent")
+                .literal("delete")
                 .requires(source -> source.hasPermissionLevel(2))
-                .then(Commands.argument("item", ItemArgument.item()).executes(ReagentCommands::deleteReagent));
+                .then(Commands.argument("item", ItemArgument.item()).executes(ReagentCommand::deleteReagent));
     }
 
     private static int createReagent(CommandContext<CommandSource> context)
@@ -105,7 +115,7 @@ public class ReagentCommands
             source.sendErrorMessage(new TranslationTextComponent("command.reagenchant.reagent.create.override", item.getRegistryName()));
         }
 
-        saveReagent(server, reagent);
+        saveReagentFile(server, reagent);
         return CommandCompletion.SUCCESS;
     }
 
@@ -132,7 +142,7 @@ public class ReagentCommands
 
             reagent.addEnchantment(new ReagentEnchantmentData(enchantment, minimumLevel, maximumLevel, probability, cost));
             source.sendFeedback(new TranslationTextComponent("command.reagenchant.reagent.add.success", enchantment.getRegistryName(), item.getRegistryName()), true);
-            saveReagent(server, reagent);
+            saveReagentFile(server, reagent);
             return CommandCompletion.SUCCESS;
         }
 
@@ -158,7 +168,7 @@ public class ReagentCommands
 
             reagent.removeEnchantment(enchantment);
             source.sendFeedback(new TranslationTextComponent("command.reagenchant.reagent.remove.success", enchantment.getRegistryName(), item.getRegistryName()), true);
-            saveReagent(server, reagent);
+            saveReagentFile(server, reagent);
             return CommandCompletion.SUCCESS;
         }
 
@@ -180,11 +190,11 @@ public class ReagentCommands
 
         Reagenchant.REAGENT_MANAGER.unregisterReagent(reagent);
         source.sendFeedback(new TranslationTextComponent("command.reagenchant.reagent.delete.success", item.getRegistryName()), true);
-        deleteReagent(server, reagent);
+        deleteReagentFile(server, reagent);
         return CommandCompletion.SUCCESS;
     }
 
-    private static void saveReagent(MinecraftServer server, Reagent reagent)
+    private static void saveReagentFile(MinecraftServer server, Reagent reagent)
     {
         File datapackDirectory = server.getActiveAnvilConverter().getFile(server.getFolderName(), "datapacks");
         File customReagentDatapackFile = new File(datapackDirectory, "custom_reagent_pack/pack.mcmeta");
@@ -249,7 +259,7 @@ public class ReagentCommands
         }
     }
 
-    private static void deleteReagent(MinecraftServer server, Reagent reagent)
+    private static void deleteReagentFile(MinecraftServer server, Reagent reagent)
     {
         File datapackDirectory = server.getActiveAnvilConverter().getFile(server.getFolderName(), "datapacks");
         File customReagentDatapackFile = new File(datapackDirectory, "custom_reagent_pack/pack.mcmeta");
