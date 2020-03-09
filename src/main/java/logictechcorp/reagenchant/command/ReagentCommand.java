@@ -54,7 +54,8 @@ public class ReagentCommand
         return Commands
                 .literal("reagent")
                 .then(registerCreation())
-                .then(registerAddition())
+                .then(registerDefaultAddition())
+                .then(registerCustomAddition())
                 .then(registerRemoval())
                 .then(registerDeletion());
     }
@@ -67,7 +68,17 @@ public class ReagentCommand
                 .then(Commands.argument("item", ItemArgument.item()).executes(ReagentCommand::createReagent));
     }
 
-    private static ArgumentBuilder<CommandSource, ?> registerAddition()
+    private static ArgumentBuilder<CommandSource, ?> registerDefaultAddition()
+    {
+        return Commands
+                .literal("addEnchantment")
+                .requires(source -> source.hasPermissionLevel(2))
+                .then(Commands.argument("item", ItemArgument.item())
+                        .then(Commands.argument("enchantment", EnchantmentArgument.enchantment())
+                                .executes(ReagentCommand::addDefaultToReagent)));
+    }
+
+    private static ArgumentBuilder<CommandSource, ?> registerCustomAddition()
     {
         return Commands
                 .literal("addEnchantment")
@@ -77,7 +88,7 @@ public class ReagentCommand
                                 .then(Commands.argument("minimum level", IntegerArgumentType.integer(1))
                                         .then(Commands.argument("maximum level", IntegerArgumentType.integer(1))
                                                 .then(Commands.argument("probability", DoubleArgumentType.doubleArg(0.0D))
-                                                        .then(Commands.argument("cost", IntegerArgumentType.integer(0)).executes(ReagentCommand::addToReagent)))))));
+                                                        .then(Commands.argument("cost", IntegerArgumentType.integer(0)).executes(ReagentCommand::addCustomToReagent)))))));
     }
 
     private static ArgumentBuilder<CommandSource, ?> registerRemoval()
@@ -119,7 +130,33 @@ public class ReagentCommand
         return CommandCompletion.SUCCESS;
     }
 
-    private static int addToReagent(CommandContext<CommandSource> context)
+    private static int addDefaultToReagent(CommandContext<CommandSource> context)
+    {
+        CommandSource source = context.getSource();
+        MinecraftServer server = source.getServer();
+        Item item = ItemArgument.getItem(context, "item").getItem();
+
+        if(item != Items.AIR)
+        {
+            Reagent reagent = Reagenchant.REAGENT_MANAGER.getReagent(item);
+            Enchantment enchantment = EnchantmentArgument.getEnchantment(context, "enchantment");
+
+            if(reagent == null)
+            {
+                source.sendErrorMessage(new TranslationTextComponent("command.reagenchant.reagent.add.error", item.getRegistryName()));
+                return CommandCompletion.FAILURE;
+            }
+
+            reagent.addEnchantment(new ReagentEnchantmentData(enchantment, enchantment.getMinLevel(), enchantment.getMaxLevel(), 0.5F, 1));
+            source.sendFeedback(new TranslationTextComponent("command.reagenchant.reagent.add.success", enchantment.getRegistryName(), item.getRegistryName()), true);
+            saveReagentFile(server, reagent);
+            return CommandCompletion.SUCCESS;
+        }
+
+        return CommandCompletion.FAILURE;
+    }
+
+    private static int addCustomToReagent(CommandContext<CommandSource> context)
     {
         CommandSource source = context.getSource();
         MinecraftServer server = source.getServer();
@@ -207,8 +244,8 @@ public class ReagentCommand
 
             JsonObject jsonObject = new JsonObject();
             JsonObject packObject = new JsonObject();
+            packObject.addProperty("description", "Custom reagent data pack.");
             packObject.addProperty("pack_format", 4);
-            packObject.addProperty("description", "Custom reagent data pack");
             jsonObject.add("pack", packObject);
 
             try
@@ -262,11 +299,10 @@ public class ReagentCommand
     private static void deleteReagentFile(MinecraftServer server, Reagent reagent)
     {
         File datapackDirectory = server.getActiveAnvilConverter().getFile(server.getFolderName(), "datapacks");
-        File customReagentDatapackFile = new File(datapackDirectory, "custom_reagent_pack/pack.mcmeta");
-        File customReagentDirectory = new File(datapackDirectory, "custom_reagent_pack/data/" + Reagenchant.MOD_ID + "/reagents");
+        File customReagentDirectory = new File(datapackDirectory, "/custom_reagent_pack/data/" + Reagenchant.MOD_ID + "/reagents/");
         File customReagentFile = new File(customReagentDirectory, reagent.getItem().getRegistryName().toString().replace(":", "/") + ".json");
 
-        if(customReagentDatapackFile.exists() && customReagentFile.exists())
+        if(customReagentFile.exists())
         {
             customReagentFile.delete();
         }
