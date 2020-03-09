@@ -18,7 +18,7 @@
 package logictechcorp.reagenchant;
 
 import com.mojang.brigadier.CommandDispatcher;
-import logictechcorp.libraryex.resource.OptionalResourcePack;
+import logictechcorp.libraryex.resource.BuiltinDataPack;
 import logictechcorp.reagenchant.block.ReagenchantBlocks;
 import logictechcorp.reagenchant.command.ReagenchantCommand;
 import logictechcorp.reagenchant.inventory.container.ReagenchantContainers;
@@ -71,7 +71,7 @@ public class Reagenchant
         MinecraftServer server = event.getServer();
         ModFile modFile = ModList.get().getModFileById(MOD_ID).getFile();
 
-        server.getResourcePacks().addPackFinder(new OptionalResourcePack(modFile, "reagent_pack", true));
+        server.getResourcePacks().addPackFinder(new BuiltinDataPack(modFile, "reagent_pack"));
         server.getResourceManager().addReloadListener(REAGENT_MANAGER);
     }
 

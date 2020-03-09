@@ -68,7 +68,7 @@ public class ReagentManager extends ReloadListener<Map<ResourceLocation, JsonObj
         {
             try
             {
-                if(!resourceLocation.toString().contains(this.folderName))
+                if(!resourceLocation.getPath().startsWith(this.folderName))
                 {
                     resourceLocation = new ResourceLocation(resourceLocation.getNamespace(), this.folderName + "/" + resourceLocation.getPath() + ".json");
                 }
@@ -123,7 +123,7 @@ public class ReagentManager extends ReloadListener<Map<ResourceLocation, JsonObj
             String path = resource.getPath();
             ResourceLocation truncatedResource;
 
-            if(!resource.getPath().startsWith(this.folderName))
+            if(!path.startsWith(this.folderName))
             {
                 truncatedResource = resource;
             }
@@ -140,7 +140,7 @@ public class ReagentManager extends ReloadListener<Map<ResourceLocation, JsonObj
                 {
                     if(map.put(truncatedResource, jsonObject) != null)
                     {
-                        Reagenchant.LOGGER.error("Duplicate data file: " + truncatedResource);
+                        Reagenchant.LOGGER.error("Duplicate data file: {}", truncatedResource);
                     }
                 }
                 else
