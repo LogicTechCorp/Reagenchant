@@ -1,0 +1,12 @@
+{
+  "item": "minecraft:spider_eye",
+  "enchantments": [
+    {
+      "enchantment": "ffenchants:poison_aspect",
+      "minimumEnchantmentLevel": 1,
+      "maximumEnchantmentLevel": 2,
+      "probability": 0.5,
+      "reagentCost": 1
+    }
+  ]
+}

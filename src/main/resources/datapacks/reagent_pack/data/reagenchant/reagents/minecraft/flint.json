@@ -1,0 +1,12 @@
+{
+  "item": "minecraft:flint",
+  "enchantments": [
+    {
+      "enchantment": "ensorcellation:cavalier",
+      "minimumEnchantmentLevel": 1,
+      "maximumEnchantmentLevel": 4,
+      "probability": 0.5,
+      "reagentCost": 1
+    }
+  ]
+}

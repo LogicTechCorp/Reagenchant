@@ -1,0 +1,12 @@
+{
+  "item": "minecraft:totem_of_undying",
+  "enchantments": [
+    {
+      "enchantment": "ensorcellation:curse_mercy",
+      "minimumEnchantmentLevel": 1,
+      "maximumEnchantmentLevel": 1,
+      "probability": 0.5,
+      "reagentCost": 1
+    }
+  ]
+}

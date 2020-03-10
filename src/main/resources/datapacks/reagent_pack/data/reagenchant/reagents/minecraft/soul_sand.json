@@ -1,0 +1,19 @@
+{
+  "item": "minecraft:soul_sand",
+  "enchantments": [
+    {
+      "enchantment": "ensorcellation:leech",
+      "minimumEnchantmentLevel": 1,
+      "maximumEnchantmentLevel": 4,
+      "probability": 0.5,
+      "reagentCost": 1
+    },
+    {
+      "enchantment": "ffenchants:vampiric",
+      "minimumEnchantmentLevel": 1,
+      "maximumEnchantmentLevel": 2,
+      "probability": 1,
+      "reagentCost": 1
+    }
+  ]
+}

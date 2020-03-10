@@ -1,0 +1,12 @@
+{
+  "item": "minecraft:end_crystal",
+  "enchantments": [
+    {
+      "enchantment": "ensorcellation:vorpal",
+      "minimumEnchantmentLevel": 1,
+      "maximumEnchantmentLevel": 3,
+      "probability": 0.5,
+      "reagentCost": 1
+    }
+  ]
+}

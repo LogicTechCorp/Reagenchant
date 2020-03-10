@@ -1,0 +1,12 @@
+{
+  "item": "minecraft:emerald",
+  "enchantments": [
+    {
+      "enchantment": "ensorcellation:damage_villager",
+      "minimumEnchantmentLevel": 1,
+      "maximumEnchantmentLevel": 5,
+      "probability": 0.5,
+      "reagentCost": 1
+    }
+  ]
+}

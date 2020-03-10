@@ -1,0 +1,12 @@
+{
+  "item": "minecraft:glowstone",
+  "enchantments": [
+    {
+      "enchantment": "ffenchants:bloodlust",
+      "minimumEnchantmentLevel": 1,
+      "maximumEnchantmentLevel": 2,
+      "probability": 0.5,
+      "reagentCost": 1
+    }
+  ]
+}

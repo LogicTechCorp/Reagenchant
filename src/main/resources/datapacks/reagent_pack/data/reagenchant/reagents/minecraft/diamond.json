@@ -1,46 +1,46 @@
 {
-    "item": "minecraft:redstone",
+    "item": "minecraft:diamond",
     "enchantments": [
         {
-            "enchantment": "minecraft:efficiency",
+            "enchantment": "ensorcellation:magic_protection",
             "minimumEnchantmentLevel": 1,
-            "maximumEnchantmentLevel": 5,
+            "maximumEnchantmentLevel": 4,
             "probability": 0.5,
             "reagentCost": 1
         },
         {
-            "enchantment": "ensorcellation:air_affinity",
+            "enchantment": "minecraft:looting",
+            "minimumEnchantmentLevel": 1,
+            "maximumEnchantmentLevel": 3,
+            "probability": 0.5,
+            "reagentCost": 1
+        },
+        {
+            "enchantment": "ensorcellation:angler",
+            "minimumEnchantmentLevel": 1,
+            "maximumEnchantmentLevel": 2,
+            "probability": 1,
+            "reagentCost": 1
+        },
+        {
+            "enchantment": "minecraft:fortune",
+            "minimumEnchantmentLevel": 1,
+            "maximumEnchantmentLevel": 3,
+            "probability": 0.5,
+            "reagentCost": 1
+        },
+        {
+            "enchantment": "minecraft:multishot",
             "minimumEnchantmentLevel": 1,
             "maximumEnchantmentLevel": 1,
             "probability": 0.5,
             "reagentCost": 1
         },
         {
-            "enchantment": "ensorcellation:phalanx",
+            "enchantment": "ensorcellation:hunter",
             "minimumEnchantmentLevel": 1,
             "maximumEnchantmentLevel": 2,
-            "probability": 0.5,
-            "reagentCost": 1
-        },
-        {
-            "enchantment": "minecraft:sweeping",
-            "minimumEnchantmentLevel": 1,
-            "maximumEnchantmentLevel": 3,
-            "probability": 0.5,
-            "reagentCost": 1
-        },
-        {
-            "enchantment": "minecraft:quick_charge",
-            "minimumEnchantmentLevel": 1,
-            "maximumEnchantmentLevel": 3,
-            "probability": 0.5,
-            "reagentCost": 1
-        },
-        {
-            "enchantment": "ensorcellation:fire_rebuke",
-            "minimumEnchantmentLevel": 1,
-            "maximumEnchantmentLevel": 3,
-            "probability": 0.5,
+            "probability": 1,
             "reagentCost": 1
         }
     ]

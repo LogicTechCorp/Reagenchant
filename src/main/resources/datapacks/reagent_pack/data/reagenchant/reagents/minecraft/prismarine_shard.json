@@ -1,33 +1,40 @@
 {
-    "item": "minecraft:prismarine_shard",
-    "enchantments": [
-        {
-            "enchantment": "minecraft:riptide",
-            "minimumEnchantmentLevel": 1,
-            "maximumEnchantmentLevel": 3,
-            "probability": 0.5,
-            "reagentCost": 1
-        },
-        {
-            "enchantment": "minecraft:aqua_affinity",
-            "minimumEnchantmentLevel": 1,
-            "maximumEnchantmentLevel": 1,
-            "probability": 0.5,
-            "reagentCost": 1
-        },
-        {
-            "enchantment": "minecraft:feather_falling",
-            "minimumEnchantmentLevel": 1,
-            "maximumEnchantmentLevel": 4,
-            "probability": 0.5,
-            "reagentCost": 1
-        },
-        {
-            "enchantment": "minecraft:lure",
-            "minimumEnchantmentLevel": 1,
-            "maximumEnchantmentLevel": 3,
-            "probability": 0.5,
-            "reagentCost": 1
-        }
-    ]
+  "item": "minecraft:prismarine_shard",
+  "enchantments": [
+    {
+      "enchantment": "minecraft:riptide",
+      "minimumEnchantmentLevel": 1,
+      "maximumEnchantmentLevel": 3,
+      "probability": 0.5,
+      "reagentCost": 1
+    },
+    {
+      "enchantment": "ffenchants:weighted",
+      "minimumEnchantmentLevel": 1,
+      "maximumEnchantmentLevel": 2,
+      "probability": 0.5,
+      "reagentCost": 1
+    },
+    {
+      "enchantment": "minecraft:feather_falling",
+      "minimumEnchantmentLevel": 1,
+      "maximumEnchantmentLevel": 4,
+      "probability": 0.5,
+      "reagentCost": 1
+    },
+    {
+      "enchantment": "minecraft:lure",
+      "minimumEnchantmentLevel": 1,
+      "maximumEnchantmentLevel": 3,
+      "probability": 0.5,
+      "reagentCost": 1
+    },
+    {
+      "enchantment": "minecraft:aqua_affinity",
+      "minimumEnchantmentLevel": 1,
+      "maximumEnchantmentLevel": 1,
+      "probability": 0.5,
+      "reagentCost": 1
+    }
+  ]
 }

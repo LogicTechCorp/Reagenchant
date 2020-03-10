@@ -1,0 +1,12 @@
+{
+  "item": "minecraft:wither_rose",
+  "enchantments": [
+    {
+      "enchantment": "ffenchants:wither_aspect",
+      "minimumEnchantmentLevel": 1,
+      "maximumEnchantmentLevel": 2,
+      "probability": 1,
+      "reagentCost": 1
+    }
+  ]
+}

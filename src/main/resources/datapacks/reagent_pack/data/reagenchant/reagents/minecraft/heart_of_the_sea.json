@@ -1,0 +1,26 @@
+{
+  "item": "minecraft:heart_of_the_sea",
+  "enchantments": [
+    {
+      "enchantment": "enchantable:cultivator",
+      "minimumEnchantmentLevel": 1,
+      "maximumEnchantmentLevel": 1,
+      "probability": 0.5,
+      "reagentCost": 1
+    },
+    {
+      "enchantment": "ensorcellation:tilling",
+      "minimumEnchantmentLevel": 1,
+      "maximumEnchantmentLevel": 4,
+      "probability": 1,
+      "reagentCost": 1
+    },
+    {
+      "enchantment": "ensorcellation:excavating",
+      "minimumEnchantmentLevel": 1,
+      "maximumEnchantmentLevel": 2,
+      "probability": 1,
+      "reagentCost": 1
+    }
+  ]
+}

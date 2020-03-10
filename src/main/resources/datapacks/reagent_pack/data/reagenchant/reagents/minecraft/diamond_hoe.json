@@ -1,0 +1,12 @@
+{
+  "item": "minecraft:diamond_hoe",
+  "enchantments": [
+    {
+      "enchantment": "ensorcellation:furrowing",
+      "minimumEnchantmentLevel": 1,
+      "maximumEnchantmentLevel": 4,
+      "probability": 0.5,
+      "reagentCost": 1
+    }
+  ]
+}

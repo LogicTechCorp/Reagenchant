@@ -1,0 +1,12 @@
+{
+  "item": "minecraft:magma_cream",
+  "enchantments": [
+    {
+      "enchantment": "ffenchants:searing",
+      "minimumEnchantmentLevel": 1,
+      "maximumEnchantmentLevel": 2,
+      "probability": 0.5,
+      "reagentCost": 1
+    }
+  ]
+}
