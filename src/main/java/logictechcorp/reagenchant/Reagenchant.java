@@ -20,7 +20,6 @@ package logictechcorp.reagenchant;
 import logictechcorp.libraryex.IModData;
 import logictechcorp.libraryex.proxy.IProxy;
 import logictechcorp.reagenchant.handler.GuiHandler;
-import logictechcorp.reagenchant.handler.UnbreakingHandler;
 import logictechcorp.reagenchant.init.ReagenchantReagents;
 import logictechcorp.reagenchant.reagent.ReagentManager;
 import net.minecraft.creativetab.CreativeTabs;
@@ -39,7 +38,7 @@ public class Reagenchant implements IModData
 {
     public static final String MOD_ID = "reagenchant";
     public static final String NAME = "Reagenchant";
-    public static final String VERSION = "1.1.0";
+    public static final String VERSION = "1.1.1";
     public static final String DEPENDENCIES = "required-after:libraryex@[1.1.2,);";
 
     @Mod.Instance(MOD_ID)
@@ -62,7 +61,6 @@ public class Reagenchant implements IModData
     @Mod.EventHandler
     public void onFMLInitialization(FMLInitializationEvent event)
     {
-        UnbreakingHandler.overrideBehavior();
         proxy.init();
     }
 
