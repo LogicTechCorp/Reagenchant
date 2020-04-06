@@ -42,7 +42,7 @@ public class ReagentTableTileEntity extends TileEntityInventory implements ITick
 
     public ReagentTableTileEntity()
     {
-        super(ReagenchantTileEntities.REAGENT_TABLE_TILE_ENTITY.get(), 3);
+        super(ReagenchantTileEntityTypes.REAGENT_TABLE_TILE_ENTITY.get(), 3);
     }
 
     @Override
@@ -55,8 +55,8 @@ public class ReagentTableTileEntity extends TileEntityInventory implements ITick
 
         if(playerToFace != null)
         {
-            double posX = playerToFace.posX - (double) ((float) this.pos.getX() + 0.5F);
-            double posZ = playerToFace.posZ - (double) ((float) this.pos.getZ() + 0.5F);
+            double posX = playerToFace.getPosX() - (double) ((float) this.pos.getX() + 0.5F);
+            double posZ = playerToFace.getPosZ() - (double) ((float) this.pos.getZ() + 0.5F);
             this.offsetRotation = (float) MathHelper.atan2(posZ, posX);
             this.bookSpread += 0.1F;
 

@@ -26,7 +26,7 @@ import logictechcorp.reagenchant.item.ReagenchantItems;
 import logictechcorp.reagenchant.proxy.ClientProxy;
 import logictechcorp.reagenchant.proxy.ServerProxy;
 import logictechcorp.reagenchant.reagent.ReagentManager;
-import logictechcorp.reagenchant.tileentity.ReagenchantTileEntities;
+import logictechcorp.reagenchant.tileentity.ReagenchantTileEntityTypes;
 import net.minecraft.command.CommandSource;
 import net.minecraft.server.MinecraftServer;
 import net.minecraftforge.common.MinecraftForge;
@@ -57,7 +57,7 @@ public class Reagenchant
         IEventBus modEventBus = FMLJavaModLoadingContext.get().getModEventBus();
         ReagenchantBlocks.BLOCK_OVERRIDES.register(modEventBus);
         ReagenchantItems.ITEM_OVERRIDES.register(modEventBus);
-        ReagenchantTileEntities.TILE_ENTITIES.register(modEventBus);
+        ReagenchantTileEntityTypes.TILE_ENTITY_TYPE_OVERRIDES.register(modEventBus);
         ReagenchantContainers.CONTAINERS.register(modEventBus);
 
         IEventBus forgeEventBus = MinecraftForge.EVENT_BUS;

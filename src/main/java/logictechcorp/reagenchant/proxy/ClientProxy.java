@@ -18,9 +18,9 @@
 package logictechcorp.reagenchant.proxy;
 
 import logictechcorp.reagenchant.client.gui.screen.ReagentTableScreen;
-import logictechcorp.reagenchant.client.renderer.tileentity.TileEntityReagentTableRenderer;
+import logictechcorp.reagenchant.client.renderer.tileentity.ReagentTableTileEntityRenderer;
 import logictechcorp.reagenchant.inventory.container.ReagenchantContainers;
-import logictechcorp.reagenchant.tileentity.ReagentTableTileEntity;
+import logictechcorp.reagenchant.tileentity.ReagenchantTileEntityTypes;
 import net.minecraft.client.gui.ScreenManager;
 import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.fml.client.registry.ClientRegistry;
@@ -37,7 +37,7 @@ public class ClientProxy
 
     private void onClientSetup(FMLClientSetupEvent event)
     {
-        ClientRegistry.bindTileEntitySpecialRenderer(ReagentTableTileEntity.class, new TileEntityReagentTableRenderer());
+        ClientRegistry.bindTileEntityRenderer(ReagenchantTileEntityTypes.REAGENT_TABLE_TILE_ENTITY.get(), ReagentTableTileEntityRenderer::new);
         ScreenManager.registerFactory(ReagenchantContainers.REAGENT_TABLE_CONTAINER.get(), ReagentTableScreen::new);
     }
 }

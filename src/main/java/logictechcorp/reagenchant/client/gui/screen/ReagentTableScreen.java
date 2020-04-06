@@ -17,16 +17,18 @@
 
 package logictechcorp.reagenchant.client.gui.screen;
 
-import com.mojang.blaze3d.platform.GlStateManager;
+import com.mojang.blaze3d.matrix.MatrixStack;
+import com.mojang.blaze3d.systems.RenderSystem;
+import com.mojang.blaze3d.vertex.IVertexBuilder;
 import logictechcorp.reagenchant.Reagenchant;
 import logictechcorp.reagenchant.inventory.container.ReagentTableContainer;
 import logictechcorp.reagenchant.reagent.Reagent;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.gui.screen.inventory.ContainerScreen;
-import net.minecraft.client.renderer.Matrix4f;
-import net.minecraft.client.renderer.RenderHelper;
+import net.minecraft.client.renderer.*;
 import net.minecraft.client.renderer.entity.model.BookModel;
+import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.client.resources.I18n;
 import net.minecraft.enchantment.Enchantment;
 import net.minecraft.enchantment.EnchantmentData;
@@ -50,8 +52,8 @@ public class ReagentTableScreen extends ContainerScreen<ReagentTableContainer>
 {
     private static final ResourceLocation REAGENT_TABLE_WITH_REAGENT_GUI = new ResourceLocation(Reagenchant.MOD_ID, "textures/gui/container/reagent_table_with_reagent.png");
     private static final ResourceLocation REAGENT_TABLE_WITHOUT_REAGENT_GUI = new ResourceLocation(Reagenchant.MOD_ID, "textures/gui/container/reagent_table_without_reagent.png");
-    private static final ResourceLocation REAGENT_TABLE_BOOK = new ResourceLocation(Reagenchant.MOD_ID, "textures/entity/reagent_table_book.png");
-    private static final BookModel MODEL_BOOK = new BookModel();
+    private static final ResourceLocation BOOK_TEXTURE = new ResourceLocation("textures/entity/enchanting_table_book.png");
+    private static final BookModel BOOK_MODEL = new BookModel();
 
     private final Random random;
     private float flip;
@@ -90,7 +92,7 @@ public class ReagentTableScreen extends ContainerScreen<ReagentTableContainer>
 
         for(int enchantmentTier = 0; enchantmentTier < 3; enchantmentTier++)
         {
-            double posX = mouseX - (double) (width + 60);
+            double posX = mouseX - (double) (width + 62);
             double posY = mouseY - (double) (height + 14 + 19 * enchantmentTier);
 
             if(posX >= 0.0D && posY >= 0.0D && posX < 108.0D && posY < 19.0D && this.container.enchantItem(this.minecraft.player, enchantmentTier))
@@ -117,32 +119,34 @@ public class ReagentTableScreen extends ContainerScreen<ReagentTableContainer>
             guiTexture = REAGENT_TABLE_WITHOUT_REAGENT_GUI;
         }
 
-        GlStateManager.color4f(1.0F, 1.0F, 1.0F, 1.0F);
+        RenderHelper.setupGuiFlatDiffuseLighting();
+        RenderSystem.color4f(1.0F, 1.0F, 1.0F, 1.0F);
         this.minecraft.getTextureManager().bindTexture(guiTexture);
         int width = (this.width - this.xSize) / 2;
         int height = (this.height - this.ySize) / 2;
         this.blit(width, height, 0, 0, this.xSize, this.ySize);
-        GlStateManager.pushMatrix();
-        GlStateManager.matrixMode(5889);
-        GlStateManager.pushMatrix();
-        GlStateManager.loadIdentity();
-        int guiScaleFactor = (int) this.minecraft.mainWindow.getGuiScaleFactor();
-        GlStateManager.viewport((this.width - 320) / 2 * guiScaleFactor, (this.height - 240) / 2 * guiScaleFactor, 320 * guiScaleFactor, 240 * guiScaleFactor);
-        GlStateManager.translatef(-0.34F, 0.23F, 0.0F);
-        GlStateManager.multMatrix(Matrix4f.perspective(90.0D, 1.3333334F, 9.0F, 80.0F));
-        GlStateManager.matrixMode(5888);
-        GlStateManager.loadIdentity();
-        RenderHelper.enableStandardItemLighting();
-        GlStateManager.translatef(0.0F, 3.3F, -16.0F);
-        GlStateManager.scalef(1.0F, 1.0F, 1.0F);
-        GlStateManager.scalef(5.0F, 5.0F, 5.0F);
-        GlStateManager.rotatef(180.0F, 0.0F, 0.0F, 1.0F);
-        this.minecraft.getTextureManager().bindTexture(REAGENT_TABLE_BOOK);
-        GlStateManager.rotatef(20.0F, 1.0F, 0.0F, 0.0F);
+        RenderSystem.matrixMode(5889);
+        RenderSystem.pushMatrix();
+        RenderSystem.loadIdentity();
+        int guiScaleFactor = (int) this.minecraft.getMainWindow().getGuiScaleFactor();
+        RenderSystem.viewport((this.width - 320) / 2 * guiScaleFactor, (this.height - 240) / 2 * guiScaleFactor, 320 * guiScaleFactor, 240 * guiScaleFactor);
+        RenderSystem.translatef(-0.34F, 0.23F, 0.0F);
+        RenderSystem.multMatrix(Matrix4f.perspective(90.0D, 1.3333334F, 9.0F, 80.0F));
+        RenderSystem.matrixMode(5888);
+        MatrixStack matrixStack = new MatrixStack();
+        matrixStack.push();
+        MatrixStack.Entry matrixstack$entry = matrixStack.getLast();
+        matrixstack$entry.getMatrix().setIdentity();
+        matrixstack$entry.getNormal().setIdentity();
+        matrixStack.translate(0.0D, 3.3F, 1984.0D);
+        matrixStack.scale(5.0F, 5.0F, 5.0F);
+        matrixStack.rotate(Vector3f.ZP.rotationDegrees(180.0F));
+        matrixStack.rotate(Vector3f.XP.rotationDegrees(20.0F));
         float openFlip = MathHelper.lerp(partialTicks, this.openPrev, this.open);
-        GlStateManager.translatef((1.0F - openFlip) * 0.2F, (1.0F - openFlip) * 0.1F, (1.0F - openFlip) * 0.25F);
-        GlStateManager.rotatef(-(1.0F - openFlip) * 90.0F - 90.0F, 0.0F, 1.0F, 0.0F);
-        GlStateManager.rotatef(180.0F, 1.0F, 0.0F, 0.0F);
+        matrixStack.translate(((1.0F - openFlip) * 0.2F), ((1.0F - openFlip) * 0.1F), ((1.0F - openFlip) * 0.25F));
+        float f2 = -(1.0F - openFlip) * 90.0F - 90.0F;
+        matrixStack.rotate(Vector3f.YP.rotationDegrees(f2));
+        matrixStack.rotate(Vector3f.XP.rotationDegrees(180.0F));
         float pageOneFlip = MathHelper.lerp(partialTicks, this.flipPrev, this.flip) + 0.25F;
         float pageTwoFlip = MathHelper.lerp(partialTicks, this.flipPrev, this.flip) + 0.75F;
         pageOneFlip = (pageOneFlip - (float) MathHelper.fastFloor(pageOneFlip)) * 1.6F - 0.3F;
@@ -152,43 +156,42 @@ public class ReagentTableScreen extends ContainerScreen<ReagentTableContainer>
         {
             pageOneFlip = 0.0F;
         }
-
         if(pageTwoFlip < 0.0F)
         {
             pageTwoFlip = 0.0F;
         }
-
         if(pageOneFlip > 1.0F)
         {
             pageOneFlip = 1.0F;
         }
-
         if(pageTwoFlip > 1.0F)
         {
             pageTwoFlip = 1.0F;
         }
 
-        GlStateManager.enableRescaleNormal();
-        MODEL_BOOK.render(0.0F, pageOneFlip, pageTwoFlip, openFlip, 0.0F, 0.0625F);
-        GlStateManager.disableRescaleNormal();
-        RenderHelper.disableStandardItemLighting();
-        GlStateManager.matrixMode(5889);
-        GlStateManager.viewport(0, 0, this.minecraft.mainWindow.getFramebufferWidth(), this.minecraft.mainWindow.getFramebufferHeight());
-        GlStateManager.popMatrix();
-        GlStateManager.matrixMode(5888);
-        GlStateManager.popMatrix();
-        RenderHelper.disableStandardItemLighting();
-        GlStateManager.color4f(1.0F, 1.0F, 1.0F, 1.0F);
+        RenderSystem.enableRescaleNormal();
+        BOOK_MODEL.func_228247_a_(0.0F, pageOneFlip, pageTwoFlip, openFlip);
+        IRenderTypeBuffer.Impl renderBuffer = IRenderTypeBuffer.getImpl(Tessellator.getInstance().getBuffer());
+        IVertexBuilder vertexBuilder = renderBuffer.getBuffer(BOOK_MODEL.getRenderType(BOOK_TEXTURE));
+        BOOK_MODEL.render(matrixStack, vertexBuilder, 15728880, OverlayTexture.NO_OVERLAY, 1.0F, 1.0F, 1.0F, 1.0F);
+        renderBuffer.finish();
+        matrixStack.pop();
+        RenderSystem.matrixMode(5889);
+        RenderSystem.viewport(0, 0, this.minecraft.getMainWindow().getFramebufferWidth(), this.minecraft.getMainWindow().getFramebufferHeight());
+        RenderSystem.popMatrix();
+        RenderSystem.matrixMode(5888);
+        RenderHelper.setupGui3DDiffuseLighting();
+        RenderSystem.color4f(1.0F, 1.0F, 1.0F, 1.0F);
         EnchantmentNameParts.getInstance().reseedRandomGenerator(this.container.getXpSeed() + (this.container.getReagentAmount() == 0 ? 0 : 1));
 
         for(int i = 0; i < 3; ++i)
         {
             int rectanglePosX = width + 62;
             int textPosX = rectanglePosX + 20;
-            this.blitOffset = 0;
+            this.setBlitOffset(0);
             this.minecraft.getTextureManager().bindTexture(guiTexture);
             int enchantabilityLevel = this.container.getEnchantabilityLevels()[i];
-            GlStateManager.color4f(1.0F, 1.0F, 1.0F, 1.0F);
+            RenderSystem.color4f(1.0F, 1.0F, 1.0F, 1.0F);
 
             if(enchantabilityLevel == 0)
             {
@@ -211,7 +214,7 @@ public class ReagentTableScreen extends ContainerScreen<ReagentTableContainer>
                 }
                 else
                 {
-                    int cursorPosX = mouseX - (width + 60);
+                    int cursorPosX = mouseX - (width + 62);
                     int cursorPosY = mouseY - (height + 14 + 19 * i);
 
                     if(cursorPosX >= 0 && cursorPosY >= 0 && cursorPosX < 108 && cursorPosY < 19)

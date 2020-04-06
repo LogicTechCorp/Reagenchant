@@ -24,9 +24,9 @@ import net.minecraftforge.fml.RegistryObject;
 import net.minecraftforge.registries.DeferredRegister;
 import net.minecraftforge.registries.ForgeRegistries;
 
-public class ReagenchantTileEntities
+public class ReagenchantTileEntityTypes
 {
-    public static final DeferredRegister<TileEntityType<?>> TILE_ENTITIES = new DeferredRegister<>(ForgeRegistries.TILE_ENTITIES, Reagenchant.MOD_ID);
+    public static final DeferredRegister<TileEntityType<?>> TILE_ENTITY_TYPE_OVERRIDES = new DeferredRegister<>(ForgeRegistries.TILE_ENTITIES, Reagenchant.MOD_ID);
 
-    public static final RegistryObject<TileEntityType<ReagentTableTileEntity>> REAGENT_TABLE_TILE_ENTITY = TILE_ENTITIES.register("reagent_table_tile_entity", () -> TileEntityType.Builder.create(ReagentTableTileEntity::new, Blocks.ENCHANTING_TABLE).build(null));
+    public static final RegistryObject<TileEntityType<ReagentTableTileEntity>> REAGENT_TABLE_TILE_ENTITY = TILE_ENTITY_TYPE_OVERRIDES.register("reagent_table_tile_entity", () -> TileEntityType.Builder.create(ReagentTableTileEntity::new, Blocks.ENCHANTING_TABLE).build(null));
 }

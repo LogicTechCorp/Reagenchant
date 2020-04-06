@@ -33,6 +33,7 @@ import net.minecraft.particles.ParticleTypes;
 import net.minecraft.pathfinding.PathType;
 import net.minecraft.tileentity.EnchantingTableTileEntity;
 import net.minecraft.tileentity.TileEntity;
+import net.minecraft.util.ActionResultType;
 import net.minecraft.util.Hand;
 import net.minecraft.util.IWorldPosCallable;
 import net.minecraft.util.math.BlockPos;
@@ -107,7 +108,7 @@ public class ReagentTableBlock extends TileEntityBlock<ReagentTableTileEntity>
     }
 
     @Override
-    public boolean onBlockActivated(BlockState state, World world, BlockPos pos, PlayerEntity player, Hand hand, BlockRayTraceResult rayTraceResult)
+    public ActionResultType onBlockActivated(BlockState state, World world, BlockPos pos, PlayerEntity player, Hand hand, BlockRayTraceResult rayTraceResult)
     {
         if(!world.isRemote)
         {
@@ -125,7 +126,7 @@ public class ReagentTableBlock extends TileEntityBlock<ReagentTableTileEntity>
             }
         }
 
-        return true;
+        return ActionResultType.SUCCESS;
     }
 
     @Override
@@ -135,7 +136,7 @@ public class ReagentTableBlock extends TileEntityBlock<ReagentTableTileEntity>
     }
 
     @Override
-    public boolean func_220074_n(BlockState p_220074_1_)
+    public boolean isTransparent(BlockState state)
     {
         return true;
     }
