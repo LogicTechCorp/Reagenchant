@@ -273,18 +273,14 @@ public class ReagentTableScreen extends ContainerScreen<ReagentTableContainer>
                         list.add(lapisTextFormatting + "" + I18n.format("container.enchant.lapis.many", enchantmentTier));
 
                         ItemStack reagentStack = this.container.getItemStackHandler().getStackInSlot(2);
+                        Reagent reagent = Reagenchant.REAGENT_MANAGER.getReagent(reagentStack.getItem());
 
-                        if(!reagentStack.isEmpty())
+                        if(!reagent.isEmpty() && reagent.getEnchantments().contains(enchantment))
                         {
-                            Reagent reagent = Reagenchant.REAGENT_MANAGER.getReagent(reagentStack.getItem());
-
-                            if(reagent.getEnchantments().contains(enchantment))
-                            {
-                                ItemStack unenchantedStack = this.container.getItemStackHandler().getStackInSlot(0);
-                                int reagentCost = reagent.getCost(unenchantedStack, reagentStack, new EnchantmentData(enchantment, enchantmentLevel), this.container.getRandom());
-                                TextFormatting reagentTextFormatting = this.container.getReagentAmount() >= reagentCost ? TextFormatting.GRAY : TextFormatting.RED;
-                                list.add(reagentTextFormatting + "" + reagentCost + " " + I18n.format(reagentStack.getItem().getTranslationKey()));
-                            }
+                            ItemStack unenchantedStack = this.container.getItemStackHandler().getStackInSlot(0);
+                            int reagentCost = reagent.getCost(unenchantedStack, reagentStack, new EnchantmentData(enchantment, enchantmentLevel), this.container.getRandom());
+                            TextFormatting reagentTextFormatting = this.container.getReagentAmount() >= reagentCost ? TextFormatting.GRAY : TextFormatting.RED;
+                            list.add(reagentTextFormatting + "" + reagentCost + " " + I18n.format(reagentStack.getItem().getTranslationKey()));
                         }
 
                         list.add(TextFormatting.GRAY + "" + I18n.format("container.enchant.level.many", enchantmentTier));

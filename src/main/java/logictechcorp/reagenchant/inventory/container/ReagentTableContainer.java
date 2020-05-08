@@ -264,20 +264,14 @@ public class ReagentTableContainer extends Container
                         this.itemStackHandler.setStackInSlot(0, enchantedStack);
                     }
 
-                    Reagent reagent = null;
-
-                    if(!reagentStack.isEmpty())
-                    {
-                        reagent = Reagenchant.REAGENT_MANAGER.getReagent(reagentStack.getItem());
-                    }
-
+                    Reagent reagent = Reagenchant.REAGENT_MANAGER.getReagent(reagentStack.getItem());
                     int maxReagentCost = 0;
 
                     for(EnchantmentData enchantmentData : enchantmentList)
                     {
                         if(!EnchantmentHelper.getEnchantments(enchantedStack).containsKey(enchantmentData.enchantment))
                         {
-                            if(reagent != null)
+                            if(!reagent.isEmpty())
                             {
                                 int reagentCost = reagent.getCost(enchantedStack, reagentStack, enchantmentData, this.random);
 
@@ -329,16 +323,13 @@ public class ReagentTableContainer extends Container
                             this.itemStackHandler.setStackInSlot(1, ItemStack.EMPTY);
                         }
 
-                        if(reagent != null)
+                        if(!reagent.isEmpty() && reagent.consumeReagent(unenchantedStack, enchantedStack, reagentStack, enchantmentList, this.random))
                         {
-                            if(reagent.consumeReagent(unenchantedStack, enchantedStack, reagentStack, enchantmentList, this.random))
-                            {
-                                reagentStack.shrink(maxReagentCost);
+                            reagentStack.shrink(maxReagentCost);
 
-                                if(reagentStack.isEmpty())
-                                {
-                                    this.itemStackHandler.setStackInSlot(2, ItemStack.EMPTY);
-                                }
+                            if(reagentStack.isEmpty())
+                            {
+                                this.itemStackHandler.setStackInSlot(2, ItemStack.EMPTY);
                             }
                         }
                     }
@@ -368,15 +359,14 @@ public class ReagentTableContainer extends Container
         ItemStack unenchantedStack = this.itemStackHandler.getStackInSlot(0);
         ItemStack reagentStack = this.itemStackHandler.getStackInSlot(2);
         int enchantabilityLevel = this.enchantabilityLevels[enchantmentTier];
+        Reagent reagent = Reagenchant.REAGENT_MANAGER.getReagent(reagentStack.getItem());
 
         this.random.setSeed((this.xpSeed.get() + enchantmentTier));
         List<EnchantmentData> enchantmentData = EnchantmentHelper.buildEnchantmentList(this.random, unenchantedStack, enchantabilityLevel, false);
         boolean usedReagentEnchantments = false;
 
-        if(!reagentStack.isEmpty())
+        if(!reagent.isEmpty())
         {
-            Reagent reagent = Reagenchant.REAGENT_MANAGER.getReagent(reagentStack.getItem());
-
             Optional<List<EnchantmentData>> optional = this.worldPosCallable.apply((world, pos) ->
             {
                 if(reagent.hasApplicableEnchantments(unenchantedStack, reagentStack, this.random))
@@ -484,6 +474,16 @@ public class ReagentTableContainer extends Container
             {
                 if(!this.mergeItemStack(slotStack, 2, 3, true))
                 {
+                    if(this.inventorySlots.get(0).getHasStack() || !this.inventorySlots.get(0).isItemValid(slotStack))
+                    {
+                        return ItemStack.EMPTY;
+                    }
+
+                    if(!slotStack.isEmpty())
+                    {
+                        this.inventorySlots.get(0).putStack(slotStack.split(1));
+                    }
+
                     return ItemStack.EMPTY;
                 }
             }
@@ -553,13 +553,13 @@ public class ReagentTableContainer extends Container
     public int getLapisAmount()
     {
         ItemStack lapisStack = this.itemStackHandler.getStackInSlot(1);
-        return lapisStack.isEmpty() ? 0 : lapisStack.getCount();
+        return lapisStack.getCount();
     }
 
     public int getReagentAmount()
     {
         ItemStack reagentStack = this.itemStackHandler.getStackInSlot(2);
-        return reagentStack.isEmpty() ? 0 : reagentStack.getCount();
+        return reagentStack.getCount();
     }
 
     private float getEnchantPower(World world, BlockPos pos)

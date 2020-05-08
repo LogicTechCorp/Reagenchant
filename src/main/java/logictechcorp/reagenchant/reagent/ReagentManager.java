@@ -164,12 +164,18 @@ public class ReagentManager extends ReloadListener<Map<ResourceLocation, JsonObj
 
     public void registerReagent(Reagent reagent)
     {
-        this.reagents.put(reagent.getItem().getRegistryName(), reagent);
+        if(reagent.getItem() != Items.AIR)
+        {
+            this.reagents.put(reagent.getItem().getRegistryName(), reagent);
+        }
     }
 
     public void unregisterReagent(Reagent reagent)
     {
-        this.reagents.remove(reagent.getItem().getRegistryName());
+        if(reagent.getItem() != Items.AIR)
+        {
+            this.reagents.remove(reagent.getItem().getRegistryName());
+        }
     }
 
     protected <T> ReagentEnchantmentData deserializeReagentEnchantmentData(Dynamic<T> dynamic)
@@ -221,7 +227,7 @@ public class ReagentManager extends ReloadListener<Map<ResourceLocation, JsonObj
 
     public Reagent getReagent(Item item)
     {
-        return this.reagents.get(item.getRegistryName());
+        return this.reagents.getOrDefault(item.getRegistryName(), Reagent.EMPTY);
     }
 
     public Map<ResourceLocation, Reagent> getReagents()
