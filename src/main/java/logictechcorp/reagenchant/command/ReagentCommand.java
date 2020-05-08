@@ -115,7 +115,7 @@ public class ReagentCommand
         Item item = ItemArgument.getItem(context, "item").getItem();
         Reagent reagent = Reagenchant.REAGENT_MANAGER.getReagent(item);
 
-        if(reagent == null)
+        if(reagent.isEmpty() && item != Items.AIR)
         {
             reagent = Reagenchant.REAGENT_MANAGER.createReagent(item);
             Reagenchant.REAGENT_MANAGER.registerReagent(reagent);
@@ -141,7 +141,7 @@ public class ReagentCommand
             Reagent reagent = Reagenchant.REAGENT_MANAGER.getReagent(item);
             Enchantment enchantment = EnchantmentArgument.getEnchantment(context, "enchantment");
 
-            if(reagent == null)
+            if(reagent.isEmpty())
             {
                 source.sendErrorMessage(new TranslationTextComponent("command.reagenchant.reagent.add.error", item.getRegistryName()));
                 return CommandCompletion.FAILURE;
@@ -171,7 +171,7 @@ public class ReagentCommand
             double probability = DoubleArgumentType.getDouble(context, "probability");
             int cost = IntegerArgumentType.getInteger(context, "cost");
 
-            if(reagent == null)
+            if(reagent.isEmpty())
             {
                 source.sendErrorMessage(new TranslationTextComponent("command.reagenchant.reagent.add.error", item.getRegistryName()));
                 return CommandCompletion.FAILURE;
@@ -197,7 +197,7 @@ public class ReagentCommand
             Enchantment enchantment = EnchantmentArgument.getEnchantment(context, "enchantment");
             Reagent reagent = Reagenchant.REAGENT_MANAGER.getReagent(item);
 
-            if(reagent == null)
+            if(reagent.isEmpty())
             {
                 source.sendErrorMessage(new TranslationTextComponent("command.reagenchant.reagent.remove.error", item.getRegistryName()));
                 return CommandCompletion.FAILURE;
@@ -219,7 +219,7 @@ public class ReagentCommand
         Item item = ItemArgument.getItem(context, "item").getItem();
         Reagent reagent = Reagenchant.REAGENT_MANAGER.getReagent(item);
 
-        if(reagent == null)
+        if(reagent.isEmpty())
         {
             source.sendErrorMessage(new TranslationTextComponent("command.reagenchant.reagent.delete.error", item.getRegistryName()));
             return CommandCompletion.FAILURE;

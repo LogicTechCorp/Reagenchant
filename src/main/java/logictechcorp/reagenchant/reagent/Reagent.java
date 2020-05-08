@@ -31,29 +31,30 @@ import java.util.*;
 
 public class Reagent
 {
+    public static final Reagent EMPTY = new Reagent(Items.AIR);
+
     protected final Item item;
     protected final Map<Enchantment, ReagentEnchantmentData> enchantments = new HashMap<>();
 
     public Reagent(Item item)
     {
-        if(item != null)
-        {
-            this.item = item;
-        }
-        else
-        {
-            this.item = Items.AIR;
-        }
+        this.item = item;
     }
 
     public void addEnchantment(ReagentEnchantmentData reagentEnchantmentData)
     {
-        this.enchantments.put(reagentEnchantmentData.getEnchantment(), reagentEnchantmentData);
+        if(!this.isEmpty())
+        {
+            this.enchantments.put(reagentEnchantmentData.getEnchantment(), reagentEnchantmentData);
+        }
     }
 
     public void removeEnchantment(Enchantment enchantment)
     {
-        this.enchantments.remove(enchantment);
+        if(!this.isEmpty())
+        {
+            this.enchantments.remove(enchantment);
+        }
     }
 
     public List<EnchantmentData> createEnchantmentList(ItemStack unenchantedStack, ItemStack reagentStack, int enchantmentTier, int enchantabilityLevel, Random random)
@@ -177,9 +178,14 @@ public class Reagent
         return false;
     }
 
+    public boolean isEmpty()
+    {
+        return this == EMPTY || this.item == null;
+    }
+
     public Item getItem()
     {
-        return this.item;
+        return this.isEmpty() ? Items.AIR : this.item;
     }
 
     public Set<Enchantment> getEnchantments()
