@@ -24,8 +24,7 @@ import com.google.gson.JsonObject;
 import com.mojang.datafixers.Dynamic;
 import com.mojang.datafixers.types.JsonOps;
 import logictechcorp.reagenchant.Reagenchant;
-import net.minecraft.client.resources.ReloadListener;
-import net.minecraft.enchantment.Enchantment;
+import net.minecraft.client.resources.JsonReloadListener;
 import net.minecraft.item.Item;
 import net.minecraft.item.Items;
 import net.minecraft.profiler.IProfiler;
@@ -38,27 +37,23 @@ import org.apache.commons.io.IOUtils;
 
 import java.io.*;
 import java.nio.charset.StandardCharsets;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
-public class ReagentManager extends ReloadListener<Map<ResourceLocation, JsonObject>>
+public class ReagentManager extends JsonReloadListener
 {
     private static final Gson GSON = new GsonBuilder().setPrettyPrinting().disableHtmlEscaping().create();
 
-    private final String folderName;
     private final Map<ResourceLocation, Reagent> reagents;
+
+    public ReagentManager(String folderName)
+    {
+        super(GSON, folderName);
+        this.reagents = new HashMap<>();
+    }
 
     public ReagentManager()
     {
         this("reagents");
-    }
-
-    public ReagentManager(String folderName)
-    {
-        this.folderName = folderName;
-        this.reagents = new HashMap<>();
     }
 
     @Override
@@ -68,12 +63,7 @@ public class ReagentManager extends ReloadListener<Map<ResourceLocation, JsonObj
         {
             try
             {
-                if(!resourceLocation.getPath().startsWith(this.folderName))
-                {
-                    resourceLocation = new ResourceLocation(resourceLocation.getNamespace(), this.folderName + "/" + resourceLocation.getPath() + ".json");
-                }
-
-                IResource resource = resourceManager.getResource(resourceLocation);
+                IResource resource = resourceManager.getResource(this.getPreparedPath(resourceLocation));
                 InputStream inputStream = resource.getInputStream();
                 Reader reader = new BufferedReader(new InputStreamReader(inputStream, StandardCharsets.UTF_8));
                 Dynamic<JsonElement> dynamic = new Dynamic<>(JsonOps.INSTANCE, JSONUtils.fromJson(GSON, reader, JsonObject.class));
@@ -90,11 +80,11 @@ public class ReagentManager extends ReloadListener<Map<ResourceLocation, JsonObj
 
                     if(item != null && item != Items.AIR)
                     {
-                        List<ReagentEnchantmentData> enchantments = dynamic.get("enchantments").asList(this::deserializeReagentEnchantmentData);
+                        List<ReagentEnchantData> enchantments = dynamic.get("enchantments").asList(ReagentEnchantData::deserialize);
 
                         Reagent reagent = this.createReagent(item);
 
-                        for(ReagentEnchantmentData enchantmentData : enchantments)
+                        for(ReagentEnchantData enchantmentData : enchantments)
                         {
                             if(!enchantmentData.isEmpty())
                             {
@@ -111,50 +101,6 @@ public class ReagentManager extends ReloadListener<Map<ResourceLocation, JsonObj
                 e.printStackTrace();
             }
         });
-    }
-
-    @Override
-    protected Map<ResourceLocation, JsonObject> prepare(IResourceManager resourceManager, IProfiler profiler)
-    {
-        Map<ResourceLocation, JsonObject> map = new HashMap<>();
-
-        for(ResourceLocation resource : resourceManager.getAllResourceLocations(this.folderName, (fileName) -> fileName.endsWith(".json")))
-        {
-            String path = resource.getPath();
-            ResourceLocation truncatedResource;
-
-            if(!path.startsWith(this.folderName))
-            {
-                truncatedResource = resource;
-            }
-            else
-            {
-                truncatedResource = new ResourceLocation(resource.getNamespace(), path.substring(this.folderName.length() + 1, path.lastIndexOf(".")));
-            }
-
-            try(Reader reader = new BufferedReader(new InputStreamReader(resourceManager.getResource(resource).getInputStream(), StandardCharsets.UTF_8)))
-            {
-                JsonObject jsonObject = JSONUtils.fromJson(GSON, reader, JsonObject.class);
-
-                if(jsonObject != null)
-                {
-                    if(map.put(truncatedResource, jsonObject) != null)
-                    {
-                        Reagenchant.LOGGER.error("Duplicate data file: {}", truncatedResource);
-                    }
-                }
-                else
-                {
-                    Reagenchant.LOGGER.error("Invalid data file: {}", truncatedResource);
-                }
-            }
-            catch(IOException e)
-            {
-                Reagenchant.LOGGER.error("Unreadable data file: {}", truncatedResource);
-            }
-        }
-
-        return map;
     }
 
     public Reagent createReagent(Item item)
@@ -178,46 +124,19 @@ public class ReagentManager extends ReloadListener<Map<ResourceLocation, JsonObj
         }
     }
 
-    protected <T> ReagentEnchantmentData deserializeReagentEnchantmentData(Dynamic<T> dynamic)
-    {
-        Enchantment enchantment = ForgeRegistries.ENCHANTMENTS.getValue(new ResourceLocation(dynamic.get("enchantment").asString("null")));
-
-        if(enchantment != null)
-        {
-            double probability = dynamic.get("probability").asDouble(0.5D);
-            if(probability <= 0.0D)
-            {
-                probability = 0.5D;
-            }
-
-            int minimumEnchantmentLevel = dynamic.get("minimumEnchantmentLevel").asInt(enchantment.getMinLevel());
-            int maximumEnchantmentLevel = dynamic.get("maximumEnchantmentLevel").asInt(enchantment.getMaxLevel());
-
-            if(minimumEnchantmentLevel < 1)
-            {
-                minimumEnchantmentLevel = 1;
-            }
-            if(maximumEnchantmentLevel > 100)
-            {
-                maximumEnchantmentLevel = 100;
-            }
-
-            int reagentCost = dynamic.get("reagentCost").asInt(1);
-
-            if(reagentCost < 0)
-            {
-                reagentCost = 1;
-            }
-
-            return new ReagentEnchantmentData(enchantment, minimumEnchantmentLevel, maximumEnchantmentLevel, probability, reagentCost);
-        }
-
-        return ReagentEnchantmentData.EMPTY;
-    }
-
     public void cleanup()
     {
         this.reagents.clear();
+    }
+
+    public void syncClientReagents(Collection<Reagent> reagents)
+    {
+        this.cleanup();
+
+        for(Reagent reagent : reagents)
+        {
+            this.reagents.put(reagent.getItem().getRegistryName(), reagent);
+        }
     }
 
     public boolean isReagent(Item item)

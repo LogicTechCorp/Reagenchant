@@ -29,7 +29,7 @@ public class ReagenchantCommand
         dispatcher.register(LiteralArgumentBuilder
                 .<CommandSource>literal(Reagenchant.MOD_ID)
                 .then(ReagentCommand.register())
-                .then(ExportDefaultReagentPacksCommand.register())
+                .then(ExportCurrentReagentPackCommand.register())
         );
     }
 }

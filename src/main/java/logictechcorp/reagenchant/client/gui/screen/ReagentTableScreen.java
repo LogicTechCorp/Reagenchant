@@ -275,7 +275,7 @@ public class ReagentTableScreen extends ContainerScreen<ReagentTableContainer>
                         ItemStack reagentStack = this.container.getItemStackHandler().getStackInSlot(2);
                         Reagent reagent = Reagenchant.REAGENT_MANAGER.getReagent(reagentStack.getItem());
 
-                        if(!reagent.isEmpty() && reagent.getEnchantments().contains(enchantment))
+                        if(!reagent.isEmpty() && reagent.containsEnchantment(enchantment))
                         {
                             ItemStack unenchantedStack = this.container.getItemStackHandler().getStackInSlot(0);
                             int reagentCost = reagent.getCost(unenchantedStack, reagentStack, new EnchantmentData(enchantment, enchantmentLevel), this.container.getRandom());

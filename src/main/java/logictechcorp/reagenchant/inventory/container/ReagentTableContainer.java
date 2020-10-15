@@ -33,10 +33,7 @@ import net.minecraft.item.EnchantedBookItem;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
 import net.minecraft.stats.Stats;
-import net.minecraft.util.IWorldPosCallable;
-import net.minecraft.util.IntReferenceHolder;
-import net.minecraft.util.SoundCategory;
-import net.minecraft.util.SoundEvents;
+import net.minecraft.util.*;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.registry.Registry;
 import net.minecraft.world.World;
@@ -47,7 +44,6 @@ import net.minecraftforge.items.SlotItemHandler;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 import java.util.Random;
 
 public class ReagentTableContainer extends Container
@@ -362,46 +358,55 @@ public class ReagentTableContainer extends Container
         Reagent reagent = Reagenchant.REAGENT_MANAGER.getReagent(reagentStack.getItem());
 
         this.random.setSeed((this.xpSeed.get() + enchantmentTier));
-        List<EnchantmentData> enchantmentData = EnchantmentHelper.buildEnchantmentList(this.random, unenchantedStack, enchantabilityLevel, false);
-        boolean usedReagentEnchantments = false;
+        List<EnchantmentData> reagentEnchantmentData = new ArrayList<>();
+        List<EnchantmentData> defaultEnchantmentData = EnchantmentHelper.buildEnchantmentList(this.random, unenchantedStack, enchantabilityLevel, false);
 
-        if(!reagent.isEmpty())
+        if(!reagent.isEmpty() && reagent.hasApplicableEnchantments(unenchantedStack, reagentStack, this.random))
         {
-            Optional<List<EnchantmentData>> optional = this.worldPosCallable.apply((world, pos) ->
-            {
-                if(reagent.hasApplicableEnchantments(unenchantedStack, reagentStack, this.random))
-                {
-                    return reagent.createEnchantmentList(unenchantedStack, reagentStack, enchantmentTier, enchantabilityLevel, this.random);
-                }
-
-                return new ArrayList<>();
-            });
-
-            if(optional.isPresent())
-            {
-                List<EnchantmentData> optionalEnchantmentData = optional.get();
-
-                if(!optionalEnchantmentData.isEmpty())
-                {
-                    enchantmentData = optionalEnchantmentData;
-                    usedReagentEnchantments = true;
-                }
-            }
+            final int finalEnchantabilityLevel = enchantabilityLevel;
+            reagentEnchantmentData = this.worldPosCallable.applyOrElse((world, pos) -> reagent.createEnchantmentList(unenchantedStack, reagentStack, enchantmentTier, finalEnchantabilityLevel, this.random), reagentEnchantmentData);
         }
 
-        if(unenchantedStack.getItem() == Items.BOOK && enchantmentData.size() > 1)
+        List<EnchantmentData> aggregateEnchantmentData = new ArrayList<>(reagentEnchantmentData);
+        aggregateEnchantmentData.addAll(defaultEnchantmentData);
+
+        List<EnchantmentData> refinedEnchantmentData = new ArrayList<>();
+
+        if(!reagentEnchantmentData.isEmpty())
         {
-            if(usedReagentEnchantments)
+            refinedEnchantmentData.add(WeightedRandom.getRandomItem(this.random, reagentEnchantmentData));
+
+            while(this.random.nextInt(50) <= enchantabilityLevel)
             {
-                enchantmentData.remove(RandomHelper.getNumberInRange(1, enchantmentData.size() - 1, this.random));
+                EnchantmentHelper.removeIncompatible(aggregateEnchantmentData, Util.getLast(refinedEnchantmentData));
+
+                if(aggregateEnchantmentData.isEmpty())
+                {
+                    break;
+                }
+
+                refinedEnchantmentData.add(WeightedRandom.getRandomItem(this.random, aggregateEnchantmentData));
+                enchantabilityLevel /= 2;
+            }
+        }
+        else
+        {
+            refinedEnchantmentData.addAll(aggregateEnchantmentData);
+        }
+
+        if(unenchantedStack.getItem() == Items.BOOK && refinedEnchantmentData.size() > 1)
+        {
+            if(!reagentEnchantmentData.isEmpty())
+            {
+                refinedEnchantmentData.remove(RandomHelper.getNumberInRange(1, refinedEnchantmentData.size() - 1, this.random));
             }
             else
             {
-                enchantmentData.remove(this.random.nextInt(enchantmentData.size()));
+                refinedEnchantmentData.remove(this.random.nextInt(refinedEnchantmentData.size()));
             }
         }
 
-        return enchantmentData;
+        return refinedEnchantmentData;
     }
 
     @Override
