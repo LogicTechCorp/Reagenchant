@@ -24,7 +24,6 @@ import net.minecraft.enchantment.EnchantmentHelper;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
-import net.minecraft.util.Util;
 import net.minecraft.util.WeightedRandom;
 import net.minecraft.util.math.MathHelper;
 
@@ -35,11 +34,12 @@ public class Reagent
     public static final Reagent EMPTY = new Reagent(Items.AIR);
 
     protected final Item item;
-    protected final Map<Enchantment, ReagentEnchantData> enchantments = new HashMap<>();
+    protected final Map<Enchantment, ReagentEnchantData> enchantments;
 
     public Reagent(Item item)
     {
         this.item = item;
+        this.enchantments = new HashMap<>();
     }
 
     public void addEnchantment(ReagentEnchantData reagentEnchantData)
@@ -58,7 +58,7 @@ public class Reagent
         }
     }
 
-    public List<EnchantmentData> createEnchantmentList(ItemStack unenchantedStack, ItemStack reagentStack, int enchantmentTier, int enchantabilityLevel, Random random)
+    public List<EnchantmentData> compileEnchantmentList(ItemStack unenchantedStack, int enchantmentTier, int enchantabilityLevel, Random random)
     {
         int itemEnchantability = unenchantedStack.getItemEnchantability();
 
@@ -72,9 +72,9 @@ public class Reagent
             enchantabilityLevel = (enchantabilityLevel + 1 + random.nextInt((itemEnchantability / 4) + 1) + random.nextInt((itemEnchantability / 4) + 1));
             enchantabilityLevel = MathHelper.clamp(Math.round(enchantabilityLevel + (enchantmentMultiplier * enchantabilityLevel)), 1, Integer.MAX_VALUE);
 
-            List<EnchantmentData> aggregateEnchantmentData = new ArrayList<>();
+            List<EnchantmentData> defaultEnchantments = new ArrayList<>();
 
-            for(Enchantment enchantment : this.getApplicableEnchantments(unenchantedStack, reagentStack, random))
+            for(Enchantment enchantment : this.getApplicableEnchantments(unenchantedStack))
             {
                 ReagentEnchantData reagentEnchantData = this.getReagentEnchantData(enchantment);
                 int minimumEnchantmentLevel = reagentEnchantData.getMinimumEnchantmentLevel();
@@ -114,40 +114,27 @@ public class Reagent
 
                 if(enchantmentLevel > 0)
                 {
-                    EnchantmentData enchantmentData = new EnchantmentData(enchantment, enchantmentLevel);
-
-                    if(this.getEnchantmentProbability(unenchantedStack, reagentStack, enchantmentData, random) >= random.nextFloat())
+                    if(this.getEnchantmentProbability(enchantment) >= random.nextFloat())
                     {
-                        aggregateEnchantmentData.add(enchantmentData);
+                        defaultEnchantments.add(new EnchantmentData(enchantment, enchantmentLevel));
                     }
                 }
             }
 
-            List<EnchantmentData> refinedEnchantmentData = new ArrayList<>();
+            List<EnchantmentData> refinedEnchantments = new ArrayList<>();
 
-            if(!aggregateEnchantmentData.isEmpty())
+            while(!defaultEnchantments.isEmpty())
             {
-                refinedEnchantmentData.add(WeightedRandom.getRandomItem(random, aggregateEnchantmentData));
-
-                while(random.nextInt(50) <= enchantabilityLevel)
-                {
-                    EnchantmentHelper.removeIncompatible(aggregateEnchantmentData, Util.getLast(refinedEnchantmentData));
-
-                    if(aggregateEnchantmentData.isEmpty())
-                    {
-                        break;
-                    }
-
-                    refinedEnchantmentData.add(WeightedRandom.getRandomItem(random, aggregateEnchantmentData));
-                    enchantabilityLevel /= 2;
-                }
+                EnchantmentData removedEnchantment = WeightedRandom.getRandomItem(random, defaultEnchantments);
+                refinedEnchantments.add(defaultEnchantments.remove(defaultEnchantments.indexOf(removedEnchantment)));
+                EnchantmentHelper.removeIncompatible(defaultEnchantments, removedEnchantment);
             }
 
-            return refinedEnchantmentData;
+            return refinedEnchantments;
         }
     }
 
-    public boolean hasApplicableEnchantments(ItemStack unenchantedStack, ItemStack reagentStack, Random random)
+    public boolean canApplyEnchantments(ItemStack unenchantedStack)
     {
         for(Enchantment enchantment : this.enchantments.keySet())
         {
@@ -160,11 +147,11 @@ public class Reagent
         return false;
     }
 
-    public boolean consumeReagent(ItemStack unenchantedStack, ItemStack enchantedStack, ItemStack reagentStack, List<EnchantmentData> enchantmentList, Random random)
+    public boolean consumeReagent(ItemStack unenchantedStack, List<EnchantmentData> enchantments)
     {
-        List<Enchantment> applicableEnchantments = this.getApplicableEnchantments(unenchantedStack, reagentStack, random);
+        List<Enchantment> applicableEnchantments = this.getApplicableEnchantments(unenchantedStack);
 
-        for(EnchantmentData enchantmentData : enchantmentList)
+        for(EnchantmentData enchantmentData : enchantments)
         {
             if(applicableEnchantments.contains(enchantmentData.enchantment))
             {
@@ -182,12 +169,12 @@ public class Reagent
 
     public boolean isEmpty()
     {
-        return this == EMPTY || this.item == null;
+        return this == EMPTY || this.item == Items.AIR || this.item == null;
     }
 
     public Item getItem()
     {
-        return this.isEmpty() ? Items.AIR : this.item;
+        return this.item;
     }
 
     public Set<Enchantment> getEnchantments()
@@ -200,7 +187,7 @@ public class Reagent
         return this.enchantments.getOrDefault(enchantment, ReagentEnchantData.EMPTY);
     }
 
-    public List<Enchantment> getApplicableEnchantments(ItemStack unenchantedStack, ItemStack reagentStack, Random random)
+    public List<Enchantment> getApplicableEnchantments(ItemStack unenchantedStack)
     {
         List<Enchantment> enchantments = new ArrayList<>();
 
@@ -215,27 +202,13 @@ public class Reagent
         return enchantments;
     }
 
-    public float getEnchantmentProbability(ItemStack unenchantedStack, ItemStack reagentStack, EnchantmentData enchantmentData, Random random)
+    public float getEnchantmentProbability(Enchantment enchantment)
     {
-        Enchantment enchantment = enchantmentData.enchantment;
-
-        if(this.enchantments.containsKey(enchantment))
-        {
-            return this.enchantments.get(enchantment).getEnchantmentProbability();
-        }
-
-        return 0.0F;
+        return this.getReagentEnchantData(enchantment).getEnchantmentProbability();
     }
 
-    public int getCost(ItemStack unenchantedStack, ItemStack reagentStack, EnchantmentData enchantmentData, Random random)
+    public int getCost(Enchantment enchantment)
     {
-        Enchantment enchantment = enchantmentData.enchantment;
-
-        if(this.enchantments.containsKey(enchantment))
-        {
-            return this.enchantments.get(enchantment).getReagentCost();
-        }
-
-        return 0;
+        return this.getReagentEnchantData(enchantment).getReagentCost();
     }
 }
