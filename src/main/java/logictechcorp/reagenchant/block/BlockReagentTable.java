@@ -84,7 +84,7 @@ public class BlockReagentTable extends BlockTileEntity<TileEntityReagentTable>
                                 break;
                             }
 
-                            world.spawnParticle(EnumParticleTypes.ENCHANTMENT_TABLE, (double) pos.getX() + 0.5D, (double) pos.getY() + 2.0D, (double) pos.getZ() + 0.5D, (double) ((float) x + rand.nextFloat()) - 0.5D, (double) ((float) y - rand.nextFloat() - 1.0F), (double) ((float) z + rand.nextFloat()) - 0.5D);
+                            world.spawnParticle(EnumParticleTypes.ENCHANTMENT_TABLE, (double) pos.getX() + 0.5D, (double) pos.getY() + 2.0D, (double) pos.getZ() + 0.5D, (double) ((float) x + rand.nextFloat()) - 0.5D, ((float) y - rand.nextFloat() - 1.0F), (double) ((float) z + rand.nextFloat()) - 0.5D);
                         }
                     }
                 }

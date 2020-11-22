@@ -55,8 +55,8 @@ public class TileEntityReagentTableRenderer extends TileEntitySpecialRenderer<Ti
         this.bindTexture(ReagenchantTextures.REAGENT_TABLE_BOOK);
         float pageOneFlip = reagentTable.getPageFlipPrev() + (reagentTable.getPageFlip() - reagentTable.getPageFlipPrev()) * partialTicks + 0.25F;
         float pageTwoFlip = reagentTable.getPageFlipPrev() + (reagentTable.getPageFlip() - reagentTable.getPageFlipPrev()) * partialTicks + 0.75F;
-        pageOneFlip = (pageOneFlip - (float) MathHelper.fastFloor((double) pageOneFlip)) * 1.6F - 0.3F;
-        pageTwoFlip = (pageTwoFlip - (float) MathHelper.fastFloor((double) pageTwoFlip)) * 1.6F - 0.3F;
+        pageOneFlip = (pageOneFlip - (float) MathHelper.fastFloor(pageOneFlip)) * 1.6F - 0.3F;
+        pageTwoFlip = (pageTwoFlip - (float) MathHelper.fastFloor(pageTwoFlip)) * 1.6F - 0.3F;
 
         if(pageOneFlip < 0.0F)
         {

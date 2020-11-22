@@ -48,7 +48,7 @@ class ReagentTableCategory implements IRecipeCategory<ReagentWrapper>
     {
         this.background = guiHelper.createDrawable(ReagenchantTextures.REAGENT_TABLE_RECIPE_GUI, 0, 0, 79, 25);
         this.icon = guiHelper.createDrawableIngredient(new ItemStack(ReagenchantBlocks.REAGENT_TABLE));
-        this.title = I18n.format("gui.reagenchant:reagent_table.title");
+        this.title = I18n.format("container." + Reagenchant.MOD_ID + ":jei.reagent_table.title");
 
     }
 
@@ -98,8 +98,8 @@ class ReagentTableCategory implements IRecipeCategory<ReagentWrapper>
 
                 tooltip.add("");
                 tooltip.add(enchantment.getTranslatedName(level));
-                tooltip.add(I18n.format("gui.reagenchant:reagent_table.probability.base", reagent.getReagentEnchantmentData(enchantment).getEnchantmentProbability() * 100.0F));
-                tooltip.add(I18n.format("gui.reagenchant:reagent_table.reagent.base_cost", reagent.getReagentEnchantmentData(enchantment).getReagentCost()));
+                tooltip.add(I18n.format("container." + Reagenchant.MOD_ID + ":jei.reagent_table.enchantment_probability.base", reagent.getReagentEnchantData(enchantment).getEnchantmentProbability() * 100.0D));
+                tooltip.add(I18n.format("container." + Reagenchant.MOD_ID + ":jei.reagent_table.reagent_cost", reagent.getReagentEnchantData(enchantment).getReagentCost()));
             }
         });
         recipeLayout.getItemStacks().init(INPUT_SLOT, true, 0, 4);

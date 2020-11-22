@@ -19,11 +19,16 @@ package logictechcorp.reagenchant.reagent;
 
 import com.electronwill.nightconfig.core.file.FileConfig;
 import com.electronwill.nightconfig.json.JsonFormat;
+import logictechcorp.libraryex.LibraryEx;
 import logictechcorp.libraryex.utility.FileHelper;
 import logictechcorp.libraryex.utility.WorldHelper;
+import logictechcorp.reagenchant.Reagenchant;
+import logictechcorp.reagenchant.ReagenchantConfig;
 import net.minecraft.init.Items;
 import net.minecraft.item.Item;
 import net.minecraft.util.ResourceLocation;
+import net.minecraft.world.DimensionType;
+import net.minecraft.world.World;
 import net.minecraftforge.event.world.WorldEvent;
 import net.minecraftforge.fml.common.registry.ForgeRegistries;
 import org.apache.logging.log4j.LogManager;
@@ -33,29 +38,32 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.Map;
+import java.nio.file.Paths;
+import java.util.*;
 
 public final class ReagentManager
 {
-    private final String modId;
     private final Logger logger;
     private final Map<ResourceLocation, Reagent> defaultReagents;
-    private final Map<ResourceLocation, Reagent> worldSpecificReagents;
+    private final Map<ResourceLocation, Reagent> currentReagents;
 
-    public ReagentManager(String modId, String modName)
+    public ReagentManager(String modName)
     {
-        this.modId = modId;
         this.logger = LogManager.getLogger(modName);
         this.defaultReagents = new HashMap<>();
-        this.worldSpecificReagents = new HashMap<>();
+        this.currentReagents = new HashMap<>();
     }
 
     public void setup()
     {
-        this.worldSpecificReagents.forEach(this.defaultReagents::put);
+        this.defaultReagents.putAll(this.currentReagents);
+        this.currentReagents.clear();
+
+        if(ReagenchantConfig.reagent.general.useGlobalReagentConfigs)
+        {
+            Path globalReagentConfigDirectoryPath = LibraryEx.CONFIG_DIRECTORY.toPath().resolve(Reagenchant.MOD_ID).resolve("reagents");
+            this.createReagentConfigs(globalReagentConfigDirectoryPath);
+        }
     }
 
     public void registerReagent(Reagent reagent)
@@ -63,87 +71,136 @@ public final class ReagentManager
         if(reagent != null)
         {
             Item item = reagent.getItem();
-            ResourceLocation itemRegistryName = item.getRegistryName();
 
-            if(!this.worldSpecificReagents.containsKey(itemRegistryName) && item != Items.AIR)
+            if(item != Items.AIR)
             {
-                this.worldSpecificReagents.put(item.getRegistryName(), reagent);
+                this.currentReagents.put(item.getRegistryName(), reagent);
             }
         }
     }
 
     public void unregisterReagent(Item item)
     {
-        this.worldSpecificReagents.remove(item.getRegistryName());
+        this.currentReagents.remove(item.getRegistryName());
     }
 
-    public void cleanup()
+    public void onWorldLoad(WorldEvent.Load event)
     {
-        this.worldSpecificReagents.clear();
-    }
+        World world = event.getWorld();
 
-    public void readReagentConfigs(WorldEvent.Load event)
-    {
-        this.logger.info("Reading Reagent configs.");
-        Path path = new File(WorldHelper.getSaveDirectory(event.getWorld()), "/config/" + this.modId + "/reagents/").toPath();
-
-        try
+        if(!world.isRemote)
         {
-            Files.createDirectories(path);
-            Iterator<Path> pathIter = Files.walk(path).iterator();
-
-            while(pathIter.hasNext())
+            if(world.provider.getDimension() == DimensionType.OVERWORLD.getId())
             {
-                File configFile = pathIter.next().toFile();
-
-                if(FileHelper.getFileExtension(configFile).equals("json"))
+                if(ReagenchantConfig.reagent.general.useGlobalReagentConfigs)
                 {
-                    FileConfig config = FileConfig.builder(configFile, JsonFormat.fancyInstance()).preserveInsertionOrder().build();
-                    config.load();
-
-                    Item item = ForgeRegistries.ITEMS.getValue(new ResourceLocation(config.getOrElse("item", "missing:no")));
-
-                    if(item != null && item != Items.AIR)
-                    {
-                        Reagent reagent;
-
-                        if(this.hasReagent(item))
-                        {
-                            reagent = this.getReagent(item);
-                        }
-                        else
-                        {
-                            reagent = new Reagent(item);
-                        }
-
-                        reagent.readFromConfig(config);
-                        this.registerReagent(reagent);
-                    }
-
-                    config.save();
-                    config.close();
+                    Path globalReagentConfigDirectoryPath = LibraryEx.CONFIG_DIRECTORY.toPath().resolve(Reagenchant.MOD_ID).resolve("reagents");
+                    this.readReagentConfigs(globalReagentConfigDirectoryPath);
                 }
-                else if(!configFile.isDirectory())
+
+                if(ReagenchantConfig.reagent.general.usePerWorldReagentConfigs)
                 {
-                    this.logger.info("Skipping file located at, {}, as it is not a json file.", configFile.getPath());
+                    Path perWorldReagentConfigDirectoryPath = Paths.get(WorldHelper.getSaveDirectory(event.getWorld()), "config", Reagenchant.MOD_ID, "reagents");
+                    this.createReagentConfigs(perWorldReagentConfigDirectoryPath);
+                    this.readReagentConfigs(perWorldReagentConfigDirectoryPath);
                 }
             }
         }
-        catch(IOException e)
+    }
+
+    public void onWorldUnload(WorldEvent.Unload event)
+    {
+        World world = event.getWorld();
+
+        if(!world.isRemote)
         {
-            e.printStackTrace();
+            if(world.provider.getDimension() == DimensionType.OVERWORLD.getId())
+            {
+                this.currentReagents.clear();
+            }
         }
     }
 
-    public void createReagentConfigs(WorldEvent.Load event)
+    public void syncClientReagents(Collection<Reagent> reagents)
     {
-        this.logger.info("Creating Reagent configs.");
+        this.currentReagents.clear();
+
+        for(Reagent reagent : reagents)
+        {
+            this.currentReagents.put(reagent.getItem().getRegistryName(), reagent);
+        }
+    }
+
+    public void readReagentConfigs(Path reagentConfigDirectoryPath)
+    {
+        if(Files.isReadable(reagentConfigDirectoryPath))
+        {
+
+            this.logger.info("Reading reagent configs.");
+
+            try
+            {
+                Files.createDirectories(reagentConfigDirectoryPath);
+                Iterator<Path> pathIter = Files.walk(reagentConfigDirectoryPath).iterator();
+
+                while(pathIter.hasNext())
+                {
+                    File configFile = pathIter.next().toFile();
+
+                    if(FileHelper.getFileExtension(configFile).equals("json"))
+                    {
+                        FileConfig config = FileConfig.builder(configFile, JsonFormat.fancyInstance()).preserveInsertionOrder().build();
+                        config.load();
+
+                        Item item = ForgeRegistries.ITEMS.getValue(new ResourceLocation(config.get("item")));
+
+                        if(item != null && item != Items.AIR)
+                        {
+                            Reagent reagent;
+
+                            if(this.hasReagent(item))
+                            {
+                                reagent = this.getReagent(item);
+                            }
+                            else
+                            {
+                                reagent = new Reagent(item);
+                            }
+
+                            reagent.readFromConfig(config);
+                            this.registerReagent(reagent);
+                        }
+
+                        config.save();
+                        config.close();
+                    }
+                    else if(!configFile.isDirectory())
+                    {
+                        this.logger.info("Skipping file located at, {}, since it is not a json file.", configFile.getPath());
+                    }
+                }
+            }
+            catch(IOException e)
+            {
+                e.printStackTrace();
+            }
+        }
+        else
+        {
+            this.logger.warn("Unable to read reagent configs.");
+        }
+    }
+
+    public void createReagentConfigs(Path reagentConfigDirectoryPath)
+    {
+        this.logger.info("Creating reagent configs.");
 
         try
         {
-            for(Reagent reagent : this.getDefaultReagents().values())
+            for(Reagent reagent : this.defaultReagents.values())
             {
-                File configFile = new File(WorldHelper.getSaveDirectory(event.getWorld()), "config/" + this.modId + "/reagents/" + reagent.getItem().getRegistryName().toString().replace(":", "/") + ".json");
+                ResourceLocation itemRegistryName = reagent.getItem().getRegistryName();
+                File configFile = new File(reagentConfigDirectoryPath.toFile(), itemRegistryName.toString().replace(":", "/") + ".json");
 
                 if(!configFile.exists())
                 {
@@ -163,12 +220,12 @@ public final class ReagentManager
 
     public boolean hasReagent(Item item)
     {
-        return this.worldSpecificReagents.containsKey(item.getRegistryName());
+        return this.currentReagents.containsKey(item.getRegistryName());
     }
 
     public Reagent getReagent(Item item)
     {
-        return this.worldSpecificReagents.get(item.getRegistryName());
+        return this.currentReagents.getOrDefault(item.getRegistryName(), Reagent.EMPTY);
     }
 
     public Map<ResourceLocation, Reagent> getDefaultReagents()
@@ -176,8 +233,8 @@ public final class ReagentManager
         return Collections.unmodifiableMap(this.defaultReagents);
     }
 
-    public Map<ResourceLocation, Reagent> getWorldSpecificReagents()
+    public Map<ResourceLocation, Reagent> getCurrentReagents()
     {
-        return Collections.unmodifiableMap(this.worldSpecificReagents);
+        return Collections.unmodifiableMap(this.currentReagents);
     }
 }

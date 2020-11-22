@@ -21,7 +21,6 @@ import logictechcorp.reagenchant.Reagenchant;
 import logictechcorp.reagenchant.client.gui.GuiReagentTable;
 import logictechcorp.reagenchant.init.ReagenchantBlocks;
 import logictechcorp.reagenchant.reagent.Reagent;
-import logictechcorp.reagenchant.reagent.ReagentManager;
 import mezz.jei.api.IModPlugin;
 import mezz.jei.api.IModRegistry;
 import mezz.jei.api.JEIPlugin;
@@ -39,7 +38,7 @@ public class ReagenchantJEIPlugin implements IModPlugin
     {
         List<ReagentWrapper> reagentWrappers = new ArrayList<>();
 
-        for(Reagent reagent : Reagenchant.REAGENT_MANAGER.getWorldSpecificReagents().values())
+        for(Reagent reagent : Reagenchant.REAGENT_MANAGER.getCurrentReagents().values())
         {
             reagentWrappers.add(new ReagentWrapper(reagent));
         }

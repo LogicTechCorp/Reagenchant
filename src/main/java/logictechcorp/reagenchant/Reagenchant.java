@@ -20,6 +20,7 @@ package logictechcorp.reagenchant;
 import logictechcorp.libraryex.IModData;
 import logictechcorp.libraryex.proxy.IProxy;
 import logictechcorp.reagenchant.handler.GuiHandler;
+import logictechcorp.reagenchant.handler.PacketHandler;
 import logictechcorp.reagenchant.init.ReagenchantReagents;
 import logictechcorp.reagenchant.reagent.ReagentManager;
 import net.minecraft.creativetab.CreativeTabs;
@@ -38,8 +39,8 @@ public class Reagenchant implements IModData
 {
     public static final String MOD_ID = "reagenchant";
     public static final String NAME = "Reagenchant";
-    public static final String VERSION = "1.1.1";
-    public static final String DEPENDENCIES = "required-after:libraryex@[1.1.2,);";
+    public static final String VERSION = "1.2.0";
+    public static final String DEPENDENCIES = "required-after:libraryex@[1.2.0,);";
 
     @Mod.Instance(MOD_ID)
     public static Reagenchant instance;
@@ -47,12 +48,13 @@ public class Reagenchant implements IModData
     @SidedProxy(clientSide = "logictechcorp.reagenchant.proxy.ClientProxy", serverSide = "logictechcorp.reagenchant.proxy.ServerProxy")
     public static IProxy proxy;
 
-    public static final ReagentManager REAGENT_MANAGER = new ReagentManager(MOD_ID, NAME);
+    public static final ReagentManager REAGENT_MANAGER = new ReagentManager(NAME);
     public static final Logger LOGGER = LogManager.getLogger("Reagenchant");
 
     @Mod.EventHandler
     public void onFMLPreInitialization(FMLPreInitializationEvent event)
     {
+        PacketHandler.init();
         ReagenchantReagents.initReagents();
         NetworkRegistry.INSTANCE.registerGuiHandler(this, new GuiHandler());
         proxy.preInit();

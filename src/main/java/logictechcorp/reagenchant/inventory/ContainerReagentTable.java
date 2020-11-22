@@ -18,7 +18,6 @@
 package logictechcorp.reagenchant.inventory;
 
 import logictechcorp.reagenchant.Reagenchant;
-import logictechcorp.reagenchant.reagent.ReagentManager;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.init.Blocks;
@@ -66,7 +65,7 @@ public class ContainerReagentTable extends Container
         });
         this.addSlotToContainer(new SlotItemHandler(this.reagentTableManager.getInventory(), 1, 24, 47)
         {
-            List<ItemStack> ores = OreDictionary.getOres("gemLapis");
+            private final List<ItemStack> ores = OreDictionary.getOres("gemLapis");
 
             @Override
             public void onSlotChanged()
@@ -300,9 +299,9 @@ public class ContainerReagentTable extends Container
     }
 
     @Override
-    public boolean enchantItem(EntityPlayer player, int enchantmentTier)
+    public boolean enchantItem(EntityPlayer player, int enchantmentIndex)
     {
-        return this.reagentTableManager.enchantItem(player, enchantmentTier, this);
+        return this.reagentTableManager.enchantItem(player, enchantmentIndex, this);
     }
 
     private void broadcastData(IContainerListener listener)

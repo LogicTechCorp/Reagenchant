@@ -67,7 +67,7 @@ public class TileEntityReagentTable extends TileEntityInventory implements ITick
         }
         else
         {
-            playerToFace = this.world.getClosestPlayer((double) ((float) this.pos.getX() + 0.5F), (double) ((float) this.pos.getY() + 0.5F), (double) ((float) this.pos.getZ() + 0.5F), 3.0D, false);
+            playerToFace = this.world.getClosestPlayer(((float) this.pos.getX() + 0.5F), ((float) this.pos.getY() + 0.5F), ((float) this.pos.getZ() + 0.5F), 3.0D, false);
         }
 
         if(playerToFace != null)

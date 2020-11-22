@@ -3,6 +3,19 @@ language.name=English
 language.region=United States
 language.code=en_us
 
+# Config
+config.reagenchant=Reagenchant Config
+
+config.reagenchant:reagent=Reagent Settings
+config.reagenchant:reagent.tooltip=Settings that only affect Reagents
+
+config.reagenchant:reagent.general=General Reagent Settings
+config.reagenchant:reagent.general.tooltip=Settings that affect all reagents
+config.reagenchant:reagent.general.useGlobalReagentConfigs=Use Global Reagent Configs
+config.reagenchant:reagent.general.useGlobalReagentConfigs.tooltip=Use global reagent configs
+config.reagenchant:reagent.general.usePerWorldReagentConfigs=Use Per World Reagent Configs
+config.reagenchant:reagent.general.usePerWorldReagentConfigs.tooltip=Use per world reagent configs
+
 # Levels
 enchantment.level.11=XI
 enchantment.level.12=XII
@@ -96,15 +109,8 @@ enchantment.level.99=XCIX
 enchantment.level.100=C
 
 # Guis
-gui.reagenchant:reagent_table.title=Enchant
-gui.reagenchant:reagent_table.lapis.cost=Lapis Lazuli cost: %s
-gui.reagenchant:reagent_table.reagent.cost=Reagent cost: %s
-gui.reagenchant:reagent_table.experience.requirement=Experience required to unlock: %s
-gui.reagenchant:reagent_table.experience.cost=Experience Level cost: %s
-gui.reagenchant:reagent_table.enchantment.clue=%s . . . ?
-gui.reagenchant:reagent_table.enchantment.limited=Limited Enchantability
-gui.reagenchant:reagent_table.probability.base=Base Probability: %s%%
-gui.reagenchant:reagent_table.reagent.base_cost=Base Reagent cost: %s
-
-# Tooltips
-tooltip.reagenchant:item.broken=Broken
+container.reagenchant.reagent_table.reagent.cost.one=1 %s
+container.reagenchant.reagent_table.reagent.cost.many=%s %s
+container.reagenchant:jei.reagent_table.title=Enchant
+container.reagenchant:jei.reagent_table.enchantment_probability.base=Enchantment Probability: %s%%
+container.reagenchant:jei.reagent_table.reagent_cost=Reagent cost: %s

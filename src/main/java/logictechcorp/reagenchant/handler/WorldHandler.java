@@ -18,8 +18,6 @@
 package logictechcorp.reagenchant.handler;
 
 import logictechcorp.reagenchant.Reagenchant;
-import net.minecraft.world.DimensionType;
-import net.minecraft.world.World;
 import net.minecraftforge.event.world.WorldEvent;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
@@ -30,29 +28,12 @@ public class WorldHandler
     @SubscribeEvent
     public static void onWorldLoad(WorldEvent.Load event)
     {
-        World world = event.getWorld();
-
-        if(!world.isRemote)
-        {
-            if(world.provider.getDimension() == DimensionType.OVERWORLD.getId())
-            {
-                Reagenchant.REAGENT_MANAGER.createReagentConfigs(event);
-                Reagenchant.REAGENT_MANAGER.readReagentConfigs(event);
-            }
-        }
+        Reagenchant.REAGENT_MANAGER.onWorldLoad(event);
     }
 
     @SubscribeEvent
     public static void onWorldUnload(WorldEvent.Unload event)
     {
-        World world = event.getWorld();
-
-        if(!world.isRemote)
-        {
-            if(world.provider.getDimension() == DimensionType.OVERWORLD.getId())
-            {
-                Reagenchant.REAGENT_MANAGER.cleanup();
-            }
-        }
+        Reagenchant.REAGENT_MANAGER.onWorldUnload(event);
     }
 }
