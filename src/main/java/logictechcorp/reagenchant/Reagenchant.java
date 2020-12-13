@@ -39,8 +39,8 @@ public class Reagenchant implements IModData
 {
     public static final String MOD_ID = "reagenchant";
     public static final String NAME = "Reagenchant";
-    public static final String VERSION = "1.2.0";
-    public static final String DEPENDENCIES = "required-after:libraryex@[1.2.0,);";
+    public static final String VERSION = "1.2.1";
+    public static final String DEPENDENCIES = "required-after:libraryex@[1.2.1,);";
 
     @Mod.Instance(MOD_ID)
     public static Reagenchant instance;

@@ -31,11 +31,13 @@ import net.minecraft.world.DimensionType;
 import net.minecraft.world.World;
 import net.minecraftforge.event.world.WorldEvent;
 import net.minecraftforge.fml.common.registry.ForgeRegistries;
+import org.apache.commons.io.FileUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -133,50 +135,65 @@ public final class ReagentManager
 
     public void readReagentConfigs(Path reagentConfigDirectoryPath)
     {
-        if(Files.isReadable(reagentConfigDirectoryPath))
+        if(Files.exists(reagentConfigDirectoryPath))
         {
-
             this.logger.info("Reading reagent configs.");
 
             try
             {
-                Files.createDirectories(reagentConfigDirectoryPath);
                 Iterator<Path> pathIter = Files.walk(reagentConfigDirectoryPath).iterator();
 
                 while(pathIter.hasNext())
                 {
-                    File configFile = pathIter.next().toFile();
+                    Path configPath = pathIter.next();
+                    File configFile = configPath.toFile();
 
                     if(FileHelper.getFileExtension(configFile).equals("json"))
                     {
-                        FileConfig config = FileConfig.builder(configFile, JsonFormat.fancyInstance()).preserveInsertionOrder().build();
-                        config.load();
-
-                        Item item = ForgeRegistries.ITEMS.getValue(new ResourceLocation(config.get("item")));
-
-                        if(item != null && item != Items.AIR)
+                        if(Files.isReadable(configPath))
                         {
-                            Reagent reagent;
+                            String fileText = FileUtils.readFileToString(configFile, Charset.defaultCharset()).trim();
 
-                            if(this.hasReagent(item))
+                            if(fileText.startsWith("{") && fileText.endsWith("}"))
                             {
-                                reagent = this.getReagent(item);
+                                FileConfig config = FileConfig.builder(configFile, JsonFormat.fancyInstance()).preserveInsertionOrder().build();
+                                config.load();
+
+                                Item item = ForgeRegistries.ITEMS.getValue(new ResourceLocation(config.get("item")));
+
+                                if(item != null && item != Items.AIR)
+                                {
+                                    Reagent reagent;
+
+                                    if(this.hasReagent(item))
+                                    {
+                                        reagent = this.getReagent(item);
+                                    }
+                                    else
+                                    {
+                                        reagent = new Reagent(item);
+                                    }
+
+                                    reagent.readFromConfig(config);
+                                    this.registerReagent(reagent);
+                                }
+
+                                config.save();
+                                config.close();
                             }
                             else
                             {
-                                reagent = new Reagent(item);
+                                this.logger.info("Skipping reagent config at {}. Its contents are invalid.", configPath);
                             }
-
-                            reagent.readFromConfig(config);
-                            this.registerReagent(reagent);
                         }
-
-                        config.save();
-                        config.close();
+                        else
+                        {
+                            this.logger.info("Skipping reagent config at {}. It is unreadable.", configPath);
+                        }
                     }
                     else if(!configFile.isDirectory())
                     {
-                        this.logger.info("Skipping file located at, {}, since it is not a json file.", configFile.getPath());
+                        this.logger.info("Skipping reagent config at {}. It is not a json file.", configPath);
                     }
                 }
             }
@@ -185,25 +202,20 @@ public final class ReagentManager
                 e.printStackTrace();
             }
         }
-        else
-        {
-            this.logger.warn("Unable to read reagent configs.");
-        }
     }
 
     public void createReagentConfigs(Path reagentConfigDirectoryPath)
     {
-        this.logger.info("Creating reagent configs.");
-
-        try
+        if(Files.notExists(reagentConfigDirectoryPath))
         {
-            for(Reagent reagent : this.defaultReagents.values())
-            {
-                ResourceLocation itemRegistryName = reagent.getItem().getRegistryName();
-                File configFile = new File(reagentConfigDirectoryPath.toFile(), itemRegistryName.toString().replace(":", "/") + ".json");
+            this.logger.info("Creating reagent configs.");
 
-                if(!configFile.exists())
+            try
+            {
+                for(Reagent reagent : this.defaultReagents.values())
                 {
+                    String itemRegistryName = reagent.getItem().getRegistryName().toString();
+                    File configFile = new File(reagentConfigDirectoryPath.toFile(), itemRegistryName.replace(":", "/") + ".json");
                     Files.createDirectories(configFile.getParentFile().toPath());
                     FileConfig config = FileConfig.builder(configFile, JsonFormat.fancyInstance()).preserveInsertionOrder().build();
                     reagent.writeToConfig(config);
@@ -211,10 +223,10 @@ public final class ReagentManager
                     config.close();
                 }
             }
-        }
-        catch(IOException e)
-        {
-            e.printStackTrace();
+            catch(IOException e)
+            {
+                e.printStackTrace();
+            }
         }
     }
 
