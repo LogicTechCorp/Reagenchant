@@ -87,14 +87,14 @@ public class ReagentTableScreen extends ContainerScreen<ReagentTableContainer>
         int width = (this.width - this.xSize) / 2;
         int height = (this.height - this.ySize) / 2;
 
-        for(int enchantmentTier = 0; enchantmentTier < 3; enchantmentTier++)
+        for(int enchantmentIndex = 0; enchantmentIndex < 3; enchantmentIndex++)
         {
             double posX = mouseX - (double) (width + 60);
-            double posY = mouseY - (double) (height + 14 + 19 * enchantmentTier);
+            double posY = mouseY - (double) (height + 14 + 19 * enchantmentIndex);
 
-            if(posX >= 0.0D && posY >= 0.0D && posX < 108.0D && posY < 19.0D && this.container.enchantItem(this.minecraft.player, enchantmentTier))
+            if(posX >= 0.0D && posY >= 0.0D && posX < 108.0D && posY < 19.0D && this.container.enchantItem(this.minecraft.player, enchantmentIndex))
             {
-                this.minecraft.playerController.sendEnchantPacket((this.container).windowId, enchantmentTier);
+                this.minecraft.playerController.sendEnchantPacket((this.container).windowId, enchantmentIndex);
                 return true;
             }
         }
@@ -180,9 +180,9 @@ public class ReagentTableScreen extends ContainerScreen<ReagentTableContainer>
         GlStateManager.color4f(1.0F, 1.0F, 1.0F, 1.0F);
         EnchantmentNameParts.getInstance().reseedRandomGenerator(this.container.getXpSeed() + (this.container.getReagentAmount() == 0 ? 0 : 1));
 
-        for(int i = 0; i < 3; i++)
+        for(int enchantmentIndex = 0; enchantmentIndex < 3; enchantmentIndex++)
         {
-            int enchantabilityLevel = this.container.getEnchantabilityLevels()[i];
+            int enchantabilityLevel = this.container.getEnchantabilityLevels()[enchantmentIndex];
             int rectanglePosX = width + 62;
             int textPosX = rectanglePosX + 20;
             this.blitOffset = 0;
@@ -191,7 +191,7 @@ public class ReagentTableScreen extends ContainerScreen<ReagentTableContainer>
 
             if(enchantabilityLevel == 0)
             {
-                this.blit(rectanglePosX, height + 14 + 19 * i, 0, 185, 108, 19);
+                this.blit(rectanglePosX, height + 14 + 19 * enchantmentIndex, 0, 185, 108, 19);
             }
             else
             {
@@ -201,35 +201,35 @@ public class ReagentTableScreen extends ContainerScreen<ReagentTableContainer>
                 FontRenderer fontRenderer = this.minecraft.getFontResourceManager().getFontRenderer(Minecraft.standardGalacticFontRenderer);
                 int color = 6839882;
 
-                if(((this.container.getLapisAmount() < i + 1 || this.container.getReagentAmount() < this.container.getReagentCost()[i] || this.minecraft.player.experienceLevel < enchantabilityLevel) && !this.minecraft.player.abilities.isCreativeMode) || this.container.getEnchantments()[i] == -1)
+                if(((this.container.getLapisAmount() < enchantmentIndex + 1 || this.container.getReagentAmount() < this.container.getReagentCosts()[enchantmentIndex] || this.minecraft.player.experienceLevel < enchantabilityLevel) && !this.minecraft.player.abilities.isCreativeMode) || this.container.getEnchantmentHints()[enchantmentIndex] == -1)
                 {
-                    this.blit(rectanglePosX, height + 14 + 19 * i, 0, 185, 108, 19);
-                    this.blit(rectanglePosX + 1, height + 15 + 19 * i, 16 * i, 239, 16, 16);
-                    fontRenderer.drawSplitString(randomName, textPosX, height + 16 + 19 * i, length, (color & 16711422) >> 1);
+                    this.blit(rectanglePosX, height + 14 + 19 * enchantmentIndex, 0, 185, 108, 19);
+                    this.blit(rectanglePosX + 1, height + 15 + 19 * enchantmentIndex, 16 * enchantmentIndex, 239, 16, 16);
+                    fontRenderer.drawSplitString(randomName, textPosX, height + 16 + 19 * enchantmentIndex, length, (color & 16711422) >> 1);
                     color = 4226832;
                 }
                 else
                 {
                     int cursorPosX = mouseX - (width + 60);
-                    int cursorPosY = mouseY - (height + 14 + 19 * i);
+                    int cursorPosY = mouseY - (height + 14 + 19 * enchantmentIndex);
 
                     if(cursorPosX >= 0 && cursorPosY >= 0 && cursorPosX < 108 && cursorPosY < 19)
                     {
-                        this.blit(rectanglePosX, height + 14 + 19 * i, 0, 204, 108, 19);
+                        this.blit(rectanglePosX, height + 14 + 19 * enchantmentIndex, 0, 204, 108, 19);
                         color = 16777088;
                     }
                     else
                     {
-                        this.blit(rectanglePosX, height + 14 + 19 * i, 0, 166, 108, 19);
+                        this.blit(rectanglePosX, height + 14 + 19 * enchantmentIndex, 0, 166, 108, 19);
                     }
 
-                    this.blit(rectanglePosX + 1, height + 15 + 19 * i, 16 * i, 223, 16, 16);
-                    fontRenderer.drawSplitString(randomName, textPosX, height + 16 + 19 * i, length, color);
+                    this.blit(rectanglePosX + 1, height + 15 + 19 * enchantmentIndex, 16 * enchantmentIndex, 223, 16, 16);
+                    fontRenderer.drawSplitString(randomName, textPosX, height + 16 + 19 * enchantmentIndex, length, color);
                     color = 8453920;
                 }
 
                 fontRenderer = this.minecraft.fontRenderer;
-                fontRenderer.drawStringWithShadow(enchantabilityLevelString, (float) (textPosX + 86 - fontRenderer.getStringWidth(enchantabilityLevelString)), (float) (height + 16 + 19 * i + 7), color);
+                fontRenderer.drawStringWithShadow(enchantabilityLevelString, (float) (textPosX + 86 - fontRenderer.getStringWidth(enchantabilityLevelString)), (float) (height + 16 + 19 * enchantmentIndex + 7), color);
             }
         }
     }
@@ -242,14 +242,13 @@ public class ReagentTableScreen extends ContainerScreen<ReagentTableContainer>
         super.render(mouseX, mouseY, partialTicks);
         this.renderHoveredToolTip(mouseX, mouseY);
 
-        for(int i = 0; i < 3; i++)
+        for(int enchantmentIndex = 0; enchantmentIndex < 3; enchantmentIndex++)
         {
-            Enchantment enchantment = Enchantment.getEnchantmentByID(this.container.getEnchantments()[i]);
-            int enchantmentLevel = this.container.getEnchantmentLevels()[i];
-            int enchantabilityLevel = this.container.getEnchantabilityLevels()[i];
-            int enchantmentTier = i + 1;
+            Enchantment enchantment = Enchantment.getEnchantmentByID(this.container.getEnchantmentHints()[enchantmentIndex]);
+            int enchantmentLevel = this.container.getEnchantmentLevels()[enchantmentIndex];
+            int enchantabilityLevel = this.container.getEnchantabilityLevels()[enchantmentIndex];
 
-            if(this.isPointInRegion(62, 14 + 19 * i, 108, 17, mouseX, mouseY) && enchantabilityLevel > 0)
+            if(this.isPointInRegion(62, 14 + 19 * enchantmentIndex, 108, 17, mouseX, mouseY) && enchantabilityLevel > 0)
             {
                 List<String> list = new ArrayList<>();
                 list.add("" + TextFormatting.WHITE + TextFormatting.ITALIC + I18n.format("container.enchant.clue", enchantment == null ? "" : enchantment.getDisplayName(enchantmentLevel).getFormattedText()));
@@ -268,16 +267,18 @@ public class ReagentTableScreen extends ContainerScreen<ReagentTableContainer>
                     }
                     else
                     {
-                        String lapisText;
-                        TextFormatting lapisTextFormatting = this.container.getLapisAmount() >= enchantmentTier ? TextFormatting.GRAY : TextFormatting.RED;
+                        int enchantmentTierCost = enchantmentIndex + 1;
 
-                        if(enchantmentTier == 1)
+                        String lapisText;
+                        TextFormatting lapisTextFormatting = this.container.getLapisAmount() >= enchantmentTierCost ? TextFormatting.GRAY : TextFormatting.RED;
+
+                        if(enchantmentTierCost == 1)
                         {
                             lapisText = I18n.format("container.enchant.lapis.one");
                         }
                         else
                         {
-                            lapisText = I18n.format("container.enchant.lapis.many", enchantmentTier);
+                            lapisText = I18n.format("container.enchant.lapis.many", enchantmentTierCost);
                         }
 
                         list.add(lapisTextFormatting + "" + lapisText);
@@ -287,7 +288,7 @@ public class ReagentTableScreen extends ContainerScreen<ReagentTableContainer>
 
                         if(!reagent.isEmpty())
                         {
-                            int reagentCost = this.container.getReagentCost()[i];
+                            int reagentCost = this.container.getReagentCosts()[enchantmentIndex];
 
                             if(reagentCost > 0)
                             {
@@ -309,13 +310,13 @@ public class ReagentTableScreen extends ContainerScreen<ReagentTableContainer>
 
                         String enchantLevelText;
 
-                        if(enchantmentTier == 1)
+                        if(enchantmentTierCost == 1)
                         {
                             enchantLevelText = I18n.format("container.enchant.level.one");
                         }
                         else
                         {
-                            enchantLevelText = I18n.format("container.enchant.level.many", enchantmentTier);
+                            enchantLevelText = I18n.format("container.enchant.level.many", enchantmentTierCost);
                         }
 
                         list.add(TextFormatting.GRAY + "" + enchantLevelText);

@@ -58,7 +58,7 @@ public class Reagent
         }
     }
 
-    public List<EnchantmentData> compileEnchantmentList(ItemStack unenchantedStack, int enchantmentTier, int enchantabilityLevel, Random random)
+    public List<EnchantmentData> compileEnchantmentList(ItemStack unenchantedStack, int enchantmentIndex, int enchantabilityLevel, Random random)
     {
         int itemEnchantability = unenchantedStack.getItemEnchantability();
 
@@ -95,11 +95,11 @@ public class Reagent
                 {
                     int oneThird = (maximumEnchantmentLevel - minimumEnchantmentLevel) / 3;
 
-                    if(enchantmentTier == 0)
+                    if(enchantmentIndex == 0)
                     {
                         maximumEnchantmentLevel = (minimumEnchantmentLevel + oneThird);
                     }
-                    else if(enchantmentTier == 1)
+                    else if(enchantmentIndex == 1)
                     {
                         minimumEnchantmentLevel += oneThird;
                         maximumEnchantmentLevel -= oneThird;

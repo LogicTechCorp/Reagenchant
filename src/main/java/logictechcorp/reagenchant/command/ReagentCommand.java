@@ -122,11 +122,11 @@ public class ReagentCommand
 
         if(reagent.isEmpty())
         {
-            source.sendFeedback(new TranslationTextComponent("command.cave_upgrade.reagent.create.success", item.getRegistryName()), true);
+            source.sendFeedback(new TranslationTextComponent("command.reagenchant.reagent.create.success", item.getRegistryName()), true);
         }
         else
         {
-            source.sendErrorMessage(new TranslationTextComponent("command.cave_upgrade.reagent.create.override", item.getRegistryName()));
+            source.sendErrorMessage(new TranslationTextComponent("command.reagenchant.reagent.create.override", item.getRegistryName()));
         }
 
         reagent = Reagenchant.REAGENT_MANAGER.createReagent(item);
@@ -149,12 +149,12 @@ public class ReagentCommand
 
             if(reagent.isEmpty())
             {
-                source.sendErrorMessage(new TranslationTextComponent("command.cave_upgrade.reagent.add.error", item.getRegistryName()));
+                source.sendErrorMessage(new TranslationTextComponent("command.reagenchant.reagent.add.error", item.getRegistryName()));
                 return CommandCompletion.FAILURE;
             }
 
             reagent.addEnchantment(new ReagentEnchantData(enchantment, enchantment.getMinLevel(), enchantment.getMaxLevel(), 0.5F, 1));
-            source.sendFeedback(new TranslationTextComponent("command.cave_upgrade.reagent.add.success", enchantment.getRegistryName(), item.getRegistryName()), true);
+            source.sendFeedback(new TranslationTextComponent("command.reagenchant.reagent.add.success", enchantment.getRegistryName(), item.getRegistryName()), true);
             saveReagentFile(server, reagent);
             sendClientSyncPacket(source);
             return CommandCompletion.SUCCESS;
@@ -180,12 +180,12 @@ public class ReagentCommand
 
             if(reagent.isEmpty())
             {
-                source.sendErrorMessage(new TranslationTextComponent("command.cave_upgrade.reagent.add.error", item.getRegistryName()));
+                source.sendErrorMessage(new TranslationTextComponent("command.reagenchant.reagent.add.error", item.getRegistryName()));
                 return CommandCompletion.FAILURE;
             }
 
             reagent.addEnchantment(new ReagentEnchantData(enchantment, minimumLevel, maximumLevel, enchantmentProbability, reagentCost));
-            source.sendFeedback(new TranslationTextComponent("command.cave_upgrade.reagent.add.success", enchantment.getRegistryName(), item.getRegistryName()), true);
+            source.sendFeedback(new TranslationTextComponent("command.reagenchant.reagent.add.success", enchantment.getRegistryName(), item.getRegistryName()), true);
             saveReagentFile(server, reagent);
             sendClientSyncPacket(source);
             return CommandCompletion.SUCCESS;
@@ -207,12 +207,12 @@ public class ReagentCommand
 
             if(reagent.isEmpty())
             {
-                source.sendErrorMessage(new TranslationTextComponent("command.cave_upgrade.reagent.remove.error", item.getRegistryName()));
+                source.sendErrorMessage(new TranslationTextComponent("command.reagenchant.reagent.remove.error", item.getRegistryName()));
                 return CommandCompletion.FAILURE;
             }
 
             reagent.removeEnchantment(enchantment);
-            source.sendFeedback(new TranslationTextComponent("command.cave_upgrade.reagent.remove.success", enchantment.getRegistryName(), item.getRegistryName()), true);
+            source.sendFeedback(new TranslationTextComponent("command.reagenchant.reagent.remove.success", enchantment.getRegistryName(), item.getRegistryName()), true);
             saveReagentFile(server, reagent);
             sendClientSyncPacket(source);
             return CommandCompletion.SUCCESS;
@@ -230,12 +230,12 @@ public class ReagentCommand
 
         if(reagent.isEmpty())
         {
-            source.sendErrorMessage(new TranslationTextComponent("command.cave_upgrade.reagent.delete.error", item.getRegistryName()));
+            source.sendErrorMessage(new TranslationTextComponent("command.reagenchant.reagent.delete.error", item.getRegistryName()));
             return CommandCompletion.FAILURE;
         }
 
         Reagenchant.REAGENT_MANAGER.unregisterReagent(reagent);
-        source.sendFeedback(new TranslationTextComponent("command.cave_upgrade.reagent.delete.success", item.getRegistryName()), true);
+        source.sendFeedback(new TranslationTextComponent("command.reagenchant.reagent.delete.success", item.getRegistryName()), true);
         deleteReagentFile(server, reagent);
         sendClientSyncPacket(source);
         return CommandCompletion.SUCCESS;
