@@ -1,96 +1,105 @@
-import org.apache.tools.ant.filters.ReplaceTokens
-
-apply plugin: 'net.minecraftforge.gradle'
-
 buildscript {
     repositories {
         maven { url = 'https://files.minecraftforge.net/maven' }
+        maven { url = "https://repo.spongepowered.org/repository/maven-public/" }
         jcenter()
         mavenCentral()
     }
     dependencies {
         classpath group: 'net.minecraftforge.gradle', name: 'ForgeGradle', version: '3.+', changing: true
+        classpath group: 'org.spongepowered', name: 'mixingradle', version: '0.7-SNAPSHOT'
     }
 }
 
-version = mod_version
-group = "com.github.logictechcorp"
-archivesBaseName = "${mod_name}-${minecraft_version}"
+plugins {
+    id 'org.cadixdev.licenser' version '0.5.0'
+}
 
-sourceCompatibility = JavaVersion.VERSION_1_8
-targetCompatibility = JavaVersion.VERSION_1_8
+apply plugin: 'net.minecraftforge.gradle'
+apply plugin: 'org.spongepowered.mixin'
+apply plugin: 'eclipse'
+apply plugin: 'maven-publish'
+
+version = "${minecraft_version}-${mod_version}"
+group = 'com.github.logictechcorp'
+archivesBaseName = "${mod_id}"
+
+sourceCompatibility = targetCompatibility = compileJava.sourceCompatibility = compileJava.targetCompatibility = '1.8'
+
+license {
+    header = project.file('LICENSE-header.txt')
+    sourceSets = [project.sourceSets.main]
+    include '**/*.java'
+    ext {
+        year = new Date().format('YYYY')
+    }
+}
+
+mixin {
+    add sourceSets.main, "${mod_id}.refmap.json"
+}
 
 minecraft {
-    mappings channel: "snapshot", version: "${mcp_version}"
-
-    accessTransformer = file("/src/main/resources/META-INF/accesstransformer.cfg")
-
+    mappings channel: 'snapshot', version: "${mappings_version}"  
     runs {
         client {
             workingDirectory project.file('run')
-
+            property 'mixin.env.disableRefMap', "true"
+            arg "-mixin.config=${mod_id}.mixins.json".toString()
             mods {
                 Reagenchant {
                     source sourceSets.main
                 }
             }
         }
-
         server {
             workingDirectory project.file('run')
-
+            property 'mixin.env.disableRefMap', "true"
+            arg "-mixin.config=${mod_id}.mixins.json".toString()
             mods {
                 Reagenchant {
                     source sourceSets.main
                 }
             }
         }
-
         data {
             workingDirectory project.file('run')
-
+            args '--mod', "${mod_id}".toString(), '--all', '--output', file('src/data_gen/resources/')
             mods {
                 Reagenchant {
                     source sourceSets.main
                 }
             }
-            args '--mod', 'reagenchant', '--all', '--output', file('src/main/generated_resources/'), '--input', file('src/main/resources/')
         }
     }
 }
 
 repositories {
-    mavenCentral()
+    maven {
+        url "https://www.cursemaven.com"
+    }
 }
 
 dependencies {
     minecraft "net.minecraftforge:forge:${minecraft_version}-${forge_version}"
-    compile project(':LibraryEx')
+    implementation fg.deobf("curse.maven:abnormals_core-382216:${abnormals_core_version}")
 }
 
 jar {
-    exclude "**/*.bat"
-
     manifest {
         attributes([
-                "Specification-Title"     : "${mod_name}",
-                "Specification-Vendor"    : "LogicTechCorp",
-                "Specification-Version"   : "${mod_version}",
-                "Implementation-Title"    : "${mod_name}",
-                "Implementation-Version"  : "${mod_version}",
-                "Implementation-Vendor"   : "LogicTechCorp",
-                "Implementation-Timestamp": new Date().format("yyyy-MM-dd'T'HH:mm:ssZ")
+            "Specification-Title"     : "${mod_name}",
+            "Specification-Vendor"    : 'LogicTechCorp',
+            "Specification-Version"   : '1',
+            "Implementation-Title"    : "${mod_name}",
+            "Implementation-Version"  : "${mod_version}",
+            "Implementation-Vendor"   : 'LogicTechCorp',
+            "Implementation-Timestamp": new Date().format("yyyy-MM-dd'T'HH:mm:ssZ"),
+            "MixinConfigs"            : "${mod_id}.mixins.json"
         ])
     }
 }
 
-task processDevResources(type: Copy) {
-    destinationDir = ((Copy) project.tasks.getByName("processResources")).getDestinationDir()
-    from(sourceSets.main.resources.srcDirs) {
-        filter tokens: ["file.jarVersion": project.version as String], beginToken: "\${", endToken: "}", ReplaceTokens
-    }
-}
-
 build {
-    dependsOn(processDevResources)
+    dependsOn(updateLicenses)
 }

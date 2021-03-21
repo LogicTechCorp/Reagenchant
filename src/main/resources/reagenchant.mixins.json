@@ -1,0 +1,11 @@
+{
+    "required": true,
+    "package": "logictechcorp.reagenchant.core.mixin",
+    "compatibilityLevel": "JAVA_8",
+    "minVersion": "0.8.2",
+    "refmap": "reagenchant.refmap.json",
+    "mixins": [ "ExperienceOrbEntityMixin", "ItemStackMixin", "UnbreakingEnchantmentMixin" ],
+    "injectors": {
+        "defaultRequire": 1
+    }
+}
