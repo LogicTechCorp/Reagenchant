@@ -17,41 +17,27 @@
 
 package logictechcorp.reagenchant.common.block;
 
-import logictechcorp.reagenchant.common.inventory.container.ReagentEnchantingTableContainer;
 import logictechcorp.reagenchant.common.tileentity.ReagentEnchantingTableTileEntity;
 import net.minecraft.block.AbstractBlock;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.EnchantingTableBlock;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.inventory.container.Container;
-import net.minecraft.inventory.container.INamedContainerProvider;
-import net.minecraft.inventory.container.SimpleNamedContainerProvider;
+import net.minecraft.entity.player.ServerPlayerEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.EnchantingTableTileEntity;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.ActionResultType;
 import net.minecraft.util.Hand;
-import net.minecraft.util.IWorldPosCallable;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.BlockRayTraceResult;
 import net.minecraft.world.IBlockReader;
 import net.minecraft.world.World;
+import net.minecraftforge.fml.network.NetworkHooks;
 
 public class ReagentEnchantingTableBlock extends EnchantingTableBlock {
     public ReagentEnchantingTableBlock(AbstractBlock.Properties properties) {
         super(properties);
-    }
-
-    @Override
-    public void onReplaced(BlockState state, World world, BlockPos pos, BlockState newState, boolean isMoving) {
-        TileEntity tileEntity = world.getTileEntity(pos);
-
-        if(tileEntity instanceof ReagentEnchantingTableTileEntity) {
-            ((ReagentEnchantingTableTileEntity) tileEntity).dropContents(world, pos);
-        }
-
-        super.onReplaced(state, world, pos, newState, isMoving);
     }
 
     @Override
@@ -66,38 +52,39 @@ public class ReagentEnchantingTableBlock extends EnchantingTableBlock {
     }
 
     @Override
-    public TileEntity createTileEntity(BlockState state, IBlockReader world) {
-        return new ReagentEnchantingTableTileEntity();
+    public void onReplaced(BlockState state, World world, BlockPos pos, BlockState newState, boolean isMoving) {
+        TileEntity tileEntity = world.getTileEntity(pos);
+
+        if(tileEntity instanceof ReagentEnchantingTableTileEntity) {
+            ((ReagentEnchantingTableTileEntity) tileEntity).dropContents(world, pos);
+        }
+
+        super.onReplaced(state, world, pos, newState, isMoving);
     }
 
     @Override
     public ActionResultType onBlockActivated(BlockState state, World world, BlockPos pos, PlayerEntity player, Hand hand, BlockRayTraceResult rayTraceResult) {
+        if(world.getTileEntity(pos) instanceof EnchantingTableTileEntity) {
+            world.setTileEntity(pos, this.createTileEntity(state, world));
+        }
+
         if(!world.isRemote) {
-            if(world.getTileEntity(pos) instanceof EnchantingTableTileEntity) {
-                world.setTileEntity(pos, this.createTileEntity(state, world));
-            }
+            TileEntity tileEntity = world.getTileEntity(pos);
 
-            player.openContainer(state.getContainer(world, pos));
-            Container openContainer = player.openContainer;
+            if(tileEntity instanceof ReagentEnchantingTableTileEntity) {
+                ReagentEnchantingTableTileEntity reagentEnchantingTable = (ReagentEnchantingTableTileEntity) tileEntity;
 
-            if(openContainer instanceof ReagentEnchantingTableContainer) {
-                ((ReagentEnchantingTableContainer) openContainer).onContentsChanged();
+                if(player instanceof ServerPlayerEntity) {
+                    NetworkHooks.openGui((ServerPlayerEntity) player, reagentEnchantingTable, pos);
+                }
             }
         }
 
-        return ActionResultType.SUCCESS;
+        return ActionResultType.func_233537_a_(world.isRemote);
     }
 
     @Override
-    public INamedContainerProvider getContainer(BlockState state, World world, BlockPos pos) {
-        TileEntity tileEntity = world.getTileEntity(pos);
-
-        if(tileEntity instanceof ReagentEnchantingTableTileEntity) {
-            ReagentEnchantingTableTileEntity reagentTable = (ReagentEnchantingTableTileEntity) tileEntity;
-            return new SimpleNamedContainerProvider((id, playerInventory, player) -> new ReagentEnchantingTableContainer(id, playerInventory, reagentTable.getItemStackHandler(), IWorldPosCallable.of(world, pos)), reagentTable.getDisplayName());
-        }
-        else {
-            return null;
-        }
+    public TileEntity createTileEntity(BlockState state, IBlockReader world) {
+        return new ReagentEnchantingTableTileEntity();
     }
 }

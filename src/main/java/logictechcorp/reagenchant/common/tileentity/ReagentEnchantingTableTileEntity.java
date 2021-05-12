@@ -17,30 +17,19 @@
 
 package logictechcorp.reagenchant.common.tileentity;
 
+import logictechcorp.reagenchant.common.inventory.container.ReagentEnchantingTableContainer;
 import logictechcorp.reagenchant.core.registry.ReagenchantTileEntityTypes;
-import net.minecraft.block.BlockState;
 import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.inventory.InventoryHelper;
-import net.minecraft.nbt.CompoundNBT;
-import net.minecraft.network.NetworkManager;
-import net.minecraft.network.play.server.SUpdateTileEntityPacket;
+import net.minecraft.entity.player.PlayerInventory;
+import net.minecraft.inventory.container.Container;
 import net.minecraft.tileentity.ITickableTileEntity;
-import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.Direction;
-import net.minecraft.util.INameable;
-import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.IWorldPosCallable;
 import net.minecraft.util.math.MathHelper;
-import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.TranslationTextComponent;
-import net.minecraft.world.World;
-import net.minecraftforge.common.capabilities.Capability;
-import net.minecraftforge.common.util.LazyOptional;
-import net.minecraftforge.items.CapabilityItemHandler;
-import net.minecraftforge.items.ItemStackHandler;
 
 import java.util.Random;
 
-public class ReagentEnchantingTableTileEntity extends TileEntity implements ITickableTileEntity, INameable {
+public class ReagentEnchantingTableTileEntity extends InventoryTileEntity implements ITickableTileEntity {
     public int ticks;
     public float nextPageFlipAmount;
     public float pageFlipAmount;
@@ -52,15 +41,10 @@ public class ReagentEnchantingTableTileEntity extends TileEntity implements ITic
     public float pageAngle;
     public float angle;
 
-    protected LazyOptional<ItemStackHandler> itemStackHandler;
-    protected Random random;
-
-    private ITextComponent customName;
+    protected Random random = new Random();
 
     public ReagentEnchantingTableTileEntity() {
-        super(ReagenchantTileEntityTypes.REAGENT_ENCHANTING_TABLE_TILE_ENTITY.get());
-        this.itemStackHandler = LazyOptional.of(() -> new ItemStackHandler(3));
-        this.random = new Random();
+        super(ReagenchantTileEntityTypes.REAGENT_ENCHANTING_TABLE_TILE_ENTITY.get(), new TranslationTextComponent("container.enchant"), 3);
     }
 
     @Override
@@ -127,70 +111,7 @@ public class ReagentEnchantingTableTileEntity extends TileEntity implements ITic
     }
 
     @Override
-    public CompoundNBT write(CompoundNBT compound) {
-        super.write(compound);
-
-        if(this.hasCustomName()) {
-            compound.putString("CustomName", ITextComponent.Serializer.toJson(this.customName));
-        }
-
-        this.itemStackHandler.ifPresent(handler -> compound.put("Items", handler.serializeNBT()));
-        return compound;
-    }
-
-    @Override
-    public void read(BlockState state, CompoundNBT compound) {
-        super.read(state, compound);
-
-        if(compound.contains("CustomName", 8)) {
-            this.customName = ITextComponent.Serializer.getComponentFromJson(compound.getString("CustomName"));
-        }
-
-        this.itemStackHandler.ifPresent(handler -> handler.deserializeNBT(compound.getCompound("Items")));
-    }
-
-    @Override
-    public void onDataPacket(NetworkManager networkManager, SUpdateTileEntityPacket packet) {
-        this.read(this.world.getBlockState(packet.getPos()), packet.getNbtCompound());
-    }
-
-    public void dropContents(World world, BlockPos pos) {
-        this.itemStackHandler.ifPresent(handler -> {
-            for(int i = 0; i < handler.getSlots(); i++) {
-                InventoryHelper.spawnItemStack(world, pos.getX(), pos.getY(), pos.getZ(), handler.getStackInSlot(i));
-            }
-        });
-    }
-
-    @Override
-    public SUpdateTileEntityPacket getUpdatePacket() {
-        return new SUpdateTileEntityPacket(this.pos, 0, this.write(new CompoundNBT()));
-    }
-
-    @Override
-    public <T> LazyOptional<T> getCapability(Capability<T> capibility, Direction direction) {
-        if(capibility == CapabilityItemHandler.ITEM_HANDLER_CAPABILITY) {
-            return (LazyOptional<T>) this.itemStackHandler;
-        }
-
-        return LazyOptional.empty();
-    }
-
-    @Override
-    public ITextComponent getName() {
-        return (this.customName != null ? this.customName : new TranslationTextComponent("container.enchant"));
-    }
-
-    @Override
-    public ITextComponent getCustomName() {
-        return this.customName;
-    }
-
-    public ItemStackHandler getItemStackHandler() {
-        return this.itemStackHandler.orElse(new ItemStackHandler(3));
-    }
-
-    public void setCustomName(ITextComponent name) {
-        this.customName = name;
+    public Container createMenu(int windowId, PlayerInventory playerInventory, PlayerEntity player) {
+        return new ReagentEnchantingTableContainer(windowId, playerInventory, IWorldPosCallable.of(this.world, this.pos), this.itemStackHandler);
     }
 }

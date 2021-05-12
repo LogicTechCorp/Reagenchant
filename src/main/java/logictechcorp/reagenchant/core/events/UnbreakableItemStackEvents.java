@@ -34,8 +34,6 @@ import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.TextFormatting;
 import net.minecraft.util.text.TranslationTextComponent;
 import net.minecraft.world.World;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.common.IForgeShearable;
 import net.minecraftforge.event.ItemAttributeModifierEvent;
 import net.minecraftforge.event.entity.player.*;
@@ -50,7 +48,6 @@ import java.util.List;
 @Mod.EventBusSubscriber(modid = Reagenchant.MOD_ID)
 public class UnbreakableItemStackEvents {
     @SubscribeEvent
-    @OnlyIn(Dist.CLIENT)
     public static void onItemTooltip(ItemTooltipEvent event) {
         ItemStack stack = event.getItemStack();
         List<ITextComponent> tooltips = event.getToolTip();
@@ -75,7 +72,7 @@ public class UnbreakableItemStackEvents {
                         }
 
                         if((tagIndex + 1) == enchantmentCount) {
-                            tooltips.add((index + 1), new TranslationTextComponent("tooltip." + Reagenchant.MOD_ID + ":item.broken").mergeStyle(TextFormatting.GOLD));
+                            tooltips.add((index + 1), new TranslationTextComponent("tooltip." + Reagenchant.MOD_ID + ".item.broken").mergeStyle(TextFormatting.GOLD));
                         }
                     }
 

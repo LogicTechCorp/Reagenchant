@@ -15,10 +15,11 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package logictechcorp.reagenchant.core.util.registry;
+package logictechcorp.reagenchant.core.registry.helper;
 
 import com.minecraftabnormals.abnormals_core.core.util.registry.AbstractSubRegistryHelper;
 import com.minecraftabnormals.abnormals_core.core.util.registry.RegistryHelper;
+import logictechcorp.reagenchant.core.Reagenchant;
 import net.minecraft.inventory.container.ContainerType;
 import net.minecraftforge.common.loot.GlobalLootModifierSerializer;
 import net.minecraftforge.registries.ForgeRegistries;
@@ -26,8 +27,8 @@ import net.minecraftforge.registries.ForgeRegistries;
 import javax.annotation.Nonnull;
 
 public class ReagenchantRegistryHelper extends RegistryHelper {
-    public ReagenchantRegistryHelper(String modId) {
-        super(modId);
+    public ReagenchantRegistryHelper() {
+        super(Reagenchant.MOD_ID);
     }
 
     @Override

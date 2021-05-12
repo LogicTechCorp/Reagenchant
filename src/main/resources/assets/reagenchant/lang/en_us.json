@@ -1,6 +1,8 @@
 {
-    "config.reagenchant.common.tweaks.unbreakable_items": "If items with Unbreakable should not break; Default: true",
-
+    "config.reagenchant.common.compatibility.quark.enable_quark_compatibility": "If Quark compatibility should be enabled; Default: true",
+    "config.reagenchant.common.tweaks.items.unbreakable_items": "If items with the Unbreakable enchantment should not break; Default: true",
+    "config.reagenchant.common.tweaks.player.percent_of_xp_dropped_on_death": "The percent of experience which should drop on death; Default: 0.5",
+    "config.reagenchant.common.tweaks.player.percent_of_dropped_xp_lost": "The percent of experience dropped which should be lost; Default: 0.25",
     "command.reagenchant.reagent.create.success": "Created reagent for %s",
     "command.reagenchant.reagent.create.override": "Overriding the %s reagent",
     "command.reagenchant.reagent.add.success": "Added %s to the %s reagent",
@@ -9,12 +11,15 @@
     "command.reagenchant.reagent.remove.error": "The %s reagent doesn't exist",
     "command.reagenchant.reagent.delete.success": "Deleted reagent for %s",
     "command.reagenchant.reagent.delete.error": "The %s reagent doesn't exist",
-
     "container.reagenchant.reagent_enchanting_table.reagent.cost.one": "1 %s",
     "container.reagenchant.reagent_enchanting_table.reagent.cost.many": "%s %s",
-
-    "tooltip.reagenchant:item.broken" : "Broken",
-
+    "container.reagenchant.reagent_candle": "Reagent Candle",
+    "container.reagenchant.anvil.iron_repair_cost": "Iron Cost: %1$s",
+    "container.reagenchant.jei.reagent_enchanting.title": "Reagent Enchanting",
+    "container.reagenchant.jei.reagent_enchanting.enchantment_probability": "Enchantment Probability: %s%%",
+    "container.reagenchant.jei.reagent_enchanting.reagent_cost": "Reagent cost: %s",
+    "tooltip.reagenchant.item.broken": "Broken",
+    "block.reagenchant.reagent_candle": "Reagent Candle",
     "enchantment.level.11": "XI",
     "enchantment.level.12": "XII",
     "enchantment.level.13": "XIII",

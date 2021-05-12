@@ -89,12 +89,14 @@ public class MessageSUpdateReagentsPacket {
         }
     }
 
-    public static void handle(MessageSUpdateReagentsPacket packet, Supplier<NetworkEvent.Context> contextSupplier) {
+    public void handle(Supplier<NetworkEvent.Context> contextSupplier) {
         NetworkEvent.Context context = contextSupplier.get();
 
-        if(context.getDirection().getReceptionSide() == LogicalSide.CLIENT) {
-            Reagenchant.REAGENT_MANAGER.syncClientReagents(packet.reagents);
-            context.setPacketHandled(true);
-        }
+        context.enqueueWork(() -> {
+            if(context.getDirection().getReceptionSide() == LogicalSide.CLIENT) {
+                Reagenchant.REAGENT_MANAGER.syncClientReagents(this.reagents);
+                context.setPacketHandled(true);
+            }
+        });
     }
 }

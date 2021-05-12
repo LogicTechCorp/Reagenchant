@@ -92,7 +92,7 @@ public class ReagentEnchantingTableScreen extends ContainerScreen<ReagentEnchant
     protected void drawGuiContainerBackgroundLayer(MatrixStack matrixStack, float partialTicks, int mouseX, int mouseY) {
         ResourceLocation guiTexture;
 
-        if(!this.container.getItemStackHandler().getStackInSlot(2).isEmpty()) {
+        if(this.container.getSlot(2).getHasStack()) {
             guiTexture = REAGENT_ENCHANTING_TABLE_WITH_REAGENT_GUI;
         }
         else {
@@ -114,9 +114,9 @@ public class ReagentEnchantingTableScreen extends ContainerScreen<ReagentEnchant
         RenderSystem.multMatrix(Matrix4f.perspective(90.0D, 1.3333334F, 9.0F, 80.0F));
         RenderSystem.matrixMode(5888);
         matrixStack.push();
-        MatrixStack.Entry matrixstack$entry = matrixStack.getLast();
-        matrixstack$entry.getMatrix().setIdentity();
-        matrixstack$entry.getNormal().setIdentity();
+        MatrixStack.Entry matrixStackLast = matrixStack.getLast();
+        matrixStackLast.getMatrix().setIdentity();
+        matrixStackLast.getNormal().setIdentity();
         matrixStack.translate(0.0D, 3.3F, 1984.0D);
         matrixStack.scale(5.0F, 5.0F, 5.0F);
         matrixStack.rotate(Vector3f.ZP.rotationDegrees(180.0F));
@@ -157,10 +157,10 @@ public class ReagentEnchantingTableScreen extends ContainerScreen<ReagentEnchant
         RenderSystem.matrixMode(5888);
         RenderHelper.setupGui3DDiffuseLighting();
         RenderSystem.color4f(1.0F, 1.0F, 1.0F, 1.0F);
-        EnchantmentNameParts.getInstance().reseedRandomGenerator(this.container.getXpSeed() + (this.container.getReagentAmount() == 0 ? 0 : Item.getIdFromItem(this.container.getItemStackHandler().getStackInSlot(2).getItem())));
+        EnchantmentNameParts.getInstance().reseedRandomGenerator(this.container.getXpSeed() + (this.container.getReagentAmount() == 0 ? 0 : Item.getIdFromItem(this.container.getSlot(2).getStack().getItem())));
 
         for(int i = 0; i < 3; i++) {
-            int enchantabilityLevel = this.container.getEnchantabilityLevels()[i];
+            int enchantabilityLevel = this.container.getEnchantabilityLevels()[ i ];
             int rectanglePosX = width + 62;
             int textPosX = rectanglePosX + 20;
             this.setBlitOffset(0);
@@ -176,7 +176,7 @@ public class ReagentEnchantingTableScreen extends ContainerScreen<ReagentEnchant
                 ITextProperties randomName = EnchantmentNameParts.getInstance().getGalacticEnchantmentName(this.font, length);
                 int color = 6839882;
 
-                if(((this.container.getLapisAmount() < i + 1 || this.container.getReagentAmount() < this.container.getReagentCosts()[i] || this.minecraft.player.experienceLevel < enchantabilityLevel) && !this.minecraft.player.abilities.isCreativeMode) || this.container.getEnchantments()[i] == -1) {
+                if(((this.container.getLapisAmount() < i + 1 || this.container.getReagentAmount() < this.container.getReagentCosts()[ i ] || this.minecraft.player.experienceLevel < enchantabilityLevel) && !this.minecraft.player.abilities.isCreativeMode) || this.container.getEnchantments()[ i ] == -1) {
                     this.blit(matrixStack, rectanglePosX, height + 14 + 19 * i, 0, 185, 108, 19);
                     this.blit(matrixStack, rectanglePosX + 1, height + 15 + 19 * i, 16 * i, 239, 16, 16);
                     this.font.func_238418_a_(randomName, textPosX, height + 16 + 19 * i, length, (color & 16711422) >> 1);
@@ -212,9 +212,9 @@ public class ReagentEnchantingTableScreen extends ContainerScreen<ReagentEnchant
         this.renderHoveredTooltip(matrixStack, mouseX, mouseY);
 
         for(int i = 0; i < 3; i++) {
-            Enchantment enchantment = Enchantment.getEnchantmentByID(this.container.getEnchantments()[i]);
-            int enchantmentLevel = this.container.getEnchantmentLevels()[i];
-            int enchantabilityLevel = this.container.getEnchantabilityLevels()[i];
+            Enchantment enchantment = Enchantment.getEnchantmentByID(this.container.getEnchantments()[ i ]);
+            int enchantmentLevel = this.container.getEnchantmentLevels()[ i ];
+            int enchantabilityLevel = this.container.getEnchantabilityLevels()[ i ];
             int enchantmentTier = i + 1;
 
             if(this.isPointInRegion(62, 14 + 19 * i, 108, 17, mouseX, mouseY) && enchantabilityLevel > 0) {
@@ -243,11 +243,11 @@ public class ReagentEnchantingTableScreen extends ContainerScreen<ReagentEnchant
 
                         list.add(lapisTextFormatting.mergeStyle(this.container.getLapisAmount() >= enchantmentTier ? TextFormatting.GRAY : TextFormatting.RED));
 
-                        ItemStack reagentStack = this.container.getItemStackHandler().getStackInSlot(2);
+                        ItemStack reagentStack = this.container.getSlot(2).getStack();
                         Reagent reagent = Reagenchant.REAGENT_MANAGER.getReagent(reagentStack.getItem());
 
                         if(!reagent.isEmpty()) {
-                            int reagentCost = this.container.getReagentCosts()[i];
+                            int reagentCost = this.container.getReagentCosts()[ i ];
 
                             if(reagentCost > 0) {
                                 IFormattableTextComponent reagentTextFormatting;
@@ -299,7 +299,7 @@ public class ReagentEnchantingTableScreen extends ContainerScreen<ReagentEnchant
         boolean flag = false;
 
         for(int i = 0; i < 3; i++) {
-            if(this.container.getEnchantabilityLevels()[i] != 0) {
+            if(this.container.getEnchantabilityLevels()[ i ] != 0) {
                 flag = true;
             }
         }

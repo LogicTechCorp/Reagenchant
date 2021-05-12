@@ -31,12 +31,12 @@ import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.vector.Vector3f;
 
-public class ReagentTableTileEntityRenderer extends TileEntityRenderer<ReagentEnchantingTableTileEntity> {
+public class ReagentEnchantingTableTileEntityRenderer extends TileEntityRenderer<ReagentEnchantingTableTileEntity> {
     public static final RenderMaterial BOOK_TEXTURE = new RenderMaterial(AtlasTexture.LOCATION_BLOCKS_TEXTURE, new ResourceLocation("entity/enchanting_table_book"));
 
     private final BookModel bookModel = new BookModel();
 
-    public ReagentTableTileEntityRenderer(TileEntityRendererDispatcher rendererDispatcher) {
+    public ReagentEnchantingTableTileEntityRenderer(TileEntityRendererDispatcher rendererDispatcher) {
         super(rendererDispatcher);
     }
 

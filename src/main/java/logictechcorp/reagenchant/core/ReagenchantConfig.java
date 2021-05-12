@@ -38,17 +38,39 @@ public class ReagenchantConfig {
     }
 
     public static class Common {
+        public final ForgeConfigSpec.ConfigValue<Boolean> enableQuarkCompatibility;
         public final ForgeConfigSpec.ConfigValue<Boolean> unbreakableItems;
+        public final ForgeConfigSpec.ConfigValue<Float> percentOfXpDroppedOnDeath;
+        public final ForgeConfigSpec.ConfigValue<Float> percentOfDroppedXpLost;
 
         Common(ForgeConfigSpec.Builder builder) {
             builder.comment("Reagenchant common configuration")
                     .push("common");
+            builder.push("compatibility");
+            builder.push("quark");
+            this.enableQuarkCompatibility = builder
+                    .comment("If Quark compatibility should be enabled; Default: true")
+                    .translation(createTranslation("common.compatibility.quark.enable_quark_compatibility"))
+                    .define("enableQuarkCompatibility", true);
+            builder.pop();
+            builder.pop();
             builder.push("tweaks");
-
+            builder.push("items");
             this.unbreakableItems = builder
-                    .comment("If items with Unbreakable should not break; Default: true")
-                    .translation(createTranslation("common.tweaks.unbreakable_items"))
+                    .comment("If items with the Unbreakable enchantment should not break; Default: true")
+                    .translation(createTranslation("common.tweaks.items.unbreakable_items"))
                     .define("unbreakableItems", true);
+            builder.pop();
+            builder.push("player");
+            this.percentOfXpDroppedOnDeath = builder
+                    .comment("The percent of experience which should drop on death; Default: 0.5")
+                    .translation(createTranslation("common.tweaks.player.percent_of_xp_dropped_on_death"))
+                    .defineInRange("percentOfXpDroppedOnDeath", 0.5F, 0.0F, 1.0F, Float.class);
+            this.percentOfDroppedXpLost = builder
+                    .comment("The percent of experience dropped which should be lost; Default: 0.25")
+                    .translation(createTranslation("common.tweaks.player.percent_of_dropped_xp_lost"))
+                    .defineInRange("percentOfDroppedXpLost", 0.25F, 0.0F, 1.0F, Float.class);
+            builder.pop();
             builder.pop();
             builder.pop();
         }

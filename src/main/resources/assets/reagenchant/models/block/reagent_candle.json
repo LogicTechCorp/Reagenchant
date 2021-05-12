@@ -1,0 +1,36 @@
+{
+    "credit": "Made with Blockbench",
+    "textures": {
+        "particle": "reagenchant:block/reagent_candle",
+        "candle": "reagenchant:block/reagent_candle",
+        "wick": "block/coal_block"
+    },
+    "elements": [
+        {
+            "name": "candle",
+            "from": [6, 0, 6],
+            "to": [10, 8, 10],
+            "faces": {
+                "north": {"uv": [0, 0, 4, 8], "texture": "#candle"},
+                "east": {"uv": [0, 0, 4, 8], "texture": "#candle"},
+                "south": {"uv": [0, 0, 4, 8], "texture": "#candle"},
+                "west": {"uv": [0, 0, 4, 8], "texture": "#candle"},
+                "up": {"uv": [4, 0, 8, 4], "texture": "#candle"},
+                "down": {"uv": [4, 4, 8, 8], "texture": "#candle"}
+            }
+        },
+        {
+            "name": "wick",
+            "from": [7.5, 8, 7.5],
+            "to": [8.5, 9, 8.5],
+            "faces": {
+                "north": {"uv": [0, 0, 1, 1], "texture": "#wick"},
+                "east": {"uv": [0, 0, 1, 1], "texture": "#wick"},
+                "south": {"uv": [0, 0, 1, 1], "texture": "#wick"},
+                "west": {"uv": [0, 0, 1, 1], "texture": "#wick"},
+                "up": {"uv": [0, 0, 1, 1], "texture": "#wick"},
+                "down": {"uv": [0, 0, 1, 1], "texture": "#wick"}
+            }
+        }
+    ]
+}

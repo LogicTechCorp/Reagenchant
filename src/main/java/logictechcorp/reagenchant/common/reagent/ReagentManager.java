@@ -23,6 +23,8 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.mojang.serialization.Dynamic;
 import com.mojang.serialization.JsonOps;
+import logictechcorp.reagenchant.common.compatibility.Compatibility;
+import logictechcorp.reagenchant.common.compatibility.jei.JEIReagenchantPlugin;
 import logictechcorp.reagenchant.core.Reagenchant;
 import net.minecraft.client.resources.JsonReloadListener;
 import net.minecraft.item.Item;
@@ -83,6 +85,10 @@ public class ReagentManager extends JsonReloadListener {
                         }
 
                         this.reagents.put(item.getRegistryName(), reagent);
+
+                        if(Compatibility.IS_JEI_LOADED) {
+                            JEIReagenchantPlugin.getReagentRecipeManager().registerReagentRecipe(reagent);
+                        }
                     }
                 }
             }
@@ -99,17 +105,29 @@ public class ReagentManager extends JsonReloadListener {
     public void registerReagent(Reagent reagent) {
         if(reagent.getItem() != Items.AIR) {
             this.reagents.put(reagent.getItem().getRegistryName(), reagent);
+
+            if(Compatibility.IS_JEI_LOADED) {
+                JEIReagenchantPlugin.getReagentRecipeManager().registerReagentRecipe(reagent);
+            }
         }
     }
 
     public void unregisterReagent(Reagent reagent) {
         if(reagent.getItem() != Items.AIR) {
             this.reagents.remove(reagent.getItem().getRegistryName());
+
+            if(Compatibility.IS_JEI_LOADED) {
+                JEIReagenchantPlugin.getReagentRecipeManager().unregisterReagentRecipe(reagent);
+            }
         }
     }
 
     public void cleanup() {
         this.reagents.clear();
+
+        if(Compatibility.IS_JEI_LOADED) {
+            JEIReagenchantPlugin.getReagentRecipeManager().clearReagentRecipes();
+        }
     }
 
     public void syncClientReagents(Collection<Reagent> reagents) {
@@ -117,6 +135,10 @@ public class ReagentManager extends JsonReloadListener {
 
         for(Reagent reagent : reagents) {
             this.reagents.put(reagent.getItem().getRegistryName(), reagent);
+
+            if(Compatibility.IS_JEI_LOADED) {
+                JEIReagenchantPlugin.getReagentRecipeManager().registerReagentRecipe(reagent);
+            }
         }
     }
 

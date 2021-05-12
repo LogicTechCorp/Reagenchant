@@ -15,7 +15,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package logictechcorp.reagenchant.core.util.registry;
+package logictechcorp.reagenchant.core.registry.helper;
 
 import com.minecraftabnormals.abnormals_core.core.util.registry.AbstractSubRegistryHelper;
 import com.minecraftabnormals.abnormals_core.core.util.registry.RegistryHelper;

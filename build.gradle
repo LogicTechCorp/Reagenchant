@@ -29,7 +29,7 @@ sourceCompatibility = targetCompatibility = compileJava.sourceCompatibility = co
 license {
     header = project.file('LICENSE-header.txt')
     sourceSets = [project.sourceSets.main]
-    include '**/*.java'
+    include '**/reagenchant/**/*.java'
     ext {
         year = new Date().format('YYYY')
     }
@@ -76,13 +76,22 @@ minecraft {
 
 repositories {
     maven {
-        url "https://www.cursemaven.com"
+        url "https://maven.jaackson.me"
+    }
+    maven {
+        url "https://dvs1.progwml6.com/files/maven/"
+    }
+    maven {
+        url "https://modmaven.k-4u.nl"
     }
 }
 
 dependencies {
     minecraft "net.minecraftforge:forge:${minecraft_version}-${forge_version}"
-    implementation fg.deobf("curse.maven:abnormals_core-382216:${abnormals_core_version}")
+
+    implementation fg.deobf("com.minecraftabnormals:abnormals-core:${minecraft_version}-${abnormals_core_version}")
+    compileOnly fg.deobf("mezz.jei:jei-${minecraft_version}:${jei_version}:api")
+    runtimeOnly fg.deobf("mezz.jei:jei-${minecraft_version}:${jei_version}")
 }
 
 jar {

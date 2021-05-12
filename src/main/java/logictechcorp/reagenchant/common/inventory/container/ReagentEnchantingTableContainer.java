@@ -47,7 +47,6 @@ import java.util.List;
 import java.util.Random;
 
 public class ReagentEnchantingTableContainer extends Container {
-    private final ItemStackHandler itemStackHandler;
     private final IWorldPosCallable worldPosCallable;
     private final Random random;
     private final IntReferenceHolder xpSeed;
@@ -57,21 +56,20 @@ public class ReagentEnchantingTableContainer extends Container {
     private final int[] reagentCosts;
 
     public ReagentEnchantingTableContainer(int id, PlayerInventory playerInventory) {
-        this(id, playerInventory, new ItemStackHandler(3), IWorldPosCallable.DUMMY);
+        this(id, playerInventory, IWorldPosCallable.DUMMY, new ItemStackHandler(3));
     }
 
-    public ReagentEnchantingTableContainer(int id, PlayerInventory playerInventory, ItemStackHandler itemStackHandler, IWorldPosCallable worldPosCallable) {
+    public ReagentEnchantingTableContainer(int id, PlayerInventory playerInventory, IWorldPosCallable worldPosCallable, ItemStackHandler itemStackHandler) {
         super(ReagenchantContainers.REAGENT_ENCHANTING_TABLE_CONTAINER.get(), id);
-        this.itemStackHandler = itemStackHandler;
         this.worldPosCallable = worldPosCallable;
         this.random = new Random();
         this.xpSeed = IntReferenceHolder.single();
-        this.enchantments = new int[]{-1, -1, -1};
-        this.enchantmentLevels = new int[]{-1, -1, -1};
-        this.enchantabilityLevels = new int[3];
-        this.reagentCosts = new int[3];
+        this.enchantments = new int[]{ -1, -1, -1 };
+        this.enchantmentLevels = new int[]{ -1, -1, -1 };
+        this.enchantabilityLevels = new int[ 3 ];
+        this.reagentCosts = new int[ 3 ];
 
-        this.addSlot(new SlotItemHandler(this.itemStackHandler, 0, 6, 47) {
+        this.addSlot(new SlotItemHandler(itemStackHandler, 0, 6, 47) {
             @Override
             public void onSlotChanged() {
                 ReagentEnchantingTableContainer.this.onContentsChanged();
@@ -92,7 +90,7 @@ public class ReagentEnchantingTableContainer extends Container {
                 return 1;
             }
         });
-        this.addSlot(new SlotItemHandler(this.itemStackHandler, 1, 24, 47) {
+        this.addSlot(new SlotItemHandler(itemStackHandler, 1, 24, 47) {
             @Override
             public void onSlotChanged() {
                 ReagentEnchantingTableContainer.this.onContentsChanged();
@@ -103,7 +101,7 @@ public class ReagentEnchantingTableContainer extends Container {
                 return stack.getItem().isIn(Tags.Items.GEMS_LAPIS);
             }
         });
-        this.addSlot(new SlotItemHandler(this.itemStackHandler, 2, 42, 47) {
+        this.addSlot(new SlotItemHandler(itemStackHandler, 2, 42, 47) {
             @Override
             public void onSlotChanged() {
                 ReagentEnchantingTableContainer.this.onContentsChanged();
@@ -142,9 +140,9 @@ public class ReagentEnchantingTableContainer extends Container {
     }
 
     public void onContentsChanged() {
-        ItemStack unenchantedStack = this.itemStackHandler.getStackInSlot(0);
+        ItemStack unenchantedStack = this.getSlot(0).getStack();
 
-        if(unenchantedStack.isEnchantable() && !this.itemStackHandler.getStackInSlot(1).isEmpty()) {
+        if(unenchantedStack.isEnchantable() && this.getSlot(1).getHasStack()) {
             this.worldPosCallable.consume((world, pos) ->
             {
                 float power = 0;
@@ -171,38 +169,38 @@ public class ReagentEnchantingTableContainer extends Container {
                 this.random.setSeed(this.xpSeed.get());
 
                 for(int i = 0; i < 3; i++) {
-                    this.enchantments[i] = -1;
-                    this.enchantmentLevels[i] = -1;
-                    this.enchantabilityLevels[i] = EnchantmentHelper.calcItemStackEnchantability(this.random, i, (int) power, unenchantedStack);
+                    this.enchantments[ i ] = -1;
+                    this.enchantmentLevels[ i ] = -1;
+                    this.enchantabilityLevels[ i ] = EnchantmentHelper.calcItemStackEnchantability(this.random, i, (int) power, unenchantedStack);
 
-                    if(this.enchantabilityLevels[i] < i + 1) {
-                        this.enchantabilityLevels[i] = 0;
+                    if(this.enchantabilityLevels[ i ] < i + 1) {
+                        this.enchantabilityLevels[ i ] = 0;
                     }
 
-                    this.enchantabilityLevels[i] = ForgeEventFactory.onEnchantmentLevelSet(world, pos, i, (int) power, unenchantedStack, this.enchantabilityLevels[i]);
+                    this.enchantabilityLevels[ i ] = ForgeEventFactory.onEnchantmentLevelSet(world, pos, i, (int) power, unenchantedStack, this.enchantabilityLevels[ i ]);
                 }
 
                 for(int i = 0; i < 3; i++) {
-                    if(this.enchantabilityLevels[i] > 0) {
+                    if(this.enchantabilityLevels[ i ] > 0) {
                         List<EnchantmentData> enchantments = this.compileEnchantmentList(i);
 
                         if(!enchantments.isEmpty()) {
                             EnchantmentData randomEnchantmentData = enchantments.get(this.random.nextInt(enchantments.size()));
-                            this.enchantments[i] = Registry.ENCHANTMENT.getId(randomEnchantmentData.enchantment);
-                            this.enchantmentLevels[i] = randomEnchantmentData.enchantmentLevel;
-                            Reagent reagent = Reagenchant.REAGENT_MANAGER.getReagent(this.itemStackHandler.getStackInSlot(2).getItem());
+                            this.enchantments[ i ] = Registry.ENCHANTMENT.getId(randomEnchantmentData.enchantment);
+                            this.enchantmentLevels[ i ] = randomEnchantmentData.enchantmentLevel;
+                            Reagent reagent = Reagenchant.REAGENT_MANAGER.getReagent(this.getSlot(2).getStack().getItem());
 
                             if(!reagent.isEmpty()) {
                                 for(EnchantmentData enchantmentData : enchantments) {
                                     int reagentCost = reagent.getCost(enchantmentData.enchantment);
 
-                                    if(reagentCost > this.reagentCosts[i]) {
-                                        this.reagentCosts[i] = reagentCost;
+                                    if(reagentCost > this.reagentCosts[ i ]) {
+                                        this.reagentCosts[ i ] = reagentCost;
                                     }
                                 }
                             }
                             else {
-                                this.reagentCosts[i] = 0;
+                                this.reagentCosts[ i ] = 0;
                             }
                         }
                     }
@@ -213,25 +211,25 @@ public class ReagentEnchantingTableContainer extends Container {
         }
         else {
             for(int i = 0; i < 3; i++) {
-                this.enchantments[i] = -1;
-                this.enchantmentLevels[i] = -1;
-                this.enchantabilityLevels[i] = 0;
-                this.reagentCosts[i] = 0;
+                this.enchantments[ i ] = -1;
+                this.enchantmentLevels[ i ] = -1;
+                this.enchantabilityLevels[ i ] = 0;
+                this.reagentCosts[ i ] = 0;
             }
         }
     }
 
     @Override
     public boolean enchantItem(PlayerEntity player, int enchantmentTier) {
-        ItemStack unenchantedStack = this.itemStackHandler.getStackInSlot(0);
-        ItemStack lapisStack = this.itemStackHandler.getStackInSlot(1);
-        ItemStack reagentStack = this.itemStackHandler.getStackInSlot(2);
+        ItemStack unenchantedStack = this.getSlot(0).getStack();
+        ItemStack lapisStack = this.getSlot(1).getStack();
+        ItemStack reagentStack = this.getSlot(2).getStack();
         int lapisCost = enchantmentTier + 1;
 
-        if((lapisStack.isEmpty() || lapisStack.getCount() < lapisCost || reagentStack.getCount() < this.reagentCosts[enchantmentTier]) && !player.abilities.isCreativeMode) {
+        if((lapisStack.isEmpty() || lapisStack.getCount() < lapisCost || reagentStack.getCount() < this.reagentCosts[ enchantmentTier ]) && !player.abilities.isCreativeMode) {
             return false;
         }
-        else if(this.enchantabilityLevels[enchantmentTier] > 0 && !unenchantedStack.isEmpty() && (player.experienceLevel >= lapisCost && player.experienceLevel >= this.enchantabilityLevels[enchantmentTier] || player.abilities.isCreativeMode)) {
+        else if(this.enchantabilityLevels[ enchantmentTier ] > 0 && !unenchantedStack.isEmpty() && (player.experienceLevel >= lapisCost && player.experienceLevel >= this.enchantabilityLevels[ enchantmentTier ] || player.abilities.isCreativeMode)) {
             this.worldPosCallable.consume((world, pos) ->
             {
                 List<EnchantmentData> enchantments = this.compileEnchantmentList(enchantmentTier);
@@ -244,7 +242,7 @@ public class ReagentEnchantingTableContainer extends Container {
 
                     if(isBook) {
                         enchantedStack = new ItemStack(Items.ENCHANTED_BOOK);
-                        this.itemStackHandler.setStackInSlot(0, enchantedStack);
+                        this.getSlot(0).putStack(enchantedStack);
                     }
 
                     for(EnchantmentData enchantmentData : enchantments) {
@@ -260,14 +258,14 @@ public class ReagentEnchantingTableContainer extends Container {
                         lapisStack.shrink(lapisCost);
 
                         if(lapisStack.isEmpty()) {
-                            this.itemStackHandler.setStackInSlot(1, ItemStack.EMPTY);
+                            this.getSlot(1).putStack(ItemStack.EMPTY);
                         }
 
                         if(!reagent.isEmpty() && reagent.consumeReagent(unenchantedStack, enchantments)) {
-                            reagentStack.shrink(this.reagentCosts[enchantmentTier]);
+                            reagentStack.shrink(this.reagentCosts[ enchantmentTier ]);
 
                             if(reagentStack.isEmpty()) {
-                                this.itemStackHandler.setStackInSlot(2, ItemStack.EMPTY);
+                                this.getSlot(2).putStack(ItemStack.EMPTY);
                             }
                         }
                     }
@@ -291,10 +289,10 @@ public class ReagentEnchantingTableContainer extends Container {
     }
 
     private List<EnchantmentData> compileEnchantmentList(int enchantmentTier) {
-        ItemStack unenchantedStack = this.itemStackHandler.getStackInSlot(0);
-        ItemStack reagentStack = this.itemStackHandler.getStackInSlot(2);
+        ItemStack unenchantedStack = this.getSlot(0).getStack();
+        ItemStack reagentStack = this.getSlot(2).getStack();
         Reagent reagent = Reagenchant.REAGENT_MANAGER.getReagent(reagentStack.getItem());
-        int enchantabilityLevel = this.enchantabilityLevels[enchantmentTier];
+        int enchantabilityLevel = this.enchantabilityLevels[ enchantmentTier ];
 
         this.random.setSeed((this.xpSeed.get() + enchantmentTier));
         List<EnchantmentData> reagentEnchantments = new ArrayList<>();
@@ -351,13 +349,15 @@ public class ReagentEnchantingTableContainer extends Container {
 
         this.worldPosCallable.consume((world, pos) ->
         {
-            if(this.itemStackHandler.getStackInSlot(0).isEnchanted()) {
+            if(this.getSlot(0).getStack().isEnchanted()) {
                 if(!player.isAlive() || player instanceof ServerPlayerEntity && ((ServerPlayerEntity) player).hasDisconnected()) {
-                    player.dropItem(this.itemStackHandler.extractItem(0, 64, false), false);
+                    player.dropItem(this.getSlot(0).getStack(), false);
                 }
                 else {
-                    player.inventory.placeItemBackInInventory(world, this.itemStackHandler.extractItem(0, 64, false));
+                    player.inventory.placeItemBackInInventory(world, this.getSlot(0).getStack());
                 }
+
+                this.getSlot(0).putStack(ItemStack.EMPTY);
             }
         });
     }
@@ -436,14 +436,6 @@ public class ReagentEnchantingTableContainer extends Container {
         return stack;
     }
 
-    public ItemStackHandler getItemStackHandler() {
-        return this.itemStackHandler;
-    }
-
-    public Random getRandom() {
-        return this.random;
-    }
-
     public int getXpSeed() {
         return this.xpSeed.get();
     }
@@ -465,12 +457,12 @@ public class ReagentEnchantingTableContainer extends Container {
     }
 
     public int getLapisAmount() {
-        ItemStack lapisStack = this.itemStackHandler.getStackInSlot(1);
+        ItemStack lapisStack = this.getSlot(1).getStack();
         return lapisStack.getCount();
     }
 
     public int getReagentAmount() {
-        ItemStack reagentStack = this.itemStackHandler.getStackInSlot(2);
+        ItemStack reagentStack = this.getSlot(2).getStack();
         return reagentStack.getCount();
     }
 

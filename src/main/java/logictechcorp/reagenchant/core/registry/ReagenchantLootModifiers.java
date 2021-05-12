@@ -19,7 +19,7 @@ package logictechcorp.reagenchant.core.registry;
 
 import logictechcorp.reagenchant.common.loot.UnbreakableItemStackLootModifier;
 import logictechcorp.reagenchant.core.Reagenchant;
-import logictechcorp.reagenchant.core.util.registry.LootModifierSubRegistryHelper;
+import logictechcorp.reagenchant.core.registry.helper.LootModifierSubRegistryHelper;
 import net.minecraftforge.common.loot.GlobalLootModifierSerializer;
 import net.minecraftforge.fml.RegistryObject;
 import net.minecraftforge.fml.common.Mod;

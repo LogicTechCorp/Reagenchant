@@ -17,32 +17,34 @@
 
 package logictechcorp.reagenchant.core;
 
-import com.minecraftabnormals.abnormals_core.core.util.registry.RegistryHelper;
 import com.mojang.brigadier.CommandDispatcher;
+import logictechcorp.reagenchant.client.gui.screen.inventory.CustomAnvilScreen;
+import logictechcorp.reagenchant.client.gui.screen.inventory.ReagentCandleScreen;
 import logictechcorp.reagenchant.client.gui.screen.inventory.ReagentEnchantingTableScreen;
 import logictechcorp.reagenchant.client.item.ReagenchantItemModelProperties;
-import logictechcorp.reagenchant.client.renderer.tileentity.ReagentTableTileEntityRenderer;
+import logictechcorp.reagenchant.client.renderer.tileentity.ReagentEnchantingTableTileEntityRenderer;
 import logictechcorp.reagenchant.common.command.ReagenchantCommand;
+import logictechcorp.reagenchant.common.network.item.MessageCUpdateItemNamePacket;
 import logictechcorp.reagenchant.common.network.item.reagent.MessageSUpdateReagentsPacket;
 import logictechcorp.reagenchant.common.reagent.ReagentManager;
 import logictechcorp.reagenchant.core.other.ReagenchantOverrides;
+import logictechcorp.reagenchant.core.other.ReagenchantRenderTypes;
 import logictechcorp.reagenchant.core.registry.ReagenchantContainers;
 import logictechcorp.reagenchant.core.registry.ReagenchantTileEntityTypes;
-import logictechcorp.reagenchant.core.util.registry.ReagenchantRegistryHelper;
+import logictechcorp.reagenchant.core.registry.helper.OverrideRegistryHelper;
+import logictechcorp.reagenchant.core.registry.helper.ReagenchantRegistryHelper;
 import net.minecraft.client.gui.ScreenManager;
 import net.minecraft.command.CommandSource;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.ServerPlayerEntity;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.world.World;
-import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.AddReloadListenerEvent;
 import net.minecraftforge.event.RegisterCommandsEvent;
 import net.minecraftforge.event.entity.player.PlayerEvent;
 import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
-import net.minecraftforge.fml.DistExecutor;
 import net.minecraftforge.fml.client.registry.ClientRegistry;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
@@ -60,8 +62,8 @@ public class Reagenchant {
     public static final String MOD_ID = "reagenchant";
     public static final String NETWORK_VERSION = "reagenchant_network_1";
     public static final SimpleChannel CHANNEL = NetworkRegistry.newSimpleChannel(new ResourceLocation(MOD_ID, "network"), () -> NETWORK_VERSION, NETWORK_VERSION::equals, NETWORK_VERSION::equals);
-    public static final ReagenchantRegistryHelper REGISTRY_HELPER = new ReagenchantRegistryHelper(MOD_ID);
-    public static final RegistryHelper OVERRIDE_REGISTRY_HELPER = new RegistryHelper("minecraft");
+    public static final ReagenchantRegistryHelper REGISTRY_HELPER = new ReagenchantRegistryHelper();
+    public static final OverrideRegistryHelper OVERRIDE_REGISTRY_HELPER = new OverrideRegistryHelper();
     public static final ReagentManager REAGENT_MANAGER = new ReagentManager();
 
     public static final Logger LOGGER = LogManager.getLogger("Reagenchant");
@@ -72,9 +74,8 @@ public class Reagenchant {
         IEventBus modEventBus = FMLJavaModLoadingContext.get().getModEventBus();
         REGISTRY_HELPER.register(modEventBus);
         OVERRIDE_REGISTRY_HELPER.register(modEventBus);
+        modEventBus.addListener(this::onClientSetup);
         modEventBus.addListener(this::onCommonSetup);
-        DistExecutor.unsafeRunWhenOn(Dist.CLIENT, () -> () -> modEventBus.addListener(this::onClientSetup));
-
         MinecraftForge.EVENT_BUS.register(this);
         this.registerMessages();
     }
@@ -86,8 +87,11 @@ public class Reagenchant {
     private void onClientSetup(FMLClientSetupEvent event) {
         event.enqueueWork(() -> {
             ReagenchantItemModelProperties.register();
-            ClientRegistry.bindTileEntityRenderer(ReagenchantTileEntityTypes.REAGENT_ENCHANTING_TABLE_TILE_ENTITY.get(), ReagentTableTileEntityRenderer::new);
+            ReagenchantRenderTypes.registerRenderLayers();
+            ClientRegistry.bindTileEntityRenderer(ReagenchantTileEntityTypes.REAGENT_ENCHANTING_TABLE_TILE_ENTITY.get(), ReagentEnchantingTableTileEntityRenderer::new);
             ScreenManager.registerFactory(ReagenchantContainers.REAGENT_ENCHANTING_TABLE_CONTAINER.get(), ReagentEnchantingTableScreen::new);
+            ScreenManager.registerFactory(ReagenchantContainers.REAGENT_CANDLE_CONTAINER.get(), ReagentCandleScreen::new);
+            ScreenManager.registerFactory(ReagenchantContainers.CUSTOM_ANVIL_CONTAINER.get(), CustomAnvilScreen::new);
         });
     }
 
@@ -122,6 +126,11 @@ public class Reagenchant {
                 .encoder(MessageSUpdateReagentsPacket::serialize)
                 .decoder(MessageSUpdateReagentsPacket::deserialize)
                 .consumer(MessageSUpdateReagentsPacket::handle)
+                .add();
+        CHANNEL.messageBuilder(MessageCUpdateItemNamePacket.class, 1)
+                .encoder(MessageCUpdateItemNamePacket::serialize)
+                .decoder(MessageCUpdateItemNamePacket::deserialize)
+                .consumer(MessageCUpdateItemNamePacket::handle)
                 .add();
     }
 }
