@@ -37,8 +37,11 @@ public abstract class ItemStackMixin {
 
             if(stack.getDamage() >= stack.getMaxDamage()) {
                 UnbreakableItemStackUtil.breakItem(damager, stack);
-                stack.setDamage(stack.getMaxDamage());
-                callback.setReturnValue(false);
+
+                if(UnbreakableItemStackUtil.isBroken(stack)) {
+                    stack.setDamage(stack.getMaxDamage());
+                    callback.setReturnValue(false);
+                }
             }
         }
     }
