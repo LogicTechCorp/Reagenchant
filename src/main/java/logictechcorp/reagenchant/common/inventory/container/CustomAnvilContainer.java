@@ -1,3 +1,20 @@
+/*
+ * Reagenchant
+ * Copyright (c) 2019-2021 by LogicTechCorp
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation version 3 of the License.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
 package logictechcorp.reagenchant.common.inventory.container;
 
 import logictechcorp.reagenchant.core.registry.ReagenchantContainers;
@@ -46,19 +63,19 @@ public class CustomAnvilContainer extends Container {
         this.useIronInsteadOfXp = IntReferenceHolder.single();
         this.useIronInsteadOfXp.set(1);
 
-        this.addSlot(new SlotItemHandler(itemStackHandler, 0, 27, 51) {
+        this.addSlot(new SlotItemHandler(itemStackHandler, 0, 27, 47) {
             @Override
             public void onSlotChanged() {
                 CustomAnvilContainer.this.updateOutput();
             }
         });
-        this.addSlot(new SlotItemHandler(itemStackHandler, 1, 76, 41) {
+        this.addSlot(new SlotItemHandler(itemStackHandler, 1, 76, 47) {
             @Override
             public void onSlotChanged() {
                 CustomAnvilContainer.this.updateOutput();
             }
         });
-        this.addSlot(new SlotItemHandler(itemStackHandler, 2, 76, 62) {
+        this.addSlot(new SlotItemHandler(itemStackHandler, 2, 6, 6) {
             @Override
             public void onSlotChanged() {
                 CustomAnvilContainer.this.updateOutput();
@@ -69,7 +86,7 @@ public class CustomAnvilContainer extends Container {
                 return stack.getItem().isIn(Tags.Items.INGOTS_IRON);
             }
         });
-        this.addSlot(new SlotItemHandler(itemStackHandler, 3, 134, 51) {
+        this.addSlot(new SlotItemHandler(itemStackHandler, 3, 134, 47) {
             @Override
             public boolean isItemValid(ItemStack stack) {
                 return false;
@@ -103,6 +120,7 @@ public class CustomAnvilContainer extends Container {
     public void updateOutput() {
         ItemStack inputStack = this.getSlot(0).getStack();
         this.repairCost.set(1);
+        this.useIronInsteadOfXp.set(1);
         int additionalRepairCost = 0;
         int baseRepairCost = 0;
         int incrementalRepairCost = 0;
@@ -268,6 +286,7 @@ public class CustomAnvilContainer extends Container {
                 additionalRepairCost += incrementalRepairCost;
                 outputStack.setDisplayName(new StringTextComponent(this.customItemName));
             }
+
             if(isEnchantedBook && !outputStack.isBookEnchantable(repairMaterialStack)) {
                 outputStack = ItemStack.EMPTY;
             }

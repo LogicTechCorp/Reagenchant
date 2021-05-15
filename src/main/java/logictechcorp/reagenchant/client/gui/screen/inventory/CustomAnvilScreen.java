@@ -1,3 +1,20 @@
+/*
+ * Reagenchant
+ * Copyright (c) 2019-2021 by LogicTechCorp
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation version 3 of the License.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
 package logictechcorp.reagenchant.client.gui.screen.inventory;
 
 import com.mojang.blaze3d.matrix.MatrixStack;
@@ -99,28 +116,28 @@ public class CustomAnvilScreen extends ContainerScreen<CustomAnvilContainer> imp
     }
 
     @Override
-    protected void drawGuiContainerForegroundLayer(MatrixStack matrixStack, int x, int y) {
+    protected void drawGuiContainerForegroundLayer(MatrixStack matrixStack, int mouseX, int mouseY) {
         RenderSystem.disableBlend();
-        super.drawGuiContainerForegroundLayer(matrixStack, x, y);
+        super.drawGuiContainerForegroundLayer(matrixStack, mouseX, mouseY);
         int repairCost = this.container.getRepairCost();
 
         if(repairCost > 0) {
             int textColor = 8453920;
-            ITextComponent expensiveTextComponent;
+            ITextComponent anvilInfoTextComponent;
 
             if(repairCost >= 40 && !this.minecraft.player.abilities.isCreativeMode) {
-                expensiveTextComponent = EXPENSIVE_TEXT_COMPONENT;
+                anvilInfoTextComponent = EXPENSIVE_TEXT_COMPONENT;
                 textColor = 16736352;
             }
             else if(!this.container.getSlot(3).getHasStack()) {
-                expensiveTextComponent = null;
+                anvilInfoTextComponent = null;
             }
             else {
                 if(this.container.useIronInsteadOfXp()) {
-                    expensiveTextComponent = new TranslationTextComponent("container.reagenchant.anvil.iron_repair_cost", repairCost);
+                    anvilInfoTextComponent = new TranslationTextComponent("container.reagenchant.anvil.iron_repair_cost", repairCost);
                 }
                 else {
-                    expensiveTextComponent = new TranslationTextComponent("container.repair.cost", repairCost);
+                    anvilInfoTextComponent = new TranslationTextComponent("container.repair.cost", repairCost);
                 }
 
                 if(!this.container.getSlot(3).canTakeStack(this.playerInventory.player)) {
@@ -128,10 +145,10 @@ public class CustomAnvilScreen extends ContainerScreen<CustomAnvilContainer> imp
                 }
             }
 
-            if(expensiveTextComponent != null) {
-                int posX = this.xSize - 8 - this.font.getStringPropertyWidth(expensiveTextComponent) - 2;
+            if(anvilInfoTextComponent != null) {
+                int posX = this.xSize - 8 - this.font.getStringPropertyWidth(anvilInfoTextComponent) - 2;
                 fill(matrixStack, posX - 2, 67, this.xSize - 8, 79, 1325400064);
-                this.font.drawTextWithShadow(matrixStack, expensiveTextComponent, (float) posX, 69.0F, textColor);
+                this.font.drawTextWithShadow(matrixStack, anvilInfoTextComponent, (float) posX, 69.0F, textColor);
             }
         }
 
@@ -146,7 +163,7 @@ public class CustomAnvilScreen extends ContainerScreen<CustomAnvilContainer> imp
         this.blit(matrixStack, posX, posY, 0, 0, this.xSize, this.ySize);
         this.blit(matrixStack, posX + 59, posY + 20, 0, this.ySize + (this.container.getSlot(0).getHasStack() ? 0 : 16), 110, 16);
 
-        if((this.container.getSlot(0).getHasStack() || this.container.getSlot(1).getHasStack()) && !this.container.getSlot(3).getHasStack()) {
+        if((this.container.getSlot(0).getHasStack() || this.container.getSlot(1).getHasStack() || this.container.getSlot(2).getHasStack()) && !this.container.getSlot(3).getHasStack()) {
             this.blit(matrixStack, posX + 99, posY + 45, this.xSize, 0, 28, 21);
         }
     }
