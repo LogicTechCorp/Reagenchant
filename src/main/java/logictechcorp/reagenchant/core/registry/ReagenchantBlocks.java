@@ -43,10 +43,10 @@ public class ReagenchantBlocks {
     public static final RegistryObject<Block> CUSTOM_CHIPPED_ANVIL;
     public static final RegistryObject<Block> CUSTOM_DAMAGED_ANVIL;
 
-    public static final RegistryObject<Block> REAGENT_CANDLE = REGISTRY_HELPER.createBlock("reagent_candle", ReagentCandleBlock::new, ItemGroup.DECORATIONS);
+    public static final RegistryObject<Block> REAGENT_CANDLE = REGISTRY_HELPER.createCompatBlock("reagent_candle", ReagentCandleBlock::new, ItemGroup.DECORATIONS, "quarkoddities");
 
     static {
-        if(!Compatibility.IS_QUARK_LOADED || !QuarkEvents.matrixEnchantingEnabled || !ReagenchantConfig.COMMON.enableQuarkCompatibility.get()) {
+        if(!Compatibility.IS_QUARK_ODDITIES_LOADED || !QuarkEvents.matrixEnchantingEnabled || !ReagenchantConfig.COMMON.enableQuarkCompatibility.get()) {
             REAGENT_ENCHANTING_TABLE = OVERRIDE_HELPER.createBlock("enchanting_table", () -> new ReagentEnchantingTableBlock(AbstractBlock.Properties.from(Blocks.ENCHANTING_TABLE)), ItemGroup.DECORATIONS);
         }
         else {

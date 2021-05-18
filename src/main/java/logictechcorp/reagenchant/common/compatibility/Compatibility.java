@@ -21,6 +21,6 @@ import net.minecraftforge.fml.ModList;
 
 public class Compatibility {
     public static final boolean IS_JEI_LOADED = ModList.get().isLoaded("jei");
-    public static final boolean IS_QUARK_LOADED = ModList.get().isLoaded("quark");
+    public static final boolean IS_QUARK_ODDITIES_LOADED = ModList.get().isLoaded("quarkoddities");
     public static final boolean IS_APOTHEOSIS_LOADED = ModList.get().isLoaded("apotheosis");
 }

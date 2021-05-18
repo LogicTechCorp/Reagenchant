@@ -90,6 +90,5 @@ public class CustomAnvilBlock extends AnvilBlock {
         }
 
         return ActionResultType.func_233537_a_(world.isRemote);
-
     }
 }
