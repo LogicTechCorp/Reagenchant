@@ -18,7 +18,6 @@
 package logictechcorp.reagenchant.core.registry;
 
 import logictechcorp.reagenchant.common.inventory.container.CustomAnvilContainer;
-import logictechcorp.reagenchant.common.inventory.container.ReagentCandleContainer;
 import logictechcorp.reagenchant.common.inventory.container.ReagentEnchantingTableContainer;
 import logictechcorp.reagenchant.core.Reagenchant;
 import logictechcorp.reagenchant.core.registry.helper.ContainerSubRegistryHelper;
@@ -31,7 +30,6 @@ public class ReagenchantContainers {
     public static final ContainerSubRegistryHelper REGISTRY_HELPER = Reagenchant.REGISTRY_HELPER.getContainerSubHelper();
 
     public static final RegistryObject<ContainerType<ReagentEnchantingTableContainer>> REAGENT_ENCHANTING_TABLE_CONTAINER = REGISTRY_HELPER.createContainer("reagent_enchanting_table_container", () -> ReagentEnchantingTableContainer::new);
-    public static final RegistryObject<ContainerType<ReagentCandleContainer>> REAGENT_CANDLE_CONTAINER = REGISTRY_HELPER.createContainer("reagent_candle_container", () -> ReagentCandleContainer::new);
     public static final RegistryObject<ContainerType<CustomAnvilContainer>> CUSTOM_ANVIL_CONTAINER = REGISTRY_HELPER.createContainer("custom_anvil_container", () -> CustomAnvilContainer::new);
 }
 

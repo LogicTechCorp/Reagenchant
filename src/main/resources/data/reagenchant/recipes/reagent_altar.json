@@ -1,0 +1,23 @@
+{
+    "type": "minecraft:crafting_shaped",
+    "pattern": [
+        " B ",
+        "GOG",
+        "OOO"
+    ],
+    "key": {
+        "B": {
+            "item": "minecraft:book"
+        },
+        "G": {
+            "tag": "forge:ingots/gold"
+        },
+        "O": {
+            "tag": "forge:obsidian"
+        }
+    },
+    "result": {
+        "item": "reagenchant:reagent_altar",
+        "count": 2
+    }
+}

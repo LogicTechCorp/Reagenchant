@@ -19,9 +19,9 @@ package logictechcorp.reagenchant.core;
 
 import com.mojang.brigadier.CommandDispatcher;
 import logictechcorp.reagenchant.client.gui.screen.inventory.CustomAnvilScreen;
-import logictechcorp.reagenchant.client.gui.screen.inventory.ReagentCandleScreen;
 import logictechcorp.reagenchant.client.gui.screen.inventory.ReagentEnchantingTableScreen;
 import logictechcorp.reagenchant.client.item.ReagenchantItemModelProperties;
+import logictechcorp.reagenchant.client.renderer.tileentity.ReagentAltarTileEntityRenderer;
 import logictechcorp.reagenchant.client.renderer.tileentity.ReagentEnchantingTableTileEntityRenderer;
 import logictechcorp.reagenchant.common.command.ReagenchantCommand;
 import logictechcorp.reagenchant.common.network.item.MessageCUpdateItemNamePacket;
@@ -89,8 +89,8 @@ public class Reagenchant {
             ReagenchantItemModelProperties.register();
             ReagenchantRenderTypes.registerRenderLayers();
             ClientRegistry.bindTileEntityRenderer(ReagenchantTileEntityTypes.REAGENT_ENCHANTING_TABLE_TILE_ENTITY.get(), ReagentEnchantingTableTileEntityRenderer::new);
+            ClientRegistry.bindTileEntityRenderer(ReagenchantTileEntityTypes.REAGENT_ALTAR_TILE_ENTITY.get(), ReagentAltarTileEntityRenderer::new);
             ScreenManager.registerFactory(ReagenchantContainers.REAGENT_ENCHANTING_TABLE_CONTAINER.get(), ReagentEnchantingTableScreen::new);
-            ScreenManager.registerFactory(ReagenchantContainers.REAGENT_CANDLE_CONTAINER.get(), ReagentCandleScreen::new);
             ScreenManager.registerFactory(ReagenchantContainers.CUSTOM_ANVIL_CONTAINER.get(), CustomAnvilScreen::new);
         });
     }

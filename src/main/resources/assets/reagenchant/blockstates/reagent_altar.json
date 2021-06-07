@@ -1,0 +1,5 @@
+{
+    "variants": {
+        "": { "model": "reagenchant:block/reagent_altar" }
+    }
+}

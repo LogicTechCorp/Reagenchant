@@ -19,7 +19,7 @@ package logictechcorp.reagenchant.core.registry;
 
 import com.minecraftabnormals.abnormals_core.core.util.registry.TileEntitySubRegistryHelper;
 import logictechcorp.reagenchant.common.tileentity.CustomAnvilTileEntity;
-import logictechcorp.reagenchant.common.tileentity.ReagentCandleTileEntity;
+import logictechcorp.reagenchant.common.tileentity.ReagentAltarTileEntity;
 import logictechcorp.reagenchant.common.tileentity.ReagentEnchantingTableTileEntity;
 import logictechcorp.reagenchant.core.Reagenchant;
 import net.minecraft.block.Block;
@@ -33,6 +33,6 @@ public class ReagenchantTileEntityTypes {
     public static final TileEntitySubRegistryHelper REGISTRY_HELPER = Reagenchant.REGISTRY_HELPER.getTileEntitySubHelper();
 
     public static final RegistryObject<TileEntityType<ReagentEnchantingTableTileEntity>> REAGENT_ENCHANTING_TABLE_TILE_ENTITY = REGISTRY_HELPER.createTileEntity("reagent_enchanting_table_tile_entity", ReagentEnchantingTableTileEntity::new, () -> new Block[]{ Blocks.ENCHANTING_TABLE });
-    public static final RegistryObject<TileEntityType<ReagentCandleTileEntity>> REAGENT_CANDLE_TILE_ENTITY = REGISTRY_HELPER.createTileEntity("reagent_candle_tile_entity", ReagentCandleTileEntity::new, () -> new Block[]{ ReagenchantBlocks.REAGENT_CANDLE.get() });
+    public static final RegistryObject<TileEntityType<ReagentAltarTileEntity>> REAGENT_ALTAR_TILE_ENTITY = REGISTRY_HELPER.createTileEntity("reagent_altar_tile_entity", ReagentAltarTileEntity::new, () -> new Block[]{ ReagenchantBlocks.REAGENT_ALTAR.get() });
     public static final RegistryObject<TileEntityType<CustomAnvilTileEntity>> CUSTOM_ANVIL_TILE_ENTITY = REGISTRY_HELPER.createTileEntity("custom_anvil_tile_entity", CustomAnvilTileEntity::new, () -> new Block[]{ ReagenchantBlocks.CUSTOM_ANVIL.get(), ReagenchantBlocks.CUSTOM_CHIPPED_ANVIL.get(), ReagenchantBlocks.CUSTOM_DAMAGED_ANVIL.get() });
 }

@@ -17,21 +17,19 @@
 
 package logictechcorp.reagenchant.common.tileentity;
 
-import logictechcorp.reagenchant.common.inventory.container.ReagentCandleContainer;
 import logictechcorp.reagenchant.core.registry.ReagenchantTileEntityTypes;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.inventory.container.Container;
-import net.minecraft.util.IWorldPosCallable;
 import net.minecraft.util.text.TranslationTextComponent;
 
-public class ReagentCandleTileEntity extends InventoryTileEntity {
-    public ReagentCandleTileEntity() {
-        super(ReagenchantTileEntityTypes.REAGENT_CANDLE_TILE_ENTITY.get(), new TranslationTextComponent("container.reagenchant.reagent_candle"), 1);
+public class ReagentAltarTileEntity extends InventoryTileEntity {
+    public ReagentAltarTileEntity() {
+        super(ReagenchantTileEntityTypes.REAGENT_ALTAR_TILE_ENTITY.get(), new TranslationTextComponent("container.reagenchant.reagent_candle"), 1);
     }
 
     @Override
     public Container createMenu(int windowId, PlayerInventory playerInventory, PlayerEntity player) {
-        return new ReagentCandleContainer(windowId, playerInventory, IWorldPosCallable.of(this.world, this.pos), this.itemStackHandler);
+        return null;
     }
 }

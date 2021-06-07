@@ -19,7 +19,7 @@ package logictechcorp.reagenchant.core.registry;
 
 import com.minecraftabnormals.abnormals_core.core.util.registry.BlockSubRegistryHelper;
 import logictechcorp.reagenchant.common.block.CustomAnvilBlock;
-import logictechcorp.reagenchant.common.block.ReagentCandleBlock;
+import logictechcorp.reagenchant.common.block.ReagentAltarBlock;
 import logictechcorp.reagenchant.common.block.ReagentEnchantingTableBlock;
 import logictechcorp.reagenchant.common.compatibility.Compatibility;
 import logictechcorp.reagenchant.core.Reagenchant;
@@ -43,7 +43,7 @@ public class ReagenchantBlocks {
     public static final RegistryObject<Block> CUSTOM_CHIPPED_ANVIL;
     public static final RegistryObject<Block> CUSTOM_DAMAGED_ANVIL;
 
-    public static final RegistryObject<Block> REAGENT_CANDLE = REGISTRY_HELPER.createCompatBlock("reagent_candle", ReagentCandleBlock::new, ItemGroup.DECORATIONS, "quarkoddities");
+    public static final RegistryObject<Block> REAGENT_ALTAR = REGISTRY_HELPER.createBlock("reagent_altar", ReagentAltarBlock::new, ItemGroup.DECORATIONS);
 
     static {
         if(!Compatibility.IS_QUARK_ODDITIES_LOADED || !QuarkEvents.matrixEnchantingEnabled || !ReagenchantConfig.COMMON.enableQuarkCompatibility.get()) {
