@@ -92,11 +92,9 @@ public class MessageSUpdateReagentsPacket {
     public void handle(Supplier<NetworkEvent.Context> contextSupplier) {
         NetworkEvent.Context context = contextSupplier.get();
 
-        context.enqueueWork(() -> {
-            if(context.getDirection().getReceptionSide() == LogicalSide.CLIENT) {
-                Reagenchant.REAGENT_MANAGER.syncClientReagents(this.reagents);
-                context.setPacketHandled(true);
-            }
-        });
+        if(context.getDirection().getReceptionSide() == LogicalSide.CLIENT) {
+            context.enqueueWork(() -> Reagenchant.REAGENT_MANAGER.syncClientReagents(this.reagents));
+            context.setPacketHandled(true);
+        }
     }
 }

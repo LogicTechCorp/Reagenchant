@@ -95,14 +95,12 @@ public class ReagentAltarBlock extends Block implements IModifiableEnchantmentIn
                     ItemStackHandler itemStackHandler = reagentAltar.getItemStackHandler();
                     ItemStack heldStack = player.getHeldItem(hand);
 
-                    if(player.isSneaking()) {
+                    if(heldStack.isEmpty()) {
                         player.inventory.placeItemBackInInventory(world, itemStackHandler.extractItem(0, itemStackHandler.getStackInSlot(0).getCount(), false));
                     }
-                    else {
-                        if(Reagenchant.REAGENT_MANAGER.isReagent(heldStack.getItem())) {
-                            ItemStack leftoverStack = itemStackHandler.insertItem(0, heldStack, false);
-                            player.setHeldItem(hand, leftoverStack);
-                        }
+                    else if(Reagenchant.REAGENT_MANAGER.isReagent(heldStack.getItem())) {
+                        ItemStack leftoverStack = itemStackHandler.insertItem(0, heldStack, false);
+                        player.setHeldItem(hand, leftoverStack);
                     }
                 }
             }

@@ -2,7 +2,6 @@ buildscript {
     repositories {
         maven { url = 'https://files.minecraftforge.net/maven' }
         maven { url = "https://repo.spongepowered.org/repository/maven-public/" }
-        jcenter()
         mavenCentral()
     }
     dependencies {
@@ -29,7 +28,7 @@ sourceCompatibility = targetCompatibility = compileJava.sourceCompatibility = co
 license {
     header = project.file('LICENSE-header.txt')
     sourceSets = [project.sourceSets.main]
-    include '**/reagenchant/**/*.java'
+    include "**/${mod_id}/**/*.java"
     ext {
         year = new Date().format('YYYY')
     }
@@ -82,7 +81,7 @@ repositories {
         url "https://dvs1.progwml6.com/files/maven/"
     }
     maven {
-        url "https://modmaven.k-4u.nl"
+        url "https://modmaven.dev"
     }
 }
 
@@ -97,14 +96,14 @@ dependencies {
 jar {
     manifest {
         attributes([
-            "Specification-Title"     : "${mod_name}",
-            "Specification-Vendor"    : 'LogicTechCorp',
-            "Specification-Version"   : '1',
-            "Implementation-Title"    : "${mod_name}",
-            "Implementation-Version"  : "${mod_version}",
-            "Implementation-Vendor"   : 'LogicTechCorp',
-            "Implementation-Timestamp": new Date().format("yyyy-MM-dd'T'HH:mm:ssZ"),
-            "MixinConfigs"            : "${mod_id}.mixins.json"
+                "Specification-Title"     : "${mod_name}",
+                "Specification-Vendor"    : 'LogicTechCorp',
+                "Specification-Version"   : '1',
+                "Implementation-Title"    : "${mod_name}",
+                "Implementation-Version"  : "${mod_version}",
+                "Implementation-Vendor"   : 'LogicTechCorp',
+                "Implementation-Timestamp": new Date().format("yyyy-MM-dd'T'HH:mm:ssZ"),
+                "MixinConfigs"            : "${mod_id}.mixins.json"
         ])
     }
 }
