@@ -39,7 +39,7 @@ public class UnbreakableItemStackUtil {
     public static void breakItem(@Nullable ServerPlayerEntity player, ItemStack stack) {
         if(hasNoUses(stack) && !hasBrokenTag(stack)) {
             CompoundNBT stackCompound = stack.getTag();
-            ListNBT enchantments = stack.getEnchantmentTagList();
+            ListNBT enchantments = stack.getEnchantmentTags();
             ListNBT disabledEnchantments = new ListNBT();
 
             for(int tagIndex = 0; tagIndex < enchantments.size(); tagIndex++) {
@@ -57,19 +57,19 @@ public class UnbreakableItemStackUtil {
             stackCompound.put(DISABLED_ENCHANTMENTS_KEY, disabledEnchantments);
 
             if(player != null) {
-                ItemStack heldStack = player.getHeldItem(player.getActiveHand());
+                ItemStack heldStack = player.getItemInHand(player.getUsedItemHand());
 
-                if(ItemStack.areItemStacksEqual(stack, heldStack)) {
-                    player.sendBreakAnimation(player.getActiveHand());
+                if(ItemStack.matches(stack, heldStack)) {
+                    player.broadcastBreakEvent(player.getUsedItemHand());
                 }
                 else {
                     PlayerInventory playerInventory = player.inventory;
 
-                    for(int i = 0; i < playerInventory.armorInventory.size(); i++) {
-                        ItemStack armorStack = playerInventory.armorInventory.get(i);
+                    for(int i = 0; i < playerInventory.armor.size(); i++) {
+                        ItemStack armorStack = playerInventory.armor.get(i);
 
-                        if(ItemStack.areItemStacksEqual(stack, armorStack)) {
-                            player.sendBreakAnimation(EquipmentSlotType.fromSlotTypeAndIndex(EquipmentSlotType.Group.ARMOR, i));
+                        if(ItemStack.matches(stack, armorStack)) {
+                            player.broadcastBreakEvent(EquipmentSlotType.byTypeAndIndex(EquipmentSlotType.Group.ARMOR, i));
                         }
                     }
                 }
@@ -80,7 +80,7 @@ public class UnbreakableItemStackUtil {
     public static void fixItem(ItemStack stack) {
         if(hasBrokenTag(stack)) {
             CompoundNBT stackCompound = stack.getTag();
-            ListNBT enchantments = stack.getEnchantmentTagList();
+            ListNBT enchantments = stack.getEnchantmentTags();
             ListNBT disabledEnchantments = stackCompound.getList(DISABLED_ENCHANTMENTS_KEY, 10);
 
             for(int tagIndex = 0; tagIndex < disabledEnchantments.size(); tagIndex++) {
@@ -93,11 +93,11 @@ public class UnbreakableItemStackUtil {
     }
 
     public static boolean hasUnbreakable(ItemStack stack) {
-        return EnchantmentHelper.getEnchantmentLevel(Enchantments.UNBREAKING, stack) > 0;
+        return EnchantmentHelper.getItemEnchantmentLevel(Enchantments.UNBREAKING, stack) > 0;
     }
 
     public static boolean hasNoUses(ItemStack stack) {
-        return hasUnbreakable(stack) && stack.getMaxDamage() - stack.getDamage() <= 0;
+        return hasUnbreakable(stack) && stack.getMaxDamage() - stack.getDamageValue() <= 0;
     }
 
     public static boolean hasBrokenTag(ItemStack stack) {

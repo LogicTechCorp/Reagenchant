@@ -32,7 +32,7 @@ public class ReagenchantOverrides {
     private static void registerAlternativeDispenserBehaviors() {
         DataUtil.registerAlternativeDispenseBehavior(Items.FLINT_AND_STEEL, (blockSource, stack) -> UnbreakableItemStackUtil.isBroken(stack), new OptionalDispenseBehavior() {
             @Override
-            public ItemStack dispenseStack(IBlockSource blockSource, ItemStack stack) {
+            public ItemStack execute(IBlockSource blockSource, ItemStack stack) {
                 return stack;
             }
         });

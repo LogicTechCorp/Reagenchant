@@ -68,11 +68,11 @@ public class UnbreakableItemStackEvents {
                         int index = ((tooltipIndex + tagIndex));
 
                         if(enchantment != null) {
-                            tooltips.add(index, ((IFormattableTextComponent) enchantment.getDisplayName(enchantmentCompound.getInt("lvl"))).mergeStyle(TextFormatting.GOLD));
+                            tooltips.add(index, ((IFormattableTextComponent) enchantment.getFullname(enchantmentCompound.getInt("lvl"))).withStyle(TextFormatting.GOLD));
                         }
 
                         if((tagIndex + 1) == enchantmentCount) {
-                            tooltips.add((index + 1), new TranslationTextComponent("tooltip." + Reagenchant.MOD_ID + ".item.broken").mergeStyle(TextFormatting.GOLD));
+                            tooltips.add((index + 1), new TranslationTextComponent("tooltip." + Reagenchant.MOD_ID + ".item.broken").withStyle(TextFormatting.GOLD));
                         }
                     }
 
@@ -85,7 +85,7 @@ public class UnbreakableItemStackEvents {
     @SubscribeEvent
     public static void onAttackEntityEvent(AttackEntityEvent event) {
         PlayerEntity player = event.getPlayer();
-        ItemStack stack = player.getHeldItemMainhand();
+        ItemStack stack = player.getMainHandItem();
 
         if(UnbreakableItemStackUtil.isBroken(stack)) {
             event.setCanceled(true);
@@ -96,9 +96,9 @@ public class UnbreakableItemStackEvents {
     public static void onPlayerHarvestCheck(PlayerEvent.HarvestCheck event) {
         PlayerEntity player = event.getPlayer();
         BlockState state = event.getTargetBlock();
-        ItemStack stack = player.getHeldItemMainhand();
+        ItemStack stack = player.getMainHandItem();
 
-        if(UnbreakableItemStackUtil.isBroken(stack) && state.getRequiresTool()) {
+        if(UnbreakableItemStackUtil.isBroken(stack) && state.requiresCorrectToolForDrops()) {
             event.setCanHarvest(false);
         }
     }
@@ -106,7 +106,7 @@ public class UnbreakableItemStackEvents {
     @SubscribeEvent
     public static void onPlayerBreakSpeed(PlayerEvent.BreakSpeed event) {
         PlayerEntity player = event.getPlayer();
-        ItemStack stack = player.getHeldItemMainhand();
+        ItemStack stack = player.getMainHandItem();
 
         if(UnbreakableItemStackUtil.isBroken(stack)) {
             event.setNewSpeed(0.5F);
@@ -120,16 +120,16 @@ public class UnbreakableItemStackEvents {
         BlockState state = event.getState();
         PlayerEntity player = event.getPlayer();
         Block block = state.getBlock();
-        ItemStack stack = player.getHeldItemMainhand();
+        ItemStack stack = player.getMainHandItem();
 
         if(UnbreakableItemStackUtil.isBroken(stack)) {
             if(block instanceof IForgeShearable) {
                 if(((IForgeShearable) block).isShearable(stack, world, pos)) {
-                    world.setBlockState(pos, Blocks.AIR.getDefaultState());
+                    world.setBlockAndUpdate(pos, Blocks.AIR.defaultBlockState());
                 }
             }
 
-            if(state.getRequiresTool()) {
+            if(state.requiresCorrectToolForDrops()) {
                 event.setExpToDrop(0);
             }
         }
@@ -138,7 +138,7 @@ public class UnbreakableItemStackEvents {
     @SubscribeEvent
     public static void onBlockToolInteractEvent(BlockEvent.BlockToolInteractEvent event) {
         PlayerEntity player = event.getPlayer();
-        ItemStack stack = player.getHeldItemMainhand();
+        ItemStack stack = player.getMainHandItem();
 
         if(UnbreakableItemStackUtil.isBroken(stack)) {
             event.setCanceled(true);
@@ -195,7 +195,7 @@ public class UnbreakableItemStackEvents {
         ItemStack inputStack = event.getItemInput();
         ItemStack outputStack = event.getItemResult();
 
-        if(UnbreakableItemStackUtil.isBroken(inputStack) && (outputStack.getDamage() < inputStack.getDamage())) {
+        if(UnbreakableItemStackUtil.isBroken(inputStack) && (outputStack.getDamageValue() < inputStack.getDamageValue())) {
             UnbreakableItemStackUtil.fixItem(outputStack);
         }
     }

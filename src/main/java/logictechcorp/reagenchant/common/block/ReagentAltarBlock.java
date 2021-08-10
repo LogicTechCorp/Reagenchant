@@ -48,7 +48,7 @@ import vazkii.quark.api.IModifiableEnchantmentInfluencer;
 import java.util.List;
 
 public class ReagentAltarBlock extends Block implements IModifiableEnchantmentInfluencer {
-    private static final VoxelShape SHAPE = Block.makeCuboidShape(3.0D, 0.0D, 3.0D, 13.0D, 11.0D, 13.0D);
+    private static final VoxelShape SHAPE = Block.box(3.0D, 0.0D, 3.0D, 13.0D, 11.0D, 13.0D);
 
     private final DyeColor influenceColor;
 
@@ -57,56 +57,56 @@ public class ReagentAltarBlock extends Block implements IModifiableEnchantmentIn
     }
 
     public ReagentAltarBlock(DyeColor influenceColor) {
-        super(AbstractBlock.Properties.create(Material.MISCELLANEOUS, influenceColor.getMapColor()).hardnessAndResistance(0.2F).setLightLevel((state) -> 14).sound(SoundType.CLOTH));
+        super(AbstractBlock.Properties.of(Material.DECORATION, influenceColor.getMaterialColor()).strength(0.2F).lightLevel((state) -> 14).sound(SoundType.WOOL));
         this.influenceColor = influenceColor;
     }
 
     @Override
-    public void onBlockPlacedBy(World world, BlockPos pos, BlockState state, LivingEntity placer, ItemStack stack) {
-        if(stack.hasDisplayName()) {
-            TileEntity tileEntity = world.getTileEntity(pos);
+    public void setPlacedBy(World world, BlockPos pos, BlockState state, LivingEntity placer, ItemStack stack) {
+        if(stack.hasCustomHoverName()) {
+            TileEntity tileEntity = world.getBlockEntity(pos);
 
             if(tileEntity instanceof ReagentAltarTileEntity) {
-                ((ReagentAltarTileEntity) tileEntity).setCustomName(stack.getDisplayName());
+                ((ReagentAltarTileEntity) tileEntity).setCustomName(stack.getHoverName());
             }
         }
     }
 
     @Override
-    public void onReplaced(BlockState state, World world, BlockPos pos, BlockState newState, boolean isMoving) {
-        TileEntity tileEntity = world.getTileEntity(pos);
+    public void onRemove(BlockState state, World world, BlockPos pos, BlockState newState, boolean isMoving) {
+        TileEntity tileEntity = world.getBlockEntity(pos);
 
         if(tileEntity instanceof ReagentAltarTileEntity) {
             ((ReagentAltarTileEntity) tileEntity).dropContents(world, pos);
         }
 
-        super.onReplaced(state, world, pos, newState, isMoving);
+        super.onRemove(state, world, pos, newState, isMoving);
     }
 
     @Override
-    public ActionResultType onBlockActivated(BlockState state, World world, BlockPos pos, PlayerEntity player, Hand hand, BlockRayTraceResult rayTraceResult) {
-        if(!world.isRemote) {
-            TileEntity tileEntity = world.getTileEntity(pos);
+    public ActionResultType use(BlockState state, World world, BlockPos pos, PlayerEntity player, Hand hand, BlockRayTraceResult rayTraceResult) {
+        if(!world.isClientSide) {
+            TileEntity tileEntity = world.getBlockEntity(pos);
 
             if(tileEntity instanceof ReagentAltarTileEntity) {
                 ReagentAltarTileEntity reagentAltar = (ReagentAltarTileEntity) tileEntity;
 
                 if(player instanceof ServerPlayerEntity) {
                     ItemStackHandler itemStackHandler = reagentAltar.getItemStackHandler();
-                    ItemStack heldStack = player.getHeldItem(hand);
+                    ItemStack heldStack = player.getItemInHand(hand);
 
                     if(heldStack.isEmpty()) {
                         player.inventory.placeItemBackInInventory(world, itemStackHandler.extractItem(0, itemStackHandler.getStackInSlot(0).getCount(), false));
                     }
                     else if(Reagenchant.REAGENT_MANAGER.isReagent(heldStack.getItem())) {
                         ItemStack leftoverStack = itemStackHandler.insertItem(0, heldStack, false);
-                        player.setHeldItem(hand, leftoverStack);
+                        player.setItemInHand(hand, leftoverStack);
                     }
                 }
             }
         }
 
-        return ActionResultType.func_233537_a_(world.isRemote);
+        return ActionResultType.sidedSuccess(world.isClientSide);
     }
 
     @Override
@@ -121,7 +121,7 @@ public class ReagentAltarBlock extends Block implements IModifiableEnchantmentIn
 
     @Override
     public int getLightValue(BlockState state, IBlockReader world, BlockPos pos) {
-        TileEntity tileEntity = world.getTileEntity(pos);
+        TileEntity tileEntity = world.getBlockEntity(pos);
 
         if(tileEntity instanceof ReagentAltarTileEntity) {
             ReagentAltarTileEntity reagentAltar = (ReagentAltarTileEntity) tileEntity;
@@ -137,7 +137,7 @@ public class ReagentAltarBlock extends Block implements IModifiableEnchantmentIn
 
     @Override
     public DyeColor getEnchantmentInfluenceColor(IBlockReader world, BlockPos pos, BlockState state) {
-        TileEntity tileEntity = world.getTileEntity(pos);
+        TileEntity tileEntity = world.getBlockEntity(pos);
 
         if(tileEntity instanceof ReagentAltarTileEntity) {
             ReagentAltarTileEntity reagentAltar = (ReagentAltarTileEntity) tileEntity;
@@ -153,7 +153,7 @@ public class ReagentAltarBlock extends Block implements IModifiableEnchantmentIn
 
     @Override
     public float getEnchantPowerBonus(BlockState state, IWorldReader world, BlockPos pos) {
-        TileEntity tileEntity = world.getTileEntity(pos);
+        TileEntity tileEntity = world.getBlockEntity(pos);
 
         if(tileEntity instanceof ReagentAltarTileEntity) {
             ReagentAltarTileEntity reagentAltar = (ReagentAltarTileEntity) tileEntity;
@@ -169,7 +169,7 @@ public class ReagentAltarBlock extends Block implements IModifiableEnchantmentIn
 
     @Override
     public List<Enchantment> getModifiedEnchantments(IBlockReader world, BlockPos pos, BlockState state, ItemStack stack, List<Enchantment> influencedEnchants) {
-        TileEntity tileEntity = world.getTileEntity(pos);
+        TileEntity tileEntity = world.getBlockEntity(pos);
 
         if(tileEntity instanceof ReagentAltarTileEntity) {
             ReagentAltarTileEntity reagentAltar = (ReagentAltarTileEntity) tileEntity;
@@ -187,7 +187,7 @@ public class ReagentAltarBlock extends Block implements IModifiableEnchantmentIn
 
     @Override
     public float[] getModifiedColorComponents(IBlockReader world, BlockPos pos, BlockState state, float[] colorComponents) {
-        TileEntity tileEntity = world.getTileEntity(pos);
+        TileEntity tileEntity = world.getBlockEntity(pos);
 
         if(tileEntity instanceof ReagentAltarTileEntity) {
             ReagentAltarTileEntity reagentAltar = (ReagentAltarTileEntity) tileEntity;

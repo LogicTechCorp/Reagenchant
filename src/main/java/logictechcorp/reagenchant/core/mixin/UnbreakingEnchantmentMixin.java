@@ -30,8 +30,8 @@ import java.util.Random;
 
 @Mixin(UnbreakingEnchantment.class)
 public abstract class UnbreakingEnchantmentMixin {
-    @Inject(method = "negateDamage", at = @At("HEAD"), cancellable = true)
-    private static void onNegateDamage(ItemStack stack, int level, Random random, CallbackInfoReturnable<Boolean> callback) {
+    @Inject(method = "shouldIgnoreDurabilityDrop", at = @At("HEAD"), cancellable = true)
+    private static void onShouldIgnoreDurabilityDrop(ItemStack stack, int level, Random random, CallbackInfoReturnable<Boolean> callback) {
         if(ReagenchantConfig.COMMON.unbreakableItems.get()) {
             if(UnbreakableItemStackUtil.isBroken(stack)) {
                 callback.setReturnValue(true);

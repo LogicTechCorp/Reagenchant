@@ -61,8 +61,8 @@ public abstract class InventoryTileEntity extends TileEntity implements INamedCo
     }
 
     @Override
-    public CompoundNBT write(CompoundNBT compound) {
-        super.write(compound);
+    public CompoundNBT save(CompoundNBT compound) {
+        super.save(compound);
         compound.put("Inventory", this.itemStackHandler.serializeNBT());
 
         if(this.customName != null) {
@@ -73,29 +73,29 @@ public abstract class InventoryTileEntity extends TileEntity implements INamedCo
     }
 
     @Override
-    public void read(BlockState state, CompoundNBT compound) {
-        super.read(state, compound);
+    public void load(BlockState state, CompoundNBT compound) {
+        super.load(state, compound);
         this.itemStackHandler.deserializeNBT(compound.getCompound("Inventory"));
 
         if(compound.contains("CustomName", 8)) {
-            this.customName = ITextComponent.Serializer.getComponentFromJson(compound.getString("CustomName"));
+            this.customName = ITextComponent.Serializer.fromJson(compound.getString("CustomName"));
         }
     }
 
     @Override
     public void onDataPacket(NetworkManager networkManager, SUpdateTileEntityPacket packet) {
-        this.read(this.getBlockState(), packet.getNbtCompound());
+        this.load(this.getBlockState(), packet.getTag());
     }
 
     protected void onContentsChanged() {
         BlockState state = this.getBlockState();
-        this.world.notifyBlockUpdate(this.pos, state, state, Constants.BlockFlags.DEFAULT);
-        this.markDirty();
+        this.level.sendBlockUpdated(this.worldPosition, state, state, Constants.BlockFlags.DEFAULT);
+        this.setChanged();
     }
 
     public void dropContents(World world, BlockPos pos) {
         for(int i = 0; i < this.itemStackHandler.getSlots(); i++) {
-            InventoryHelper.spawnItemStack(world, pos.getX(), pos.getY(), pos.getZ(), this.itemStackHandler.getStackInSlot(i));
+            InventoryHelper.dropItemStack(world, pos.getX(), pos.getY(), pos.getZ(), this.itemStackHandler.getStackInSlot(i));
         }
     }
 
@@ -104,12 +104,12 @@ public abstract class InventoryTileEntity extends TileEntity implements INamedCo
 
     @Override
     public SUpdateTileEntityPacket getUpdatePacket() {
-        return new SUpdateTileEntityPacket(this.pos, 0, this.write(new CompoundNBT()));
+        return new SUpdateTileEntityPacket(this.worldPosition, 0, this.save(new CompoundNBT()));
     }
 
     @Override
     public CompoundNBT getUpdateTag() {
-        return this.write(new CompoundNBT());
+        return this.save(new CompoundNBT());
     }
 
     @Override

@@ -30,16 +30,16 @@ import java.util.Random;
 
 @Mixin(ItemStack.class)
 public abstract class ItemStackMixin {
-    @Inject(method = "attemptDamageItem", at = @At("TAIL"), cancellable = true)
-    public void onAttemptDamageItem(int amount, Random rand, ServerPlayerEntity damager, CallbackInfoReturnable<Boolean> callback) {
+    @Inject(method = "hurt", at = @At("TAIL"), cancellable = true)
+    public void onHurt(int amount, Random rand, ServerPlayerEntity damager, CallbackInfoReturnable<Boolean> callback) {
         if(ReagenchantConfig.COMMON.unbreakableItems.get()) {
             ItemStack stack = ((ItemStack) (Object) this);
 
-            if(stack.getDamage() >= stack.getMaxDamage()) {
+            if(stack.getDamageValue() >= stack.getMaxDamage()) {
                 UnbreakableItemStackUtil.breakItem(damager, stack);
 
                 if(UnbreakableItemStackUtil.isBroken(stack)) {
-                    stack.setDamage(stack.getMaxDamage());
+                    stack.setDamageValue(stack.getMaxDamage());
                     callback.setReturnValue(false);
                 }
             }

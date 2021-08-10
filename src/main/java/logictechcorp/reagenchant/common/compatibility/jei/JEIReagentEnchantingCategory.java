@@ -101,7 +101,7 @@ class JEIReagentEnchantingCategory implements IRecipeCategory<JEIReagentRecipe> 
                     int level = entry.getValue();
 
                     tooltip.add(StringTextComponent.EMPTY);
-                    tooltip.add(enchantment.getDisplayName(level));
+                    tooltip.add(enchantment.getFullname(level));
                     tooltip.add(new TranslationTextComponent("container." + Reagenchant.MOD_ID + ".jei.reagent_enchanting.enchantment_probability", reagent.getReagentEnchantData(enchantment).getEnchantmentProbability() * 100.0D));
                     tooltip.add(new TranslationTextComponent("container." + Reagenchant.MOD_ID + ".jei.reagent_enchanting.reagent_cost", reagent.getReagentEnchantData(enchantment).getReagentCost()));
                 }

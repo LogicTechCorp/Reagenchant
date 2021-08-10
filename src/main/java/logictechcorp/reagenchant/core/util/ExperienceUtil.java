@@ -21,7 +21,7 @@ import net.minecraft.entity.player.PlayerEntity;
 
 public class ExperienceUtil {
     public static int getPlayerExperience(PlayerEntity player) {
-        return getExperienceForLevel(player.experienceLevel) + (int) (player.experience * player.xpBarCap());
+        return getExperienceForLevel(player.experienceLevel) + (int) (player.experienceProgress * player.getXpNeededForNextLevel());
     }
 
     public static int getExperienceForLevel(int experienceLevel) {

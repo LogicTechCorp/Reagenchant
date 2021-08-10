@@ -32,7 +32,7 @@ import java.util.Map;
 
 @Mixin(ExperienceOrbEntity.class)
 public class ExperienceOrbEntityMixin {
-    @Inject(method = "onCollideWithPlayer", at = @At(value = "INVOKE", target = "net/minecraft/item/ItemStack.setDamage(I)V"), locals = LocalCapture.CAPTURE_FAILSOFT)
+    @Inject(method = "playerTouch", at = @At(value = "INVOKE", target = "net/minecraft/item/ItemStack.setDamageValue(I)V"), locals = LocalCapture.CAPTURE_FAILSOFT)
     public void onOnCollideWithPlayer(PlayerEntity entity, CallbackInfo callback, Map.Entry<EquipmentSlotType, ItemStack> entry) {
         ItemStack stack = entry.getValue();
 

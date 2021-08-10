@@ -72,15 +72,15 @@ public class ReagentEnchantingTableScreen extends ContainerScreen<ReagentEnchant
 
     @Override
     public boolean mouseClicked(double mouseX, double mouseY, int mouseButton) {
-        int width = (this.width - this.xSize) / 2;
-        int height = (this.height - this.ySize) / 2;
+        int width = (this.width - this.imageWidth) / 2;
+        int height = (this.height - this.imageHeight) / 2;
 
         for(int enchantmentTier = 0; enchantmentTier < 3; enchantmentTier++) {
             double posX = mouseX - (double) (width + 62);
             double posY = mouseY - (double) (height + 14 + 19 * enchantmentTier);
 
-            if(posX >= 0.0D && posY >= 0.0D && posX < 108.0D && posY < 19.0D && this.container.enchantItem(this.minecraft.player, enchantmentTier)) {
-                this.minecraft.playerController.sendEnchantPacket((this.container).windowId, enchantmentTier);
+            if(posX >= 0.0D && posY >= 0.0D && posX < 108.0D && posY < 19.0D && this.menu.clickMenuButton(this.minecraft.player, enchantmentTier)) {
+                this.minecraft.gameMode.handleInventoryButtonClick((this.menu).containerId, enchantmentTier);
                 return true;
             }
         }
@@ -89,43 +89,43 @@ public class ReagentEnchantingTableScreen extends ContainerScreen<ReagentEnchant
     }
 
     @Override
-    protected void drawGuiContainerBackgroundLayer(MatrixStack matrixStack, float partialTicks, int mouseX, int mouseY) {
+    protected void renderBg(MatrixStack matrixStack, float partialTicks, int mouseX, int mouseY) {
         ResourceLocation guiTexture;
 
-        if(this.container.getSlot(2).getHasStack()) {
+        if(this.menu.getSlot(2).hasItem()) {
             guiTexture = REAGENT_ENCHANTING_TABLE_WITH_REAGENT_GUI;
         }
         else {
             guiTexture = REAGENT_ENCHANTING_TABLE_WITHOUT_REAGENT_GUI;
         }
 
-        RenderHelper.setupGuiFlatDiffuseLighting();
+        RenderHelper.setupForFlatItems();
         RenderSystem.color4f(1.0F, 1.0F, 1.0F, 1.0F);
-        this.minecraft.getTextureManager().bindTexture(guiTexture);
-        int width = (this.width - this.xSize) / 2;
-        int height = (this.height - this.ySize) / 2;
-        this.blit(matrixStack, width, height, 0, 0, this.xSize, this.ySize);
+        this.minecraft.getTextureManager().bind(guiTexture);
+        int width = (this.width - this.imageWidth) / 2;
+        int height = (this.height - this.imageHeight) / 2;
+        this.blit(matrixStack, width, height, 0, 0, this.imageWidth, this.imageHeight);
         RenderSystem.matrixMode(5889);
         RenderSystem.pushMatrix();
         RenderSystem.loadIdentity();
-        int guiScaleFactor = (int) this.minecraft.getMainWindow().getGuiScaleFactor();
+        int guiScaleFactor = (int) this.minecraft.getWindow().getGuiScale();
         RenderSystem.viewport((this.width - 320) / 2 * guiScaleFactor, (this.height - 240) / 2 * guiScaleFactor, 320 * guiScaleFactor, 240 * guiScaleFactor);
         RenderSystem.translatef(-0.34F, 0.23F, 0.0F);
         RenderSystem.multMatrix(Matrix4f.perspective(90.0D, 1.3333334F, 9.0F, 80.0F));
         RenderSystem.matrixMode(5888);
-        matrixStack.push();
-        MatrixStack.Entry matrixStackLast = matrixStack.getLast();
-        matrixStackLast.getMatrix().setIdentity();
-        matrixStackLast.getNormal().setIdentity();
+        matrixStack.pushPose();
+        MatrixStack.Entry matrixStackLast = matrixStack.last();
+        matrixStackLast.pose().setIdentity();
+        matrixStackLast.normal().setIdentity();
         matrixStack.translate(0.0D, 3.3F, 1984.0D);
         matrixStack.scale(5.0F, 5.0F, 5.0F);
-        matrixStack.rotate(Vector3f.ZP.rotationDegrees(180.0F));
-        matrixStack.rotate(Vector3f.XP.rotationDegrees(20.0F));
+        matrixStack.mulPose(Vector3f.ZP.rotationDegrees(180.0F));
+        matrixStack.mulPose(Vector3f.XP.rotationDegrees(20.0F));
         float openFlip = MathHelper.lerp(partialTicks, this.openPrev, this.open);
         matrixStack.translate(((1.0F - openFlip) * 0.2F), ((1.0F - openFlip) * 0.1F), ((1.0F - openFlip) * 0.25F));
         float f2 = -(1.0F - openFlip) * 90.0F - 90.0F;
-        matrixStack.rotate(Vector3f.YP.rotationDegrees(f2));
-        matrixStack.rotate(Vector3f.XP.rotationDegrees(180.0F));
+        matrixStack.mulPose(Vector3f.YP.rotationDegrees(f2));
+        matrixStack.mulPose(Vector3f.XP.rotationDegrees(180.0F));
         float pageOneFlip = MathHelper.lerp(partialTicks, this.flipPrev, this.flip) + 0.25F;
         float pageTwoFlip = MathHelper.lerp(partialTicks, this.flipPrev, this.flip) + 0.75F;
         pageOneFlip = (pageOneFlip - (float) MathHelper.fastFloor(pageOneFlip)) * 1.6F - 0.3F;
@@ -145,26 +145,26 @@ public class ReagentEnchantingTableScreen extends ContainerScreen<ReagentEnchant
         }
 
         RenderSystem.enableRescaleNormal();
-        BOOK_MODEL.setBookState(0.0F, pageOneFlip, pageTwoFlip, openFlip);
-        IRenderTypeBuffer.Impl renderTypeBuffer = IRenderTypeBuffer.getImpl(Tessellator.getInstance().getBuffer());
-        IVertexBuilder vertexBuilder = renderTypeBuffer.getBuffer(BOOK_MODEL.getRenderType(BOOK_TEXTURE));
-        BOOK_MODEL.render(matrixStack, vertexBuilder, 15728880, OverlayTexture.NO_OVERLAY, 1.0F, 1.0F, 1.0F, 1.0F);
-        renderTypeBuffer.finish();
-        matrixStack.pop();
+        BOOK_MODEL.setupAnim(0.0F, pageOneFlip, pageTwoFlip, openFlip);
+        IRenderTypeBuffer.Impl renderTypeBuffer = IRenderTypeBuffer.immediate(Tessellator.getInstance().getBuilder());
+        IVertexBuilder vertexBuilder = renderTypeBuffer.getBuffer(BOOK_MODEL.renderType(BOOK_TEXTURE));
+        BOOK_MODEL.renderToBuffer(matrixStack, vertexBuilder, 15728880, OverlayTexture.NO_OVERLAY, 1.0F, 1.0F, 1.0F, 1.0F);
+        renderTypeBuffer.endBatch();
+        matrixStack.popPose();
         RenderSystem.matrixMode(5889);
-        RenderSystem.viewport(0, 0, this.minecraft.getMainWindow().getFramebufferWidth(), this.minecraft.getMainWindow().getFramebufferHeight());
+        RenderSystem.viewport(0, 0, this.minecraft.getWindow().getWidth(), this.minecraft.getWindow().getHeight());
         RenderSystem.popMatrix();
         RenderSystem.matrixMode(5888);
-        RenderHelper.setupGui3DDiffuseLighting();
+        RenderHelper.setupFor3DItems();
         RenderSystem.color4f(1.0F, 1.0F, 1.0F, 1.0F);
-        EnchantmentNameParts.getInstance().reseedRandomGenerator(this.container.getXpSeed() + (this.container.getReagentAmount() == 0 ? 0 : Item.getIdFromItem(this.container.getSlot(2).getStack().getItem())));
+        EnchantmentNameParts.getInstance().initSeed(this.menu.getXpSeed() + (this.menu.getReagentAmount() == 0 ? 0 : Item.getId(this.menu.getSlot(2).getItem().getItem())));
 
         for(int i = 0; i < 3; i++) {
-            int enchantabilityLevel = this.container.getEnchantabilityLevels()[ i ];
+            int enchantabilityLevel = this.menu.getEnchantabilityLevels()[i];
             int rectanglePosX = width + 62;
             int textPosX = rectanglePosX + 20;
             this.setBlitOffset(0);
-            this.minecraft.getTextureManager().bindTexture(guiTexture);
+            this.minecraft.getTextureManager().bind(guiTexture);
             RenderSystem.color4f(1.0F, 1.0F, 1.0F, 1.0F);
 
             if(enchantabilityLevel == 0) {
@@ -172,14 +172,14 @@ public class ReagentEnchantingTableScreen extends ContainerScreen<ReagentEnchant
             }
             else {
                 String enchantabilityLevelString = "" + enchantabilityLevel;
-                int length = 86 - this.font.getStringWidth(enchantabilityLevelString);
-                ITextProperties randomName = EnchantmentNameParts.getInstance().getGalacticEnchantmentName(this.font, length);
+                int length = 86 - this.font.width(enchantabilityLevelString);
+                ITextProperties randomName = EnchantmentNameParts.getInstance().getRandomName(this.font, length);
                 int color = 6839882;
 
-                if(((this.container.getLapisAmount() < i + 1 || this.container.getReagentAmount() < this.container.getReagentCosts()[ i ] || this.minecraft.player.experienceLevel < enchantabilityLevel) && !this.minecraft.player.abilities.isCreativeMode) || this.container.getEnchantments()[ i ] == -1) {
+                if(((this.menu.getLapisAmount() < i + 1 || this.menu.getReagentAmount() < this.menu.getReagentCosts()[i] || this.minecraft.player.experienceLevel < enchantabilityLevel) && !this.minecraft.player.abilities.instabuild) || this.menu.getEnchantments()[i] == -1) {
                     this.blit(matrixStack, rectanglePosX, height + 14 + 19 * i, 0, 185, 108, 19);
                     this.blit(matrixStack, rectanglePosX + 1, height + 15 + 19 * i, 16 * i, 239, 16, 16);
-                    this.font.func_238418_a_(randomName, textPosX, height + 16 + 19 * i, length, (color & 16711422) >> 1);
+                    this.font.drawWordWrap(randomName, textPosX, height + 16 + 19 * i, length, (color & 16711422) >> 1);
                     color = 4226832;
                 }
                 else {
@@ -195,41 +195,41 @@ public class ReagentEnchantingTableScreen extends ContainerScreen<ReagentEnchant
                     }
 
                     this.blit(matrixStack, rectanglePosX + 1, height + 15 + 19 * i, 16 * i, 223, 16, 16);
-                    this.font.func_238418_a_(randomName, textPosX, height + 16 + 19 * i, length, color);
+                    this.font.drawWordWrap(randomName, textPosX, height + 16 + 19 * i, length, color);
                     color = 8453920;
                 }
 
-                this.font.drawStringWithShadow(matrixStack, enchantabilityLevelString, (float) (textPosX + 86 - this.font.getStringWidth(enchantabilityLevelString)), (float) (height + 16 + 19 * i + 7), color);
+                this.font.drawShadow(matrixStack, enchantabilityLevelString, (float) (textPosX + 86 - this.font.width(enchantabilityLevelString)), (float) (height + 16 + 19 * i + 7), color);
             }
         }
     }
 
     @Override
     public void render(MatrixStack matrixStack, int mouseX, int mouseY, float partialTicks) {
-        partialTicks = this.minecraft.getTickLength();
+        partialTicks = this.minecraft.getDeltaFrameTime();
         this.renderBackground(matrixStack);
         super.render(matrixStack, mouseX, mouseY, partialTicks);
-        this.renderHoveredTooltip(matrixStack, mouseX, mouseY);
+        this.renderTooltip(matrixStack, mouseX, mouseY);
 
         for(int i = 0; i < 3; i++) {
-            Enchantment enchantment = Enchantment.getEnchantmentByID(this.container.getEnchantments()[ i ]);
-            int enchantmentLevel = this.container.getEnchantmentLevels()[ i ];
-            int enchantabilityLevel = this.container.getEnchantabilityLevels()[ i ];
+            Enchantment enchantment = Enchantment.byId(this.menu.getEnchantments()[i]);
+            int enchantmentLevel = this.menu.getEnchantmentLevels()[i];
+            int enchantabilityLevel = this.menu.getEnchantabilityLevels()[i];
             int enchantmentTier = i + 1;
 
-            if(this.isPointInRegion(62, 14 + 19 * i, 108, 17, mouseX, mouseY) && enchantabilityLevel > 0) {
+            if(this.isHovering(62, 14 + 19 * i, 108, 17, mouseX, mouseY) && enchantabilityLevel > 0) {
                 List<ITextComponent> list = new ArrayList<>();
-                list.add((new TranslationTextComponent("container.enchant.clue", enchantment == null ? "" : enchantment.getDisplayName(enchantmentLevel))).mergeStyle(TextFormatting.WHITE));
+                list.add((new TranslationTextComponent("container.enchant.clue", enchantment == null ? "" : enchantment.getFullname(enchantmentLevel))).withStyle(TextFormatting.WHITE));
 
                 if(enchantment == null) {
                     list.add(new StringTextComponent(""));
-                    list.add(new TranslationTextComponent("forge.container.enchant.limitedEnchantability").mergeStyle(TextFormatting.RED));
+                    list.add(new TranslationTextComponent("forge.container.enchant.limitedEnchantability").withStyle(TextFormatting.RED));
                 }
-                else if(!this.minecraft.player.abilities.isCreativeMode) {
+                else if(!this.minecraft.player.abilities.instabuild) {
                     list.add(StringTextComponent.EMPTY);
 
                     if(this.minecraft.player.experienceLevel < enchantabilityLevel) {
-                        list.add((new TranslationTextComponent("container.enchant.level.requirement", enchantabilityLevel)).mergeStyle(TextFormatting.RED));
+                        list.add((new TranslationTextComponent("container.enchant.level.requirement", enchantabilityLevel)).withStyle(TextFormatting.RED));
                     }
                     else {
                         IFormattableTextComponent lapisTextFormatting;
@@ -241,25 +241,25 @@ public class ReagentEnchantingTableScreen extends ContainerScreen<ReagentEnchant
                             lapisTextFormatting = new TranslationTextComponent("container.enchant.lapis.many", enchantmentTier);
                         }
 
-                        list.add(lapisTextFormatting.mergeStyle(this.container.getLapisAmount() >= enchantmentTier ? TextFormatting.GRAY : TextFormatting.RED));
+                        list.add(lapisTextFormatting.withStyle(this.menu.getLapisAmount() >= enchantmentTier ? TextFormatting.GRAY : TextFormatting.RED));
 
-                        ItemStack reagentStack = this.container.getSlot(2).getStack();
+                        ItemStack reagentStack = this.menu.getSlot(2).getItem();
                         Reagent reagent = Reagenchant.REAGENT_MANAGER.getReagent(reagentStack.getItem());
 
                         if(!reagent.isEmpty()) {
-                            int reagentCost = this.container.getReagentCosts()[ i ];
+                            int reagentCost = this.menu.getReagentCosts()[i];
 
                             if(reagentCost > 0) {
                                 IFormattableTextComponent reagentTextFormatting;
 
                                 if(reagentCost == 1) {
-                                    reagentTextFormatting = new TranslationTextComponent("container." + Reagenchant.MOD_ID + ".reagent_enchanting_table.reagent.cost.one", new TranslationTextComponent(reagentStack.getTranslationKey()));
+                                    reagentTextFormatting = new TranslationTextComponent("container." + Reagenchant.MOD_ID + ".reagent_enchanting_table.reagent.cost.one", new TranslationTextComponent(reagentStack.getDescriptionId()));
                                 }
                                 else {
-                                    reagentTextFormatting = new TranslationTextComponent("container." + Reagenchant.MOD_ID + ".reagent_enchanting_table.reagent.cost.many", reagentCost, new TranslationTextComponent(reagentStack.getTranslationKey()));
+                                    reagentTextFormatting = new TranslationTextComponent("container." + Reagenchant.MOD_ID + ".reagent_enchanting_table.reagent.cost.many", reagentCost, new TranslationTextComponent(reagentStack.getDescriptionId()));
                                 }
 
-                                list.add(reagentTextFormatting.mergeStyle(this.container.getReagentAmount() >= reagentCost ? TextFormatting.GRAY : TextFormatting.RED));
+                                list.add(reagentTextFormatting.withStyle(this.menu.getReagentAmount() >= reagentCost ? TextFormatting.GRAY : TextFormatting.RED));
                             }
                         }
 
@@ -272,20 +272,20 @@ public class ReagentEnchantingTableScreen extends ContainerScreen<ReagentEnchant
                             enchantmentTierTextFormatting = new TranslationTextComponent("container.enchant.level.many", enchantmentTier);
                         }
 
-                        list.add(enchantmentTierTextFormatting.mergeStyle(TextFormatting.GRAY));
+                        list.add(enchantmentTierTextFormatting.withStyle(TextFormatting.GRAY));
                     }
                 }
 
-                this.func_243308_b(matrixStack, list, mouseX, mouseY);
+                this.renderComponentTooltip(matrixStack, list, mouseX, mouseY);
                 break;
             }
         }
     }
 
     private void tickBook() {
-        ItemStack stack = this.container.getSlot(0).getStack();
+        ItemStack stack = this.menu.getSlot(0).getItem();
 
-        if(!ItemStack.areItemStacksEqual(stack, this.last)) {
+        if(!ItemStack.matches(stack, this.last)) {
             this.last = stack;
 
             do {
@@ -299,7 +299,7 @@ public class ReagentEnchantingTableScreen extends ContainerScreen<ReagentEnchant
         boolean flag = false;
 
         for(int i = 0; i < 3; i++) {
-            if(this.container.getEnchantabilityLevels()[ i ] != 0) {
+            if(this.menu.getEnchantabilityLevels()[i] != 0) {
                 flag = true;
             }
         }

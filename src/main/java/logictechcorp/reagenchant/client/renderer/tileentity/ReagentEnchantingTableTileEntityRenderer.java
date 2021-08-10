@@ -32,7 +32,7 @@ import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.vector.Vector3f;
 
 public class ReagentEnchantingTableTileEntityRenderer extends TileEntityRenderer<ReagentEnchantingTableTileEntity> {
-    public static final RenderMaterial BOOK_TEXTURE = new RenderMaterial(AtlasTexture.LOCATION_BLOCKS_TEXTURE, new ResourceLocation("entity/enchanting_table_book"));
+    public static final RenderMaterial BOOK_TEXTURE = new RenderMaterial(AtlasTexture.LOCATION_BLOCKS, new ResourceLocation("entity/enchanting_table_book"));
 
     private final BookModel bookModel = new BookModel();
 
@@ -42,7 +42,7 @@ public class ReagentEnchantingTableTileEntityRenderer extends TileEntityRenderer
 
     @Override
     public void render(ReagentEnchantingTableTileEntity reagentEnchantingTable, float partialTicks, MatrixStack matrixStack, IRenderTypeBuffer renderTypeBuffer, int combinedLight, int combinedOverlay) {
-        matrixStack.push();
+        matrixStack.pushPose();
         matrixStack.translate(0.5D, 0.75D, 0.5D);
         float ticks = (float) reagentEnchantingTable.ticks + partialTicks;
         matrixStack.translate(0.0D, (0.1F + MathHelper.sin(ticks * 0.1F) * 0.01F), 0.0D);
@@ -56,15 +56,15 @@ public class ReagentEnchantingTableTileEntityRenderer extends TileEntityRenderer
         }
 
         float adjustedPageAngle = reagentEnchantingTable.pageAngle + angle * partialTicks;
-        matrixStack.rotate(Vector3f.YP.rotation(-adjustedPageAngle));
-        matrixStack.rotate(Vector3f.ZP.rotationDegrees(80.0F));
+        matrixStack.mulPose(Vector3f.YP.rotation(-adjustedPageAngle));
+        matrixStack.mulPose(Vector3f.ZP.rotationDegrees(80.0F));
         float f3 = MathHelper.lerp(partialTicks, reagentEnchantingTable.pageFlipAmount, reagentEnchantingTable.nextPageFlipAmount);
         float rightPageFlipAmount = MathHelper.frac(f3 + 0.25F) * 1.6F - 0.3F;
         float leftPageFlipAmount = MathHelper.frac(f3 + 0.75F) * 1.6F - 0.3F;
         float bookOpenAmount = MathHelper.lerp(partialTicks, reagentEnchantingTable.pageTurningSpeed, reagentEnchantingTable.nextPageTurningSpeed);
-        this.bookModel.setBookState(ticks, MathHelper.clamp(rightPageFlipAmount, 0.0F, 1.0F), MathHelper.clamp(leftPageFlipAmount, 0.0F, 1.0F), bookOpenAmount);
-        IVertexBuilder ivertexbuilder = BOOK_TEXTURE.getBuffer(renderTypeBuffer, RenderType::getEntitySolid);
-        this.bookModel.renderAll(matrixStack, ivertexbuilder, combinedLight, combinedOverlay, 1.0F, 1.0F, 1.0F, 1.0F);
-        matrixStack.pop();
+        this.bookModel.setupAnim(ticks, MathHelper.clamp(rightPageFlipAmount, 0.0F, 1.0F), MathHelper.clamp(leftPageFlipAmount, 0.0F, 1.0F), bookOpenAmount);
+        IVertexBuilder ivertexbuilder = BOOK_TEXTURE.buffer(renderTypeBuffer, RenderType::entitySolid);
+        this.bookModel.render(matrixStack, ivertexbuilder, combinedLight, combinedOverlay, 1.0F, 1.0F, 1.0F, 1.0F);
+        matrixStack.popPose();
     }
 }

@@ -31,14 +31,14 @@ import java.nio.file.Path;
 public class ExportCurrentReagentPackCommand {
     public static ArgumentBuilder<CommandSource, ?> register() {
         return Commands.literal("exportCurrentReagentPack")
-                .requires(source -> source.hasPermissionLevel(2))
+                .requires(source -> source.hasPermission(2))
                 .executes(ExportCurrentReagentPackCommand::exportCurrentReagentPack);
     }
 
     private static int exportCurrentReagentPack(CommandContext<CommandSource> context) {
         CommandSource source = context.getSource();
         MinecraftServer server = source.getServer();
-        Path datapackDirectoryPath = server.func_240776_a_(FolderName.DATAPACKS).toAbsolutePath().normalize();
+        Path datapackDirectoryPath = server.getWorldPath(FolderName.DATAPACK_DIR).toAbsolutePath().normalize();
 
         for(Reagent reagent : Reagenchant.REAGENT_MANAGER.getReagents().values()) {
             ReagentCommand.saveReagentFile(datapackDirectoryPath, "current_reagent_pack", reagent);

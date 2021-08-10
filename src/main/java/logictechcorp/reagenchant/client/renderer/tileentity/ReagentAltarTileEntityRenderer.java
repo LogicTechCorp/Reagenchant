@@ -40,17 +40,17 @@ public class ReagentAltarTileEntityRenderer extends TileEntityRenderer<ReagentAl
         ItemStack stack = reagentAltar.getItemStackHandler().getStackInSlot(0);
 
         if(!stack.isEmpty()) {
-            World world = reagentAltar.getWorld();
+            World world = reagentAltar.getLevel();
             float movementValue = world.getGameTime() + partialTicks;
 
-            matrixStack.push();
+            matrixStack.pushPose();
             matrixStack.translate(0.5F, MathHelper.sin(movementValue / 10.0F) * 0.1F + 1.025F, 0.5F);
-            matrixStack.rotate(Vector3f.YP.rotation(movementValue / 20.0F));
+            matrixStack.mulPose(Vector3f.YP.rotation(movementValue / 20.0F));
             matrixStack.scale(0.5F, 0.5F, 0.5F);
-            RenderHelper.enableStandardItemLighting();
-            Minecraft.getInstance().getItemRenderer().renderItem(stack, ItemCameraTransforms.TransformType.FIXED, combinedLight, combinedOverlay, matrixStack, buffer);
-            RenderHelper.disableStandardItemLighting();
-            matrixStack.pop();
+            RenderHelper.turnBackOn();
+            Minecraft.getInstance().getItemRenderer().renderStatic(stack, ItemCameraTransforms.TransformType.FIXED, combinedLight, combinedOverlay, matrixStack, buffer);
+            RenderHelper.turnOff();
+            matrixStack.popPose();
         }
     }
 }

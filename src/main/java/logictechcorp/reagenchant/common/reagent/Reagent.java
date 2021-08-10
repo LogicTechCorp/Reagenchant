@@ -72,7 +72,7 @@ public class Reagent {
 
                 if(minimumEnchantmentLevel == enchantment.getMinLevel() && maximumEnchantmentLevel == enchantment.getMaxLevel()) {
                     for(enchantmentLevel = maximumEnchantmentLevel; enchantmentLevel > (minimumEnchantmentLevel - 1); enchantmentLevel--) {
-                        if(enchantabilityLevel >= enchantment.getMinEnchantability(enchantmentLevel)) {
+                        if(enchantabilityLevel >= enchantment.getMinCost(enchantmentLevel)) {
                             break;
                         }
                     }
@@ -106,7 +106,7 @@ public class Reagent {
             while(!defaultEnchantments.isEmpty()) {
                 EnchantmentData removedEnchantment = WeightedRandom.getRandomItem(random, defaultEnchantments);
                 refinedEnchantments.add(defaultEnchantments.remove(defaultEnchantments.indexOf(removedEnchantment)));
-                EnchantmentHelper.removeIncompatible(defaultEnchantments, removedEnchantment);
+                EnchantmentHelper.filterCompatibleEnchantments(defaultEnchantments, removedEnchantment);
             }
 
             return refinedEnchantments;

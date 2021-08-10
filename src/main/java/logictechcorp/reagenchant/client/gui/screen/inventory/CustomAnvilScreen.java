@@ -42,25 +42,25 @@ public class CustomAnvilScreen extends ContainerScreen<CustomAnvilContainer> imp
 
     public CustomAnvilScreen(CustomAnvilContainer container, PlayerInventory playerInventory, ITextComponent title) {
         super(container, playerInventory, title);
-        this.titleX = 60;
+        this.titleLabelX = 60;
     }
 
     @Override
     public void init() {
         super.init();
-        this.minecraft.keyboardListener.enableRepeatEvents(true);
-        int posX = (this.width - this.xSize) / 2;
-        int posZ = (this.height - this.ySize) / 2;
+        this.minecraft.keyboardHandler.setSendRepeatsToGui(true);
+        int posX = (this.width - this.imageWidth) / 2;
+        int posZ = (this.height - this.imageHeight) / 2;
         this.customNameField = new TextFieldWidget(this.font, posX + 62, posZ + 24, 103, 12, new TranslationTextComponent("container.repair"));
         this.customNameField.setCanLoseFocus(false);
         this.customNameField.setTextColor(-1);
-        this.customNameField.setDisabledTextColour(-1);
-        this.customNameField.setEnableBackgroundDrawing(false);
-        this.customNameField.setMaxStringLength(35);
+        this.customNameField.setTextColorUneditable(-1);
+        this.customNameField.setBordered(false);
+        this.customNameField.setMaxLength(35);
         this.customNameField.setResponder(this::renameItem);
         this.children.add(this.customNameField);
-        this.setFocusedDefault(this.customNameField);
-        this.container.addListener(this);
+        this.setInitialFocus(this.customNameField);
+        this.menu.addSlotListener(this);
     }
 
     @Override
@@ -75,114 +75,114 @@ public class CustomAnvilScreen extends ContainerScreen<CustomAnvilContainer> imp
         super.render(matrixStack, mouseX, mouseY, partialTicks);
         RenderSystem.disableBlend();
         this.customNameField.render(matrixStack, mouseX, mouseY, partialTicks);
-        this.renderHoveredTooltip(matrixStack, mouseX, mouseY);
+        this.renderTooltip(matrixStack, mouseX, mouseY);
     }
 
     @Override
     public void resize(Minecraft minecraft, int width, int height) {
-        String customName = this.customNameField.getText();
+        String customName = this.customNameField.getValue();
         this.init(minecraft, width, height);
-        this.customNameField.setText(customName);
+        this.customNameField.setValue(customName);
     }
 
     @Override
-    public void onClose() {
-        super.onClose();
-        this.minecraft.keyboardListener.enableRepeatEvents(false);
-        this.container.removeListener(this);
+    public void removed() {
+        super.removed();
+        this.minecraft.keyboardHandler.setSendRepeatsToGui(false);
+        this.menu.removeSlotListener(this);
     }
 
     @Override
     public boolean keyPressed(int keyCode, int scanCode, int modifiers) {
         if(keyCode == 256) {
-            this.minecraft.player.closeScreen();
+            this.minecraft.player.closeContainer();
         }
 
-        return this.customNameField.keyPressed(keyCode, scanCode, modifiers) || this.customNameField.canWrite() || super.keyPressed(keyCode, scanCode, modifiers);
+        return this.customNameField.keyPressed(keyCode, scanCode, modifiers) || this.customNameField.canConsumeInput() || super.keyPressed(keyCode, scanCode, modifiers);
     }
 
     private void renameItem(String customName) {
         if(!customName.isEmpty()) {
             String newName = customName;
-            Slot slot = this.container.getSlot(0);
+            Slot slot = this.menu.getSlot(0);
 
-            if(slot.getHasStack() && !slot.getStack().hasDisplayName() && customName.equals(slot.getStack().getDisplayName().getString())) {
+            if(slot.hasItem() && !slot.getItem().hasCustomHoverName() && customName.equals(slot.getItem().getHoverName().getString())) {
                 newName = "";
             }
 
-            this.container.updateItemName(newName);
+            this.menu.updateItemName(newName);
             Reagenchant.CHANNEL.sendToServer(new MessageCUpdateItemNamePacket(newName));
         }
     }
 
     @Override
-    protected void drawGuiContainerForegroundLayer(MatrixStack matrixStack, int mouseX, int mouseY) {
+    protected void renderLabels(MatrixStack matrixStack, int mouseX, int mouseY) {
         RenderSystem.disableBlend();
-        super.drawGuiContainerForegroundLayer(matrixStack, mouseX, mouseY);
-        int repairCost = this.container.getRepairCost();
+        super.renderLabels(matrixStack, mouseX, mouseY);
+        int repairCost = this.menu.getRepairCost();
 
         if(repairCost > 0) {
             int textColor = 8453920;
             ITextComponent anvilInfoTextComponent;
 
-            if(repairCost >= 40 && !this.minecraft.player.abilities.isCreativeMode) {
+            if(repairCost >= 40 && !this.minecraft.player.abilities.instabuild) {
                 anvilInfoTextComponent = EXPENSIVE_TEXT_COMPONENT;
                 textColor = 16736352;
             }
-            else if(!this.container.getSlot(3).getHasStack()) {
+            else if(!this.menu.getSlot(3).hasItem()) {
                 anvilInfoTextComponent = null;
             }
             else {
-                if(this.container.useIronInsteadOfXp()) {
+                if(this.menu.useIronInsteadOfXp()) {
                     anvilInfoTextComponent = new TranslationTextComponent("container.reagenchant.anvil.iron_repair_cost", repairCost);
                 }
                 else {
                     anvilInfoTextComponent = new TranslationTextComponent("container.repair.cost", repairCost);
                 }
 
-                if(!this.container.getSlot(3).canTakeStack(this.playerInventory.player)) {
+                if(!this.menu.getSlot(3).mayPickup(this.inventory.player)) {
                     textColor = 16736352;
                 }
             }
 
             if(anvilInfoTextComponent != null) {
-                int posX = this.xSize - 8 - this.font.getStringPropertyWidth(anvilInfoTextComponent) - 2;
-                fill(matrixStack, posX - 2, 67, this.xSize - 8, 79, 1325400064);
-                this.font.drawTextWithShadow(matrixStack, anvilInfoTextComponent, (float) posX, 69.0F, textColor);
+                int posX = this.imageWidth - 8 - this.font.width(anvilInfoTextComponent) - 2;
+                fill(matrixStack, posX - 2, 67, this.imageWidth - 8, 79, 1325400064);
+                this.font.drawShadow(matrixStack, anvilInfoTextComponent, (float) posX, 69.0F, textColor);
             }
         }
 
     }
 
     @Override
-    protected void drawGuiContainerBackgroundLayer(MatrixStack matrixStack, float partialTicks, int mouseX, int mouseY) {
+    protected void renderBg(MatrixStack matrixStack, float partialTicks, int mouseX, int mouseY) {
         RenderSystem.color4f(1.0F, 1.0F, 1.0F, 1.0F);
-        this.minecraft.getTextureManager().bindTexture(CUSTOM_ANVIL_GUI);
-        int posX = (this.width - this.xSize) / 2;
-        int posY = (this.height - this.ySize) / 2;
-        this.blit(matrixStack, posX, posY, 0, 0, this.xSize, this.ySize);
-        this.blit(matrixStack, posX + 59, posY + 20, 0, this.ySize + (this.container.getSlot(0).getHasStack() ? 0 : 16), 110, 16);
+        this.minecraft.getTextureManager().bind(CUSTOM_ANVIL_GUI);
+        int posX = (this.width - this.imageWidth) / 2;
+        int posY = (this.height - this.imageHeight) / 2;
+        this.blit(matrixStack, posX, posY, 0, 0, this.imageWidth, this.imageHeight);
+        this.blit(matrixStack, posX + 59, posY + 20, 0, this.imageHeight + (this.menu.getSlot(0).hasItem() ? 0 : 16), 110, 16);
 
-        if((this.container.getSlot(0).getHasStack() || this.container.getSlot(1).getHasStack() || this.container.getSlot(2).getHasStack()) && !this.container.getSlot(3).getHasStack()) {
-            this.blit(matrixStack, posX + 99, posY + 45, this.xSize, 0, 28, 21);
+        if((this.menu.getSlot(0).hasItem() || this.menu.getSlot(1).hasItem() || this.menu.getSlot(2).hasItem()) && !this.menu.getSlot(3).hasItem()) {
+            this.blit(matrixStack, posX + 99, posY + 45, this.imageWidth, 0, 28, 21);
         }
     }
 
     @Override
-    public void sendAllContents(Container container, NonNullList<ItemStack> stacks) {
-        this.sendSlotContents(container, 0, container.getSlot(0).getStack());
+    public void refreshContainer(Container container, NonNullList<ItemStack> stacks) {
+        this.slotChanged(container, 0, container.getSlot(0).getItem());
     }
 
     @Override
-    public void sendWindowProperty(Container container, int id, int value) {
+    public void setContainerData(Container container, int id, int value) {
     }
 
     @Override
-    public void sendSlotContents(Container container, int slotId, ItemStack stack) {
+    public void slotChanged(Container container, int slotId, ItemStack stack) {
         if(slotId == 0) {
-            this.customNameField.setText(stack.isEmpty() ? "" : stack.getDisplayName().getString());
-            this.customNameField.setEnabled(!stack.isEmpty());
-            this.setListener(this.customNameField);
+            this.customNameField.setValue(stack.isEmpty() ? "" : stack.getHoverName().getString());
+            this.customNameField.setEditable(!stack.isEmpty());
+            this.setFocused(this.customNameField);
         }
     }
 }

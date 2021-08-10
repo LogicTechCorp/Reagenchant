@@ -43,20 +43,20 @@ public class ReagenchantBlocks {
     public static final RegistryObject<Block> CUSTOM_CHIPPED_ANVIL;
     public static final RegistryObject<Block> CUSTOM_DAMAGED_ANVIL;
 
-    public static final RegistryObject<Block> REAGENT_ALTAR = REGISTRY_HELPER.createBlock("reagent_altar", ReagentAltarBlock::new, ItemGroup.DECORATIONS);
+    public static final RegistryObject<Block> REAGENT_ALTAR = REGISTRY_HELPER.createBlock("reagent_altar", ReagentAltarBlock::new, ItemGroup.TAB_DECORATIONS);
 
     static {
         if(!Compatibility.IS_QUARK_ODDITIES_LOADED || !QuarkEvents.matrixEnchantingEnabled || !ReagenchantConfig.COMMON.enableQuarkCompatibility.get()) {
-            REAGENT_ENCHANTING_TABLE = OVERRIDE_HELPER.createBlock("enchanting_table", () -> new ReagentEnchantingTableBlock(AbstractBlock.Properties.from(Blocks.ENCHANTING_TABLE)), ItemGroup.DECORATIONS);
+            REAGENT_ENCHANTING_TABLE = OVERRIDE_HELPER.createBlock("enchanting_table", () -> new ReagentEnchantingTableBlock(AbstractBlock.Properties.copy(Blocks.ENCHANTING_TABLE)), ItemGroup.TAB_DECORATIONS);
         }
         else {
             REAGENT_ENCHANTING_TABLE = RegistryObject.of(Blocks.ENCHANTING_TABLE.getRegistryName(), ForgeRegistries.BLOCKS);
         }
 
         if(!Compatibility.IS_APOTHEOSIS_LOADED) {
-            CUSTOM_ANVIL = OVERRIDE_HELPER.createBlock("anvil", () -> new CustomAnvilBlock(AbstractBlock.Properties.from(Blocks.ANVIL)), ItemGroup.DECORATIONS);
-            CUSTOM_CHIPPED_ANVIL = OVERRIDE_HELPER.createBlock("chipped_anvil", () -> new CustomAnvilBlock(AbstractBlock.Properties.from(Blocks.CHIPPED_ANVIL)), ItemGroup.DECORATIONS);
-            CUSTOM_DAMAGED_ANVIL = OVERRIDE_HELPER.createBlock("damaged_anvil", () -> new CustomAnvilBlock(AbstractBlock.Properties.from(Blocks.DAMAGED_ANVIL)), ItemGroup.DECORATIONS);
+            CUSTOM_ANVIL = OVERRIDE_HELPER.createBlock("anvil", () -> new CustomAnvilBlock(AbstractBlock.Properties.copy(Blocks.ANVIL)), ItemGroup.TAB_DECORATIONS);
+            CUSTOM_CHIPPED_ANVIL = OVERRIDE_HELPER.createBlock("chipped_anvil", () -> new CustomAnvilBlock(AbstractBlock.Properties.copy(Blocks.CHIPPED_ANVIL)), ItemGroup.TAB_DECORATIONS);
+            CUSTOM_DAMAGED_ANVIL = OVERRIDE_HELPER.createBlock("damaged_anvil", () -> new CustomAnvilBlock(AbstractBlock.Properties.copy(Blocks.DAMAGED_ANVIL)), ItemGroup.TAB_DECORATIONS);
         }
         else {
             CUSTOM_ANVIL = RegistryObject.of(Blocks.ANVIL.getRegistryName(), ForgeRegistries.BLOCKS);

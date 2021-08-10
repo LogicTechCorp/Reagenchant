@@ -37,10 +37,10 @@ public class UnbreakableItemStackLootModifier extends LootModifier {
 
     @Override
     protected List<ItemStack> doApply(List<ItemStack> generatedLoot, LootContext context) {
-        ItemStack toolStack = context.get(LootParameters.TOOL);
-        BlockState brokenBlockState = context.get(LootParameters.BLOCK_STATE);
+        ItemStack toolStack = context.getParamOrNull(LootParameters.TOOL);
+        BlockState brokenBlockState = context.getParamOrNull(LootParameters.BLOCK_STATE);
 
-        if(toolStack != null && brokenBlockState != null && UnbreakableItemStackUtil.isBroken(toolStack) && brokenBlockState.getRequiresTool()) {
+        if(toolStack != null && brokenBlockState != null && UnbreakableItemStackUtil.isBroken(toolStack) && brokenBlockState.requiresCorrectToolForDrops()) {
             generatedLoot.clear();
         }
 

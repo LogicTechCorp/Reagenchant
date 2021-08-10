@@ -34,11 +34,11 @@ public class MessageCUpdateItemNamePacket {
     }
 
     public static MessageCUpdateItemNamePacket deserialize(PacketBuffer buffer) {
-        return new MessageCUpdateItemNamePacket(buffer.readString());
+        return new MessageCUpdateItemNamePacket(buffer.readUtf());
     }
 
     public void serialize(PacketBuffer buffer) {
-        buffer.writeString(this.name);
+        buffer.writeUtf(this.name);
     }
 
     public void handle(Supplier<NetworkEvent.Context> contextSupplier) {
@@ -50,7 +50,7 @@ public class MessageCUpdateItemNamePacket {
                 ServerPlayerEntity player = context.getSender();
 
                 if(player != null) {
-                    Container container = player.openContainer;
+                    Container container = player.containerMenu;
 
                     if(container instanceof CustomAnvilContainer) {
                         ((CustomAnvilContainer) container).updateItemName(this.name);

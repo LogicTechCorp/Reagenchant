@@ -33,7 +33,7 @@ import java.util.Random;
 
 public class ItemStackColorUtil {
     private static final Minecraft MINECRAFT = Minecraft.getInstance();
-    private static final BlockModelShapes BLOCK_MODEL_SHAPES = MINECRAFT.getModelManager().getBlockModelShapes();
+    private static final BlockModelShapes BLOCK_MODEL_SHAPES = MINECRAFT.getModelManager().getBlockModelShaper();
     private static final ItemRenderer ITEM_RENDERER = MINECRAFT.getItemRenderer();
     private static final Map<ResourceLocation, float[]> ITEM_COLORS = new HashMap<>();
 
@@ -44,10 +44,10 @@ public class ItemStackColorUtil {
             TextureAtlasSprite sprite;
 
             if(item instanceof BlockItem) {
-                sprite = BLOCK_MODEL_SHAPES.getModel(((BlockItem) item).getBlock().getDefaultState()).getParticleTexture(EmptyModelData.INSTANCE);
+                sprite = BLOCK_MODEL_SHAPES.getBlockModel(((BlockItem) item).getBlock().defaultBlockState()).getParticleTexture(EmptyModelData.INSTANCE);
             }
             else {
-                sprite = ITEM_RENDERER.getItemModelWithOverrides(stack, null, null).getQuads(null, null, random, EmptyModelData.INSTANCE).get(0).getSprite();
+                sprite = ITEM_RENDERER.getModel(stack, null, null).getQuads(null, null, random, EmptyModelData.INSTANCE).get(0).getSprite();
             }
 
             int maxU = sprite.getWidth();
@@ -59,7 +59,7 @@ public class ItemStackColorUtil {
 
             for(int v = 0; v < maxV; v++) {
                 for(int u = 0; u < maxU; u++) {
-                    if(!sprite.isPixelTransparent(0, u, v)) {
+                    if(!sprite.isTransparent(0, u, v)) {
                         int pixelColor = sprite.getPixelRGBA(0, u, v);
                         rComponent += (pixelColor & 0xFF) / 255.0F;
                         gComponent += ((pixelColor >> 8) & 0xFF) / 255.0F;

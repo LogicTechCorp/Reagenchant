@@ -90,8 +90,8 @@ public class Reagenchant {
             ReagenchantRenderTypes.registerRenderLayers();
             ClientRegistry.bindTileEntityRenderer(ReagenchantTileEntityTypes.REAGENT_ENCHANTING_TABLE_TILE_ENTITY.get(), ReagentEnchantingTableTileEntityRenderer::new);
             ClientRegistry.bindTileEntityRenderer(ReagenchantTileEntityTypes.REAGENT_ALTAR_TILE_ENTITY.get(), ReagentAltarTileEntityRenderer::new);
-            ScreenManager.registerFactory(ReagenchantContainers.REAGENT_ENCHANTING_TABLE_CONTAINER.get(), ReagentEnchantingTableScreen::new);
-            ScreenManager.registerFactory(ReagenchantContainers.CUSTOM_ANVIL_CONTAINER.get(), CustomAnvilScreen::new);
+            ScreenManager.register(ReagenchantContainers.REAGENT_ENCHANTING_TABLE_CONTAINER.get(), ReagentEnchantingTableScreen::new);
+            ScreenManager.register(ReagenchantContainers.CUSTOM_ANVIL_CONTAINER.get(), CustomAnvilScreen::new);
         });
     }
 
@@ -109,9 +109,9 @@ public class Reagenchant {
     @SubscribeEvent
     public void onPlayerLoggedIn(PlayerEvent.PlayerLoggedInEvent event) {
         PlayerEntity player = event.getPlayer();
-        World world = player.getEntityWorld();
+        World world = player.getCommandSenderWorld();
 
-        if(!world.isRemote()) {
+        if(!world.isClientSide()) {
             CHANNEL.send(PacketDistributor.PLAYER.with(() -> (ServerPlayerEntity) player), new MessageSUpdateReagentsPacket(REAGENT_MANAGER.getReagents().values()));
         }
     }

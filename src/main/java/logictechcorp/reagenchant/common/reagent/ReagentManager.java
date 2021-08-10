@@ -68,7 +68,7 @@ public class ReagentManager extends JsonReloadListener {
                 IOUtils.closeQuietly(resource);
 
                 if(dynamic.getValue() == null) {
-                    Reagenchant.LOGGER.error("Couldn't load {} reagent config from {} data pack.", resource.getLocation(), resource.getPackName());
+                    Reagenchant.LOGGER.error("Couldn't load {} reagent config from {} data pack.", resource.getLocation(), resource.getSourceName());
                 }
                 else {
                     Item item = ForgeRegistries.ITEMS.getValue(new ResourceLocation(dynamic.get("item").asString("")));

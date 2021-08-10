@@ -23,6 +23,6 @@ import net.minecraft.client.renderer.RenderTypeLookup;
 
 public class ReagenchantRenderTypes {
     public static void registerRenderLayers() {
-        RenderTypeLookup.setRenderLayer(ReagenchantBlocks.REAGENT_ALTAR.get(), RenderType.getCutout());
+        RenderTypeLookup.setRenderLayer(ReagenchantBlocks.REAGENT_ALTAR.get(), RenderType.cutout());
     }
 }

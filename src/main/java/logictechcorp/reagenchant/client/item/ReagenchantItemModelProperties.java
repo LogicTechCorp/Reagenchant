@@ -35,8 +35,8 @@ public class ReagenchantItemModelProperties {
 
     private static void registerBrokenItemProperty() {
         for(Item item : ForgeRegistries.ITEMS) {
-            if(item.isDamageable()) {
-                ItemModelsProperties.registerProperty(item, BROKEN_PROPERTY_KEY, BROKEN_PROPERTY);
+            if(item.canBeDepleted()) {
+                ItemModelsProperties.register(item, BROKEN_PROPERTY_KEY, BROKEN_PROPERTY);
             }
         }
     }

@@ -32,6 +32,6 @@ public class CustomAnvilTileEntity extends InventoryTileEntity {
 
     @Override
     public Container createMenu(int windowId, PlayerInventory playerInventory, PlayerEntity player) {
-        return new CustomAnvilContainer(windowId, playerInventory, IWorldPosCallable.of(this.world, this.pos), this.itemStackHandler);
+        return new CustomAnvilContainer(windowId, playerInventory, IWorldPosCallable.create(this.level, this.worldPosition), this.itemStackHandler);
     }
 }

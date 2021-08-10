@@ -34,6 +34,8 @@ import net.minecraft.world.IBlockReader;
 import net.minecraft.world.World;
 import net.minecraftforge.fml.network.NetworkHooks;
 
+import net.minecraft.block.AbstractBlock.Properties;
+
 public class CustomAnvilBlock extends AnvilBlock {
     public CustomAnvilBlock(Properties properties) {
         super(properties);
@@ -50,33 +52,33 @@ public class CustomAnvilBlock extends AnvilBlock {
     }
 
     @Override
-    public void onBlockPlacedBy(World world, BlockPos pos, BlockState state, LivingEntity placer, ItemStack stack) {
-        if(stack.hasDisplayName()) {
-            TileEntity tileEntity = world.getTileEntity(pos);
+    public void setPlacedBy(World world, BlockPos pos, BlockState state, LivingEntity placer, ItemStack stack) {
+        if(stack.hasCustomHoverName()) {
+            TileEntity tileEntity = world.getBlockEntity(pos);
 
             if(tileEntity instanceof CustomAnvilTileEntity) {
-                ((CustomAnvilTileEntity) tileEntity).setCustomName(stack.getDisplayName());
+                ((CustomAnvilTileEntity) tileEntity).setCustomName(stack.getHoverName());
             }
         }
     }
 
     @Override
-    public void onReplaced(BlockState state, World world, BlockPos pos, BlockState newState, boolean isMoving) {
+    public void onRemove(BlockState state, World world, BlockPos pos, BlockState newState, boolean isMoving) {
         if(!(newState.getBlock() instanceof CustomAnvilBlock)) {
-            TileEntity tileEntity = world.getTileEntity(pos);
+            TileEntity tileEntity = world.getBlockEntity(pos);
 
             if(tileEntity instanceof CustomAnvilTileEntity) {
                 ((CustomAnvilTileEntity) tileEntity).dropContents(world, pos);
             }
 
-            world.removeTileEntity(pos);
+            world.removeBlockEntity(pos);
         }
     }
 
     @Override
-    public ActionResultType onBlockActivated(BlockState state, World world, BlockPos pos, PlayerEntity player, Hand hand, BlockRayTraceResult hit) {
-        if(!world.isRemote) {
-            TileEntity tileEntity = world.getTileEntity(pos);
+    public ActionResultType use(BlockState state, World world, BlockPos pos, PlayerEntity player, Hand hand, BlockRayTraceResult hit) {
+        if(!world.isClientSide) {
+            TileEntity tileEntity = world.getBlockEntity(pos);
 
             if(tileEntity instanceof CustomAnvilTileEntity) {
                 CustomAnvilTileEntity anvil = (CustomAnvilTileEntity) tileEntity;
@@ -86,9 +88,9 @@ public class CustomAnvilBlock extends AnvilBlock {
                 }
             }
 
-            player.addStat(Stats.INTERACT_WITH_ANVIL);
+            player.awardStat(Stats.INTERACT_WITH_ANVIL);
         }
 
-        return ActionResultType.func_233537_a_(world.isRemote);
+        return ActionResultType.sidedSuccess(world.isClientSide);
     }
 }

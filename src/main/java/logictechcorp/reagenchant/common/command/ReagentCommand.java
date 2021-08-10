@@ -65,14 +65,14 @@ public class ReagentCommand {
     private static ArgumentBuilder<CommandSource, ?> registerCreation() {
         return Commands
                 .literal("create")
-                .requires(source -> source.hasPermissionLevel(2))
+                .requires(source -> source.hasPermission(2))
                 .then(Commands.argument("item", ItemArgument.item()).executes(ReagentCommand::createReagent));
     }
 
     private static ArgumentBuilder<CommandSource, ?> registerDefaultAddition() {
         return Commands
                 .literal("addEnchantment")
-                .requires(source -> source.hasPermissionLevel(2))
+                .requires(source -> source.hasPermission(2))
                 .then(Commands.argument("item", ItemArgument.item())
                         .then(Commands.argument("enchantment", EnchantmentArgument.enchantment())
                                 .executes(ReagentCommand::addDefaultToReagent)));
@@ -81,7 +81,7 @@ public class ReagentCommand {
     private static ArgumentBuilder<CommandSource, ?> registerCustomAddition() {
         return Commands
                 .literal("addEnchantment")
-                .requires(source -> source.hasPermissionLevel(2))
+                .requires(source -> source.hasPermission(2))
                 .then(Commands.argument("item", ItemArgument.item())
                         .then(Commands.argument("enchantment", EnchantmentArgument.enchantment())
                                 .then(Commands.argument("minimum enchantment level", IntegerArgumentType.integer(1))
@@ -93,7 +93,7 @@ public class ReagentCommand {
     private static ArgumentBuilder<CommandSource, ?> registerRemoval() {
         return Commands
                 .literal("removeEnchantment")
-                .requires(source -> source.hasPermissionLevel(2))
+                .requires(source -> source.hasPermission(2))
                 .then(Commands.argument("item", ItemArgument.item())
                         .then(Commands.argument("enchantment", EnchantmentArgument.enchantment())
                                 .executes(ReagentCommand::removeFromReagent)));
@@ -102,7 +102,7 @@ public class ReagentCommand {
     private static ArgumentBuilder<CommandSource, ?> registerDeletion() {
         return Commands
                 .literal("delete")
-                .requires(source -> source.hasPermissionLevel(2))
+                .requires(source -> source.hasPermission(2))
                 .then(Commands.argument("item", ItemArgument.item()).executes(ReagentCommand::deleteReagent));
     }
 
@@ -113,10 +113,10 @@ public class ReagentCommand {
         Reagent reagent = Reagenchant.REAGENT_MANAGER.getReagent(item);
 
         if(reagent.isEmpty()) {
-            source.sendFeedback(new TranslationTextComponent("command.reagenchant.reagent.create.success", item.getRegistryName()), true);
+            source.sendSuccess(new TranslationTextComponent("command.reagenchant.reagent.create.success", item.getRegistryName()), true);
         }
         else {
-            source.sendErrorMessage(new TranslationTextComponent("command.reagenchant.reagent.create.override", item.getRegistryName()));
+            source.sendFailure(new TranslationTextComponent("command.reagenchant.reagent.create.override", item.getRegistryName()));
         }
 
         reagent = Reagenchant.REAGENT_MANAGER.createReagent(item);
@@ -136,12 +136,12 @@ public class ReagentCommand {
             Enchantment enchantment = EnchantmentArgument.getEnchantment(context, "enchantment");
 
             if(reagent.isEmpty()) {
-                source.sendErrorMessage(new TranslationTextComponent("command.reagenchant.reagent.add.error", item.getRegistryName()));
+                source.sendFailure(new TranslationTextComponent("command.reagenchant.reagent.add.error", item.getRegistryName()));
                 return CommandCompletion.FAILURE;
             }
 
             reagent.addEnchantment(new ReagentEnchantData(enchantment, enchantment.getMinLevel(), enchantment.getMaxLevel(), 0.5F, 1));
-            source.sendFeedback(new TranslationTextComponent("command.reagenchant.reagent.add.success", enchantment.getRegistryName(), item.getRegistryName()), true);
+            source.sendSuccess(new TranslationTextComponent("command.reagenchant.reagent.add.success", enchantment.getRegistryName(), item.getRegistryName()), true);
             saveReagentFile(server, reagent);
             sendClientSyncPacket(source);
             return CommandCompletion.SUCCESS;
@@ -164,12 +164,12 @@ public class ReagentCommand {
             int reagentCost = IntegerArgumentType.getInteger(context, "reagent cost");
 
             if(reagent.isEmpty()) {
-                source.sendErrorMessage(new TranslationTextComponent("command.reagenchant.reagent.add.error", item.getRegistryName()));
+                source.sendFailure(new TranslationTextComponent("command.reagenchant.reagent.add.error", item.getRegistryName()));
                 return CommandCompletion.FAILURE;
             }
 
             reagent.addEnchantment(new ReagentEnchantData(enchantment, minimumLevel, maximumLevel, enchantmentProbability, reagentCost));
-            source.sendFeedback(new TranslationTextComponent("command.reagenchant.reagent.add.success", enchantment.getRegistryName(), item.getRegistryName()), true);
+            source.sendSuccess(new TranslationTextComponent("command.reagenchant.reagent.add.success", enchantment.getRegistryName(), item.getRegistryName()), true);
             saveReagentFile(server, reagent);
             sendClientSyncPacket(source);
             return CommandCompletion.SUCCESS;
@@ -188,12 +188,12 @@ public class ReagentCommand {
             Reagent reagent = Reagenchant.REAGENT_MANAGER.getReagent(item);
 
             if(reagent.isEmpty()) {
-                source.sendErrorMessage(new TranslationTextComponent("command.reagenchant.reagent.remove.error", item.getRegistryName()));
+                source.sendFailure(new TranslationTextComponent("command.reagenchant.reagent.remove.error", item.getRegistryName()));
                 return CommandCompletion.FAILURE;
             }
 
             reagent.removeEnchantment(enchantment);
-            source.sendFeedback(new TranslationTextComponent("command.reagenchant.reagent.remove.success", enchantment.getRegistryName(), item.getRegistryName()), true);
+            source.sendSuccess(new TranslationTextComponent("command.reagenchant.reagent.remove.success", enchantment.getRegistryName(), item.getRegistryName()), true);
             saveReagentFile(server, reagent);
             sendClientSyncPacket(source);
             return CommandCompletion.SUCCESS;
@@ -209,12 +209,12 @@ public class ReagentCommand {
         Reagent reagent = Reagenchant.REAGENT_MANAGER.getReagent(item);
 
         if(reagent.isEmpty()) {
-            source.sendErrorMessage(new TranslationTextComponent("command.reagenchant.reagent.delete.error", item.getRegistryName()));
+            source.sendFailure(new TranslationTextComponent("command.reagenchant.reagent.delete.error", item.getRegistryName()));
             return CommandCompletion.FAILURE;
         }
 
         Reagenchant.REAGENT_MANAGER.unregisterReagent(reagent);
-        source.sendFeedback(new TranslationTextComponent("command.reagenchant.reagent.delete.success", item.getRegistryName()), true);
+        source.sendSuccess(new TranslationTextComponent("command.reagenchant.reagent.delete.success", item.getRegistryName()), true);
         deleteReagentFile(server, reagent);
         sendClientSyncPacket(source);
         return CommandCompletion.SUCCESS;
@@ -299,7 +299,7 @@ public class ReagentCommand {
     }
 
     private static void saveReagentFile(MinecraftServer server, Reagent reagent) {
-        Path datapackDirectoryPath = server.func_240776_a_(FolderName.DATAPACKS).toAbsolutePath().normalize();
+        Path datapackDirectoryPath = server.getWorldPath(FolderName.DATAPACK_DIR).toAbsolutePath().normalize();
         saveReagentFile(datapackDirectoryPath, "custom_reagent_pack", reagent);
     }
 
@@ -316,13 +316,13 @@ public class ReagentCommand {
     }
 
     private static void deleteReagentFile(MinecraftServer server, Reagent reagent) {
-        Path datapackDirectoryPath = server.func_240776_a_(FolderName.DATAPACKS).toAbsolutePath().normalize();
+        Path datapackDirectoryPath = server.getWorldPath(FolderName.DATAPACK_DIR).toAbsolutePath().normalize();
         deleteReagentFile(datapackDirectoryPath, "custom_reagent_pack", reagent);
     }
 
     private static void sendClientSyncPacket(CommandSource source) {
         try {
-            ServerPlayerEntity player = source.asPlayer();
+            ServerPlayerEntity player = source.getPlayerOrException();
             Reagenchant.CHANNEL.send(PacketDistributor.PLAYER.with(() -> player), new MessageSUpdateReagentsPacket(Reagenchant.REAGENT_MANAGER.getReagents().values()));
         }
         catch(CommandSyntaxException e) {

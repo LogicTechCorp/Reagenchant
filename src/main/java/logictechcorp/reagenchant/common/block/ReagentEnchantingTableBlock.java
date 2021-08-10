@@ -41,35 +41,35 @@ public class ReagentEnchantingTableBlock extends EnchantingTableBlock {
     }
 
     @Override
-    public void onBlockPlacedBy(World world, BlockPos pos, BlockState state, LivingEntity placer, ItemStack stack) {
-        if(stack.hasDisplayName()) {
-            TileEntity tileEntity = world.getTileEntity(pos);
+    public void setPlacedBy(World world, BlockPos pos, BlockState state, LivingEntity placer, ItemStack stack) {
+        if(stack.hasCustomHoverName()) {
+            TileEntity tileEntity = world.getBlockEntity(pos);
 
             if(tileEntity instanceof ReagentEnchantingTableTileEntity) {
-                ((ReagentEnchantingTableTileEntity) tileEntity).setCustomName(stack.getDisplayName());
+                ((ReagentEnchantingTableTileEntity) tileEntity).setCustomName(stack.getHoverName());
             }
         }
     }
 
     @Override
-    public void onReplaced(BlockState state, World world, BlockPos pos, BlockState newState, boolean isMoving) {
-        TileEntity tileEntity = world.getTileEntity(pos);
+    public void onRemove(BlockState state, World world, BlockPos pos, BlockState newState, boolean isMoving) {
+        TileEntity tileEntity = world.getBlockEntity(pos);
 
         if(tileEntity instanceof ReagentEnchantingTableTileEntity) {
             ((ReagentEnchantingTableTileEntity) tileEntity).dropContents(world, pos);
         }
 
-        super.onReplaced(state, world, pos, newState, isMoving);
+        super.onRemove(state, world, pos, newState, isMoving);
     }
 
     @Override
-    public ActionResultType onBlockActivated(BlockState state, World world, BlockPos pos, PlayerEntity player, Hand hand, BlockRayTraceResult rayTraceResult) {
-        if(world.getTileEntity(pos) instanceof EnchantingTableTileEntity) {
-            world.setTileEntity(pos, this.createTileEntity(state, world));
+    public ActionResultType use(BlockState state, World world, BlockPos pos, PlayerEntity player, Hand hand, BlockRayTraceResult rayTraceResult) {
+        if(world.getBlockEntity(pos) instanceof EnchantingTableTileEntity) {
+            world.setBlockEntity(pos, this.createTileEntity(state, world));
         }
 
-        if(!world.isRemote) {
-            TileEntity tileEntity = world.getTileEntity(pos);
+        if(!world.isClientSide) {
+            TileEntity tileEntity = world.getBlockEntity(pos);
 
             if(tileEntity instanceof ReagentEnchantingTableTileEntity) {
                 ReagentEnchantingTableTileEntity reagentEnchantingTable = (ReagentEnchantingTableTileEntity) tileEntity;
@@ -80,7 +80,7 @@ public class ReagentEnchantingTableBlock extends EnchantingTableBlock {
             }
         }
 
-        return ActionResultType.func_233537_a_(world.isRemote);
+        return ActionResultType.sidedSuccess(world.isClientSide);
     }
 
     @Override

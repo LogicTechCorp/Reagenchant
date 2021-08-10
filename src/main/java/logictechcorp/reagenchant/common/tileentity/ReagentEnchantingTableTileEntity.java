@@ -51,11 +51,11 @@ public class ReagentEnchantingTableTileEntity extends InventoryTileEntity implem
     public void tick() {
         this.pageTurningSpeed = this.nextPageTurningSpeed;
         this.pageAngle = this.nextPageAngle;
-        PlayerEntity player = this.world.getClosestPlayer((double) this.pos.getX() + 0.5D, (double) this.pos.getY() + 0.5D, (double) this.pos.getZ() + 0.5D, 3.0D, false);
+        PlayerEntity player = this.level.getNearestPlayer((double) this.worldPosition.getX() + 0.5D, (double) this.worldPosition.getY() + 0.5D, (double) this.worldPosition.getZ() + 0.5D, 3.0D, false);
 
         if(player != null) {
-            double posX = player.getPosX() - ((double) this.pos.getX() + 0.5D);
-            double posZ = player.getPosZ() - ((double) this.pos.getZ() + 0.5D);
+            double posX = player.getX() - ((double) this.worldPosition.getX() + 0.5D);
+            double posZ = player.getZ() - ((double) this.worldPosition.getZ() + 0.5D);
             this.angle = (float) MathHelper.atan2(posZ, posX);
             this.nextPageTurningSpeed += 0.1F;
 
@@ -112,6 +112,6 @@ public class ReagentEnchantingTableTileEntity extends InventoryTileEntity implem
 
     @Override
     public Container createMenu(int windowId, PlayerInventory playerInventory, PlayerEntity player) {
-        return new ReagentEnchantingTableContainer(windowId, playerInventory, IWorldPosCallable.of(this.world, this.pos), this.itemStackHandler);
+        return new ReagentEnchantingTableContainer(windowId, playerInventory, IWorldPosCallable.create(this.level, this.worldPosition), this.itemStackHandler);
     }
 }
