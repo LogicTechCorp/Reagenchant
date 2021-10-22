@@ -65,11 +65,11 @@ public class ReagenchantConfig {
             this.percentOfXpDroppedOnDeath = builder
                     .comment("The percent of experience which should drop on death; Default: 0.5")
                     .translation(createTranslation("common.tweaks.player.percent_of_xp_dropped_on_death"))
-                    .defineInRange("percentOfXpDroppedOnDeath", 0.5, 0.0, 1.0, Double.class);
+                    .defineInRange("percentOfXpDroppedOnDeath", 0.5D, 0.0D, 1.0D, Double.class);
             this.percentOfDroppedXpLost = builder
                     .comment("The percent of experience dropped which should be lost; Default: 0.25")
                     .translation(createTranslation("common.tweaks.player.percent_of_dropped_xp_lost"))
-                    .defineInRange("percentOfDroppedXpLost", 0.25, 0.0, 1.0, Double.class);
+                    .defineInRange("percentOfDroppedXpLost", 0.25D, 0.0D, 1.0D, Double.class);
             builder.pop();
             builder.pop();
             builder.pop();

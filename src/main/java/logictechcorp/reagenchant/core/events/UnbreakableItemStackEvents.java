@@ -48,41 +48,6 @@ import java.util.List;
 @Mod.EventBusSubscriber(modid = Reagenchant.MOD_ID)
 public class UnbreakableItemStackEvents {
     @SubscribeEvent
-    public static void onItemTooltip(ItemTooltipEvent event) {
-        ItemStack stack = event.getItemStack();
-        List<ITextComponent> tooltips = event.getToolTip();
-        CompoundNBT compound = stack.getTag();
-
-        if(compound != null && compound.contains(UnbreakableItemStackUtil.DISABLED_ENCHANTMENTS_KEY)) {
-            for(int tooltipIndex = 0; tooltipIndex < tooltips.size(); tooltipIndex++) {
-                ITextComponent tooltip = tooltips.get(tooltipIndex);
-
-                if(tooltip.getString().isEmpty()) {
-                    ListNBT disabledEnchantments = compound.getList(UnbreakableItemStackUtil.DISABLED_ENCHANTMENTS_KEY, 10);
-
-                    int enchantmentCount = disabledEnchantments.size();
-
-                    for(int tagIndex = 0; tagIndex < enchantmentCount; tagIndex++) {
-                        CompoundNBT enchantmentCompound = disabledEnchantments.getCompound(tagIndex);
-                        Enchantment enchantment = ForgeRegistries.ENCHANTMENTS.getValue(new ResourceLocation(enchantmentCompound.getString("id")));
-                        int index = ((tooltipIndex + tagIndex));
-
-                        if(enchantment != null) {
-                            tooltips.add(index, ((IFormattableTextComponent) enchantment.getFullname(enchantmentCompound.getInt("lvl"))).withStyle(TextFormatting.GOLD));
-                        }
-
-                        if((tagIndex + 1) == enchantmentCount) {
-                            tooltips.add((index + 1), new TranslationTextComponent("tooltip." + Reagenchant.MOD_ID + ".item.broken").withStyle(TextFormatting.GOLD));
-                        }
-                    }
-
-                    break;
-                }
-            }
-        }
-    }
-
-    @SubscribeEvent
     public static void onAttackEntityEvent(AttackEntityEvent event) {
         PlayerEntity player = event.getPlayer();
         ItemStack stack = player.getMainHandItem();
